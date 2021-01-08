@@ -183,10 +183,10 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         else:
             dep_path="dep"
 
-    options.softwares["psiclass"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass/psiclass"
-    options.softwares["junc"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass/junc"
-    options.softwares["subexon-info"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass/subexon-info"
-    options.softwares["addXS"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass/addXS"
+    options.softwares["psiclass"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass"
+    options.softwares["junc"]=dep_path+"/psiclass_terminal_exon_length_modified//junc"
+    options.softwares["subexon-info"]=dep_path+"/psiclass_terminal_exon_length_modified//subexon-info"
+    options.softwares["addXS"]=dep_path+"/psiclass_terminal_exon_length_modified//addXS"
     options.softwares["fastq-sample"]=dep_path+"/fastq-tools-0.8/scripts/fastq-sample"
     options.softwares["download_and_dump_fastq_from_SRA"]=dep_path+"/../utils/downloadAndDumpFastqFromSRA.py"
     options.softwares["transferGenomicNucleotideCountsToTranscriptome"]=dep_path+"/../scripts/transferGenomicNucleotideCountsToTranscriptome.py"

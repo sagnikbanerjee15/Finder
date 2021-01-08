@@ -1,0 +1,24 @@
+<p><b>Instructions</b></p>
+<p>Please download the files listed above by clicking on the links.</p>
+<p>All files and folders - except for log and error file - are compressed. To unpack <kbd>*.tar.gz</kbd> archives, e.g. on linux type<br><br>
+<kbd>tar -xzvf *.tar.gz</kbd><br><br>
+For unpacking <kbd>*.gz</kbd> files, e.g. on linux type<br><br>
+<kbd>gunzip *.gz.</kbd></p>
+<p>Further instructions about results contents are given at the <a href="http://bioinf.uni-greifswald.de/webaugustus/trainingtutorial.gsp#results">Training Tutorial</a> and the <a href="http://bioinf.uni-greifswald.de/webaugustus/predictiontutorial.gsp#results">Prediction Tutorial</a>.
+
+			</div>
+			</div>
+		</div>
+		<footer class="footer footer--padding-bottom">
+			<div class="footer-column footer-column--dark">
+				<div class="footer__content-wrapper">
+					<div class="footer-bottom">
+						<div class="footer-bottom__copyright">
+							<p>&copy;&nbsp; Universität Greifswald</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>

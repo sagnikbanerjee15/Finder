@@ -1,0 +1,25 @@
+include ../common.mk
+#XINC = -I$(MYSQLINC)
+
+O = BedFile.o utils.o
+
+%.o: %.cpp
+	${CC} ${COPT} ${CFLAGS} ${LOWELAB_DEFS} ${HG_DEFS} ${HG_WARN} ${HG_INC} ${XINC} -o $@ -c $<
+
+lib:$(MACHTYPE)/czlib.a
+
+$(MACHTYPE)/czlib.a: $(O) $(MACHTYPE)
+	ar rcus $@ $(O)
+
+$(MACHTYPE):
+	mkdir $(MACHTYPE)
+
+test:
+	cd tests && ${MAKE} test
+
+cleanlocal:
+	rm -rf ${O} $(MACHTYPE)
+
+clean:cleanlocal
+
+#cd tests && ${MAKE} clean

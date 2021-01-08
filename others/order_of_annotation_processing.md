@@ -1,0 +1,84 @@
+
+																					Aligned data
+																							|
+																							|
+																							|runPsiCLASSMaxTerminalExonLength()
+																							|
+																							|
+																				 combined.gtf
+																							|
+																							|
+																							|findTranscriptsInEachSampleNotReportedInCombinedAnnotations()
+																							|
+																							|
+													combined_missed_transcripts_added.gtf
+																							|
+																							|
+																							|removeRedundantTranscripts()
+																							|
+																							|
+												 combined_redundant_transcripts_removed.gtf
+																							|
+																							|
+																							|fixTranscriptsConnectingTwoTranscripts()
+																							|
+																							|
+													combined_transcripts_connecting_two_transcripts.gtf
+																							|
+																							|
+																							|fixOverlappingAndMergedTranscripts()
+																							|
+																							|
+																		combined_cov_opp_split.gtf
+																							|
+																							|
+																							|removeRedundantTranscripts()
+																							|
+																							|
+														 combined_cov_opp_split_redundancy_removed.gtf
+																							|
+																							|
+																							|mergeCloselySpacedTranscripts()
+																							|
+																							|
+																 combined_merged_transcripts.gtf
+																							|
+																							|
+																							|splitTranscriptsWithQuestionableSpliceJunctions()
+																							|
+																							|
+												 combined_split_transcripts_with_bad_SJ.gtf
+																							|
+																							|
+																							|removeRedundantTranscripts()
+																							|
+																							|
+						     combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf
+																							|
+																							|
+																							|predict_CDS
+																							|
+																							|
+																		combined_with_CDS.gtf
+																							|
+																							|
+																							|removeSpuriousTranscriptsBasedOnCDS()
+																							|
+																							|				
+																			 combined_with_CDS_high_conf.gtf,combined_with_CDS_low_conf.gtf
+																							|
+																							|addBRAKERPredictions()
+																							|
+																							|
+													 combined_with_CDS_BRAKER_appended_high_conf.gtf,
+													           FINDER_BRAKER_PROT.gtf,
+												 combined_with_CDS_high_and_low_confidence_merged.gtf
+
+
+​																							
+​																							
+​																							
+​																					
+
+
+

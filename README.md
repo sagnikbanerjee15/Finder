@@ -24,7 +24,7 @@ conda env create -f environment.yml # This will create an environment named find
 conda activate finder
 echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the bashrc file
 export PATH=\$PATH:$(pwd)
-cd src
+cd dep
 ```
 
 Initially we intended to 

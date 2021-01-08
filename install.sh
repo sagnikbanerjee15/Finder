@@ -1,28 +1,28 @@
 #!/bin/bash
 
 # Install OLego
-cd $PWD/src/olego
+cd $PWD/dep/olego
 make
 chmod -R a+x *
 cd ../..
 
 # Install PsiCLASS
-cd $PWD/src/assemblies_psiclass_modified
+cd $PWD/dep/assemblies_psiclass_modified
 make 
 chmod -R a+x *
 cd ../..
 
 # Install AUGUSTUS
-cd $PWD/src/Augustus
+cd $PWD/dep/Augustus
 chmod -R a+x *
 cd ../..
 
 # Install BRAKER2
-cd $PWD/src/BRAKER
+cd $PWD/dep/BRAKER
 chmod -R a+x *
 cd ../..
 
 # Install GUSHR
-cd $PWD/src/GUSHR
+cd $PWD/dep/GUSHR
 chmod -R a+x *
 cd ../..

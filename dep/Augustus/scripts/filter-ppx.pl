@@ -1,7 +1,6 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 
 use strict;
-use warnings;
 my $mode = 0;
 my $pending = "";
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # Author: Mario Stanke
 # Contact: mario.stanke@uni-greifswald.de

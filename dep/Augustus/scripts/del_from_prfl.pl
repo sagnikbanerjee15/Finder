@@ -1,6 +1,5 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 use strict;
-use warnings;
 
 die "Need two arguments" unless @ARGV >= 2;
 

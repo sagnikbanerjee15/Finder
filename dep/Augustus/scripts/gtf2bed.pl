@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # convert gtf/gff/gff3 to BED format
 # 23.9.2016 Stefanie Koenig

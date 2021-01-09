@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 ################################################################################
 #
 #   Name:    msa2prfl.pl
@@ -33,7 +33,6 @@
 #   --info=s               provide a text file containing the meta information
 
 use strict;
-use warnings;
 use Getopt::Long;
 use List::Util qw/sum min max/;
 

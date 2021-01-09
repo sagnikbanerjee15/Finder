@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # Katharina J. Hoff, Dec 3rd 2012
 #

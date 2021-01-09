@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # run sim4 once for each line in the matchlist file 
 # 

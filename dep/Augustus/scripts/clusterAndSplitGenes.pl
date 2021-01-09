@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # read in a file with inter-gene dependencies and
 # create clusters without inter-cluster dependencies

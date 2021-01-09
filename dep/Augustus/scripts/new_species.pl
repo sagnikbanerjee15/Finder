@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # This script is used by the braker.pl pipeline.
 # Please be extremely careful when changing this script because the braker.pl

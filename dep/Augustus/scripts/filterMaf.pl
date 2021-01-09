@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # filter blocks from a MAF alignment that intersect with a given genomic interval
 # or filter sequences for a given subset of species
 # Stefanie Koenig 23.06.2013

@@ -195,8 +195,6 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     options.softwares["olegoindex"]=dep_path+"/olego/olegoindex"
     options.softwares["mergePEsam.pl"]=dep_path+"/olego/mergePEsam.pl"
     options.softwares["xa2multi"]=dep_path+"/olego/xa2multi.pl"
-    options.softwares["augustus_main_dir"]=dep_path+"/Augustus"
-    options.softwares["braker"]=dep_path+"/BRAKER/scripts/braker.pl"
     options.softwares["gmst"]=dep_path+"/gmst.pl"
     options.softwares["prodigal"]=dep_path+"/Prodigal/prodigal"
     options.softwares["canon-gff3"]=dep_path+"/canon-gff3"
@@ -205,13 +203,17 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     ################################################################################
     # Set paths for BRAKER run
     ################################################################################
+    options.softwares["augustus_main_dir"]=dep_path+"/Augustus"
+    options.softwares["braker"]=dep_path+"/BRAKER/scripts/braker.pl"
     options.softwares["GENEMARK_PATH"]=dep_path+"/gmes_linux_64"
     options.softwares["AUGUSTUS_CONFIG_PATH"]=options.output_braker+"/Augustus/config"
     options.softwares["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"
     options.softwares["AUGUSTUS_SCRIPTS_PATH"]=options.output_braker+"/Augustus/scripts"
     options.softwares["GUSHR_PATH"]=dep_path+"/GUSHR"
     os.environ["PATH"] = os.environ["PATH"]+":/"+dep_path
-    
+    os.environ["AUGUSTUS_CONFIG_PATH"] = options.output_braker+"/Augustus/config"
+    os.environ["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"
+    os.environ["AUGUSTUS_SCRIPTS_PATH"]=options.output_braker+"/Augustus/scripts"
     with logging_mutex:
         logger_proxy.info("Software paths have been set")
     
@@ -904,7 +906,7 @@ def main():
     configureAndRunBRAKER(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info("BRAKER run completed")
-    
+    return
     findCDS(options)
     with logging_mutex:
         logger_proxy.info("Finding CDS completed")

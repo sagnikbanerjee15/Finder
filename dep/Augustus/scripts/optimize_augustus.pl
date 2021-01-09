@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 ##################################################################################
 # optimize_augustus
@@ -65,7 +65,7 @@ sub got_interrupt_signal {
     if ( !$cgp ) {
         if ( $cmdpars{'opt_trans_matrix'} ne '' ) {
             if ( -s $cmdpars{'opt_trans_matrix'} . ".curopt" ) {
-                systemordie(
+                system(
                     "cp $cmdpars{'opt_trans_matrix'}.curopt $cmdpars{'opt_trans_matrix'}"
                 );
                 print STDERR
@@ -391,7 +391,7 @@ if ( !$got_ForkManager && $cmdpars{'cpus'} > 1 ) {
 ##############################################################
 
 my $optdir = "tmp_opt_$cmdpars{'species'}";
-systemordie("rm -rf $optdir;mkdir $optdir");
+system("rm -rf $optdir;mkdir $optdir");
 opendir( TMPDIR, $optdir ) or die("Could not open $optdir");
 
 # only needed in cgp
@@ -467,19 +467,20 @@ if ( !$cgp ) {
     # create training sets for cross-validation (parallel version)
     if ( $cmdpars{'cpus'} > 1 ) {
         if ( $cmdpars{'cpus'} > $cmdpars{"kfold"} ) {
-            print "WARNING: parameter --cpus has value $cmdpars{'cpus'} but parameter --kfold has value $cmdpars{'kfold'}. --kfold limits the number of --cpus that can be used. Will use only $cmdpars{'kfold'} CPUs. Please abort and restart with --kfold=$cmdpars{'cpus'} to really use that number of CPUs!\n";
+            print STDERR
+                "WARNING: parameter --cpus has value $cmdpars{'cpus'} but parameter --kfold has value $cmdpars{'kfold'}. --kfold limits the number of --cpus that can be used. Will not use only $cmdpars{'kfold'} CPUs. Please abort and restart with --kfold=$cmdpars{'cpus'} to really use that number of CPUs!\n";
         }
         for ( my $k = 1; $k <= $cmdpars{"kfold"}; $k++ ) {
 
             # make the temporary training and testing files
-            systemordie("rm -f $optdir/curtrain-$k");
+            system("rm -f $optdir/curtrain-$k");
             for ( my $m = 1; $m <= $cmdpars{"kfold"}; $m++ ) {
                 if ( $m != $k ) {
-                    systemordie("cat $optdir/bucket$m.gb >> $optdir/curtrain-$k");
+                    system("cat $optdir/bucket$m.gb >> $optdir/curtrain-$k");
                 }
             }
             if ( $cmdpars{'onlytrain'} ne '' ) {
-                systemordie("cat $cmdpars{'onlytrain'} >> $optdir/curtrain-$k");
+                system("cat $cmdpars{'onlytrain'} >> $optdir/curtrain-$k");
             }
         }
     }
@@ -657,7 +658,7 @@ if ( $cmdpars{'opt_trans_matrix'} eq '' ) {
     }
     if ( $y < 20 ) {
         close(ORIG);
-        systemordie("cp $species_cfg_filename $species_cfg_filename.orig$y");
+        system("cp $species_cfg_filename $species_cfg_filename.orig$y");
     }
     else {
         die("Too many $species_cfg_filename.orig copies. Please delete some."
@@ -711,7 +712,7 @@ else {
     }
     if ( $y < 40 ) {
         close(ORIG);
-        systemordie(
+        system(
             "cp $cmdpars{'opt_trans_matrix'} $cmdpars{'opt_trans_matrix'}.orig$y"
         );
     }
@@ -983,7 +984,7 @@ if ( $cmdpars{'noTrainPars'} eq '' ) {
 
     # delete the temporary *pbl files
     for ( my $k = 1; $k <= $cmdpars{"kfold"}; $k++ ) {
-        systemordie(
+        system(
             "rm -f $speciesdir/exon-tmp$k.pbl $speciesdir/intron-tmp$k.pbl $speciesdir/igenic-tmp$k.pbl $speciesdir/utr-tmp$k.pbl"
         );
     }
@@ -993,16 +994,16 @@ if ( $cmdpars{'noTrainPars'} eq '' ) {
         for ( my $k = 1; $k <= $cmdpars{"kfold"}; $k++ ) {
 
             # delete the temporary training files
-            systemordie("rm -f $optdir/curtrain-$k $optdir/predictions-$k.txt");
+            system("rm -f $optdir/curtrain-$k $optdir/predictions-$k.txt");
         }
     }
     print "Making final training with the optimized parameters.\n";
 
     # make the joint training file (train.gb and onlytrain.gb)
-    systemordie("rm -f $optdir/curtrain $optdir/curtest");
-    systemordie("cp $cmdpars{'train.gb'} $optdir/curtrain");
+    system("rm -f $optdir/curtrain $optdir/curtest");
+    system("cp $cmdpars{'train.gb'} $optdir/curtrain");
     if ( $cmdpars{'onlytrain'} ne '' ) {
-        systemordie("cat $cmdpars{'onlytrain'} >> $optdir/curtrain");
+        system("cat $cmdpars{'onlytrain'} >> $optdir/curtrain");
     }
     my $cmd = "";
     if ( $cmdpars{'nice'} == 1 ) {
@@ -1011,8 +1012,8 @@ if ( $cmdpars{'noTrainPars'} eq '' ) {
     $cmd
         .= "etraining --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $be_silent $optdir/curtrain $pars $modelrestrict";
     print "$cmd\n";
-    systemordie($cmd);
-    systemordie("rm -f $optdir/curtrain");
+    system($cmd);
+    system("rm -f $optdir/curtrain");
 }
 
 #######################################################################################
@@ -1020,7 +1021,7 @@ if ( $cmdpars{'noTrainPars'} eq '' ) {
 #######################################################################################
 
 if($cmdpars{'cleanup'}==1){
-  systemordie ("rm -rf $optdir");
+  system ("rm -rf $optdir");
 }
 
 
@@ -1069,15 +1070,15 @@ sub evalsnsp {
             for ( my $k = 1; $k <= $cmdpars{"kfold"}; $k++ ) {
 
                 # make the temporary training and testing files
-                systemordie("rm -f $optdir/curtrain $optdir/curtest");
-                systemordie("cp $optdir/bucket$k.gb $optdir/curtest");
+                system("rm -f $optdir/curtrain $optdir/curtest");
+                system("cp $optdir/bucket$k.gb $optdir/curtest");
                 for ( my $m = 1; $m <= $cmdpars{"kfold"}; $m++ ) {
                     if ( $m != $k ) {
-                        systemordie("cat $optdir/bucket$m.gb >> $optdir/curtrain");
+                        system("cat $optdir/bucket$m.gb >> $optdir/curtrain");
                     }
                 }
                 if ( $cmdpars{'onlytrain'} ne '' ) {
-                    systemordie("cat $cmdpars{'onlytrain'} >> $optdir/curtrain");
+                    system("cat $cmdpars{'onlytrain'} >> $optdir/curtrain");
                 }
                 if ( $cmdpars{'noTrainPars'} eq '' )
                 { # no need to retrain if the trans matrix is optimized or this option is otherwise explicitly set.
@@ -1087,7 +1088,7 @@ sub evalsnsp {
                     }
                     $cmd
                         .= "$cmdpars{'aug_exec_dir'}etraining --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $argument $pars $be_silent $modelrestrict $optdir/curtrain";
-                    systemordie($cmd);
+                    system($cmd);
                 }
                 my $cmd = "";
                 if ( $cmdpars{'nice'} == 1 ) {
@@ -1095,7 +1096,7 @@ sub evalsnsp {
                 }
                 $cmd
                     .= "$cmdpars{'aug_exec_dir'}augustus --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $argument $pars $optdir/curtest > $optdir/predictions.txt";
-                systemordie($cmd);
+                system($cmd);
 
                 open( PRED, "<$optdir/predictions.txt" );
                 while (<PRED>) {
@@ -1170,7 +1171,7 @@ sub evalsnsp {
                     $cmd
                         .= "$cmdpars{'aug_exec_dir'}etraining --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $argument $pars "
                         . "$be_silent $modelrestrict $pbloutfiles $optdir/curtrain-$k";
-                    systemordie($cmd);
+                    system($cmd);
 
                     #   unlink $optdir/curtrain-$k;
                 }
@@ -1184,7 +1185,7 @@ sub evalsnsp {
                 }
                 $cmd
                     .= "$cmdpars{'aug_exec_dir'}augustus --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $argument $pars $pblinfiles $optdir/bucket$k.gb > $optdir/predictions-$k.txt";
-                systemordie($cmd);
+                system($cmd);
                 print "$k ";
 
                 $pm->finish;    # terminate the child process
@@ -1256,14 +1257,14 @@ sub evalsnsp {
             my $pid = $pm->start and next;
 
             # this part is done in parallel by the child process
-            systemordie("rm -rf $optdir/pred$k; mkdir $optdir/pred$k");
+            system("rm -rf $optdir/pred$k; mkdir $optdir/pred$k");
             my $cmd = "";
             if ( $cmdpars{'nice'} == 1 ) {
                 $cmd .= "nice ";
             }
             $cmd
                 .= "$cmdpars{'aug_exec_dir'}augustus --species=$cmdpars{'species'} --AUGUSTUS_CONFIG_PATH=$configdir $argument $pars --alnfile=$optdir/splitMaf/$k.maf --/CompPred/outdir=$optdir/pred$k >$optdir/pred$k/aug.out";
-            systemordie($cmd);
+            system($cmd);
             print "$k ";
             $pm->finish;    # terminate the child process
         }
@@ -2039,7 +2040,7 @@ sub splitMaf {
 
     # directory of alignment chunks
     my $mafDir = "$optdir/splitMaf";
-    systemordie("rm -rf $mafDir; mkdir $mafDir");
+    system("rm -rf $mafDir; mkdir $mafDir");
 
     open( MAF, <$cmdpars{"alnfile"}> )
         or die("Could not open $cmdpars{'alnfile'} for reading: $!");
@@ -2049,7 +2050,7 @@ sub splitMaf {
 
     if ( $cmdpars{'cpus'} <= 1 )
     {   # in the serial case just make a temporary copy of the whole alignment
-        systemordie("cp $cmdpars{'alnfile'} $mafDir/$cmdpars{'kfold'}.maf");
+        system("cp $cmdpars{'alnfile'} $mafDir/$cmdpars{'kfold'}.maf");
     }
     else {
 
@@ -2119,7 +2120,7 @@ sub evalCGP {
 
 # temporary directory that contains the prediction and the annotation split by seq
     my $gffDir = "$optdir/tempGFF";
-    systemordie("rm -rf $gffDir; mkdir $gffDir");
+    system("rm -rf $gffDir; mkdir $gffDir");
 
     my @intervals = ();    # hash of genomic intervals
     my %seqlist   = ();    # hash of sequences (only keys, no values)
@@ -2202,25 +2203,25 @@ sub evalCGP {
 
 # filter prediction for duplicates and merge genes (uses external tool 'joingenes')
     if ($joingenes) {
-        systemordie("mv $optdir/pred.gtf $optdir/pred.unfiltered.gtf");
+        system("mv $optdir/pred.gtf $optdir/pred.unfiltered.gtf");
         my $cmd = "";
         if ( $cmdpars{'nice'} == 1 ) {
             $cmd .= "nice ";
         }
         $cmd
             .= "$cmdpars{'jg_exec_dir'}joingenes -g $optdir/pred.unfiltered.gtf -o $optdir/pred.gtf";
-        systemordie($cmd);
+        system($cmd);
     }
 
 # split annotation and prediction file by seqs and prepare
 # list files that contain the directories of the GTF files being compared (required by eval)
-    systemordie("rm -f $optdir/annotation_list");
-    systemordie("rm -f $optdir/prediction_list");
+    system("rm -f $optdir/annotation_list");
+    system("rm -f $optdir/prediction_list");
     foreach my $seq ( keys %seqlist ) {
-        systemordie("echo '$gffDir/$seq.anno.gtf' >> $optdir/annotation_list");
-        systemordie("echo '$gffDir/$seq.pred.gtf' >> $optdir/prediction_list");
-        systemordie("grep \"^$seq\\b\" $optdir/pred.gtf > $gffDir/$seq.pred.gtf");
-        systemordie("grep \"^$seq\\b\" $optdir/anno.gtf > $gffDir/$seq.anno.gtf");
+        system("echo '$gffDir/$seq.anno.gtf' >> $optdir/annotation_list");
+        system("echo '$gffDir/$seq.pred.gtf' >> $optdir/prediction_list");
+        system("grep \"^$seq\\b\" $optdir/pred.gtf > $gffDir/$seq.pred.gtf");
+        system("grep \"^$seq\\b\" $optdir/anno.gtf > $gffDir/$seq.anno.gtf");
     }
 
     # call evaluate_gtf
@@ -2267,9 +2268,4 @@ sub evalCGP {
         );
     }
     return ( $cbsn, $cbsp, $cesn, $cesp, $cgsn, $cgsp, -1, -1 );
-}
-
-sub systemordie {
-    my $cmdString = shift;
-    system($cmdString)==0 or die ("failed to execute: $cmdString\n");
 }

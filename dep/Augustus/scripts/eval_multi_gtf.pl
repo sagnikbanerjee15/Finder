@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # compute the accuracy values of a set of predictions
 # against a set of annotations

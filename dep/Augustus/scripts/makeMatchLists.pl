@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # make for each matching est contig a list of matching genomic contigs in the same line
 #

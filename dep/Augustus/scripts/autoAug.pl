@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 
 ##########################################################################################################################
@@ -11,7 +11,6 @@
 #                                                                                                                        #
 ##########################################################################################################################
 
-use warnings;
 use Getopt::Long;
 use Cwd;
 
@@ -23,7 +22,7 @@ BEGIN {
     our $directory = dirname($0);
 } 
 use lib $directory;
-use helpMod qw(find checkFile check_fasta_headers relToAbs uptodate);
+use helpMod qw(find checkFile relToAbs uptodate);
 use Term::ANSIColor qw(:constants);
 use DBI;
 use strict;
@@ -37,22 +36,21 @@ my $species;                          # species name
 my $hints;                            # hints file name
 my $havehints=0;                      # have hints at all or not?
 my $estali;                           # est file for make UTR-Training
-my $positionWD=cwd();                 # working superdirectory where program is called from
+my $positionWD=cwd();                 # workding superdirectory where program is called from
 my $pasa='';                          # switch it on to create training set, est set, hints file with PASA
-my $pasapolyAhints;                   # use PASA Poly A hints as hints for the prediction
+my $pasapolyAhints;                   # use pasa Poly A hints as hints for the prediction
 my $fasta_cdna;                       # fasta file for PASA
 my $verbose=2;                        # verbose level
-my $webaugustus=0;                    # run in WebAUGUSTUS - adapt error messages to webservice or standalone
-my $singleCPU=0;                      # run everything sequentially without interruption
-my $cpus=1;                           # n is the number of CPUs to use (default: 1)
+my $singleCPU=0;                      # run everything sequentially whithout interruption
 my $maxIntronLen = 100000;            # maximal length of an intron, used by PASA and BLAT
 my $noninteractive;                   # parameter for autoAugPred.pl
 my $cname="fe";                       # parameter for autoAugPred.pl:cluster name
+my $nodeNum=20;                       # parameter for autoAugPred.pl
 my $optrounds=1;                      # optimization rounds
 my $useGMAPforPASA=0;                 # use GMAP instead of BLAT (only for PASA)
 my $useexisting=0;                    # start with and change existing config, parameter and result files
 my $utr=1;                            # default value: with "utr" if cDNA exists
-my $flanking_DNA='';                  # length of flanking DNA, default value is min{ave. gene length, 10000}
+my $flanking_DNA='';                  # length of flanking DNA, defaul value is min{ave. gene length, 10000}
 my $help=0;                           # print usage
 my $useexistingopt = "";
 my $autoAugDir_abinitio;
@@ -75,12 +73,12 @@ my $string;          		      # temp string for perl-scripts, which will be calle
 
 my $usage =  <<_EOH_;
 
-Function: train AUGUSTUS and run AUGUSTUS completely and automatically
+Function: train AUGUSTUS and run AUGUSTUS completly and automatically
 
 Usage:
 
 autoAug.pl [OPTIONS] --species=sname --genome=genome.fa --cdna=cdna.fa --trainingset=genesfile
-autoAug.pl [OPTIONS] --species=sname --genome=genome.fa --cdna=cdna.fa --pasa --useGMAPforPASA
+autoAug.pl [OPTIONS] --species=sname --genome=genome.fa --cdna=cdna.fa --pasa
 autoAug.pl [OPTIONS] --species=sname --genome=genome.fa --trainingset=genesfile [--estali=cdna.psl] [--hints=hints.gff]
 
 --genome=fasta                      fasta file with DNA sequences for training
@@ -95,14 +93,12 @@ autoAug.pl [OPTIONS] --species=sname --genome=genome.fa --trainingset=genesfile 
 options:
 --useexisting                       use and change the present config and parameter files if they exist for 'species'
 --verbose                           print more status info. Cumulative option, e.g. use -v -v -v to make this script very verbose
---webaugustus                       run in WebAUGUSTUS - adapt error messages to this webservice
 --noutr                             do not train and predict UTRs.
 --workingdir=/path/to/wd/           In the working directory results and temporary files are stored.
                                     Default: current working directory
 --singleCPU                         run the complete program sequentially instead of parallel execution of jobs on a cluster
---cpus=n                            n is the number of CPUs to use (default: 1), if cpus > 1 install pblat (parallelized blat) for better performance
 --noninteractive                    bypass all manual interaction when using a SGE cluster
---cname=yourClusterName             cluster name, only use it when "noninteractive" default:fe
+--cname=yourClusterName             cluster name, only use it wenn "noninteractive" default:fe
 --index=i                           step index, default:0 
 --optrounds=n                       optimization rounds - each meta parameter is optimized this often (default 1)
 --maxIntronLen=n                    maximal length of an intron as used by PASA and BLAT, not by AUGUSTUS (default 100000)
@@ -122,10 +118,8 @@ GetOptions( 'genome=s' => \$genome,
 	    'workingdir=s' => \$positionWD,
 	    'pasa!' => \$pasa,
 	    'singleCPU!' => \$singleCPU,
-	    'cpus=i' => \$cpus,
 	    'cdna=s' => \$fasta_cdna,
 	    'verbose+' => \$verbose,
-	    'webaugustus!' => \$webaugustus,
 	    'noninteractive' => \$noninteractive,
 	    'cname=s' => \$cname,
 	    'index=i' => \$index,
@@ -164,10 +158,6 @@ my $rootDir="$positionWD/autoAug";
 die ("$rootDir already exists. Reuse with --useexisting or use another directory with --workingdir=dir")
     if (!$useexisting && -d $rootDir);
 
-$cmdString = "augustus --version 2>&1";
-system("$cmdString")==0 or die("Augustus is not installed - failed to execute: $cmdString!\n");
-print "\n";
-
 if (! -d $rootDir) {
     mkdir "$rootDir" or die ("Could not create directory $rootDir\n");
 }
@@ -189,7 +179,7 @@ die("$AUGUSTUS_CONFIG_PATH/species/$species already exists. Choose another speci
 $genome = checkFile($genome, "fasta", $usage);
 check_fasta_headers($genome);
 
-# show error information and stop the program if the specified $positionWD couldn't be found
+# show error information and stop the program if the specified $positionWD coudn't be found
 # overwrite $positionWD with absolute path
 $positionWD=relToAbs($positionWD);         
 die("Error: Did not find the directory $positionWD! Please specify a valid one for \"workingdir\"! \n") unless (-d $positionWD);
@@ -206,10 +196,7 @@ $verboseString='-v -v -v' if ($verbose>2);
 
 $havehints = (defined($hints) || defined($fasta_cdna) || defined($estali));
 $fasta_cdna = checkFile($fasta_cdna, "fasta", $usage) if (defined($fasta_cdna));
-if (defined($fasta_cdna)) {
-    print "1 Checking fasta headers in file $fasta_cdna...\n" if ($verbose>=1);
-    check_fasta_headers($fasta_cdna);
-}
+check_fasta_headers($fasta_cdna) if (defined($fasta_cdna));
 $trainingset = checkFile($trainingset,"training genes", $usage) if($index==0 && defined($trainingset));
 $hints = checkFile($hints,"hints", $usage) if (defined($hints));
 $estali = checkFile($estali,"EST alignment", $usage) if (defined($estali));
@@ -299,15 +286,15 @@ sub training_set_dirs {
 				 . cwd() .".\n");
     }
     if (! -d "seq"){
-	print "3 mkdir $rootDir/seq\n" if ($verbose>=3);
+	print "3 mkdir seq\n" if ($verbose>=3);
 	mkdir "seq" or die("\nError: Could not create directory seq.\n");
     }
     if (! -d "hints"){
-	print "3 mkdir $rootDir/hints\n" if ($verbose>=3);
+	print "3 mkdir hints\n" if ($verbose>=3);
 	mkdir "hints" or die("\nError: Could not create directory hints.\n");
     }
     if (! -d "cdna"){
-	print "3 mkdir $rootDir/cdna\n" if ($verbose>=3);
+	print "3 mkdir cdna\n" if ($verbose>=3);
 	mkdir "cdna" or die("\nError: Could not create directory cdna.\n");
     }
     
@@ -318,11 +305,11 @@ sub training_set_dirs {
     
 
     for(("gbrowse","pasa","training")){
-	mkdir "$_" if (! -d $_);
-	print "3 mkdir $trainDir/$_\n" if ($verbose>=3);
+	mkdir "$_"; 
+	print "3 mkdir $_\n" if ($verbose>=3);
     }
  
-    print "2 All necessary directories have been created under $trainDir.\n" if ($verbose>=2);
+    print "2 All necessary directories have been created unter $trainDir.\n" if ($verbose>=2);
 
     # build symbolic link for $genome
 
@@ -364,7 +351,7 @@ sub DropDataBase {
 
 sub construct_training_set{
 
-    print "\n\n1 ####### Step 0 at ".(scalar localtime()).": Creating training set with genes using PASA #######\n\n" if ($verbose>=1);
+    print "\n\n1 ####### Step 0: Creating training set with genes using PASA #######\n\n" if ($verbose>=1);
 
     my $PASAHOME=$ENV{'PASAHOME'};
     die("Error: The environment variable PASAHOME is undefined.\n") unless $PASAHOME;
@@ -376,15 +363,15 @@ sub construct_training_set{
 
     if (!uptodate([$fasta_cdna], ["transcripts.fasta"])){
 	print "3 ln -fs $fasta_cdna transcripts.fasta\n" if ($verbose>=3);
-	system("ln -fs $fasta_cdna transcripts.fasta")==0 or die ("failed to execute: ln -fs $fasta_cdna transcripts.fasta\n");
+	system("ln -fs $fasta_cdna transcripts.fasta")==0 or die ("failed to execute: $!\n");
     }
 
     if (!uptodate(["transcripts.fasta"], ["transcripts.fasta.clean"])){
 	count_fasta_entries("$trainDir/pasa/transcripts.fasta");
-	$perlCmdString="seqclean transcripts.fasta 1>seqclean.stdout 2>seqclean.stderr";
-	print "2 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
-	system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
-	print " Finished! ".(scalar localtime())."\n" if ($verbose>=2);
+	$perlCmdString="perl $PASAHOME/seqclean/seqclean/seqclean transcripts.fasta 1>seqclean.stdout 2>seqclean.stderr";
+	print "2 Running $perlCmdString ..." if ($verbose>=2);
+	system("$perlCmdString")==0 or die ("failed to execute: $!\n");
+	print " Finished!\n" if ($verbose>=2);
     } else {
 	print ("2 Skipping seqclean. Using existing transcripts.fasta.clean.\n") if ($verbose>=2);
     }
@@ -402,9 +389,7 @@ sub construct_training_set{
 	open(CONFIG, "alignAssembly.config") or die ("Cannot open file alignAssembly.config!\n");
 	open(TEMP, ">temp") or die("\nCannot open file temp\n");
 	while(<CONFIG>){
-	    s/MYSQLDB=<__MYSQLDB__>/MYSQLDB=$pasaDBname/;    # the database name used in old PASA versions
-	    s/DATABASE=<__DATABASE__>/DATABASE=$pasaDBname/; # the database name used in newer PASA versions
-	    s/^DATABASE=(.*)$/DATABASE=$1\nMYSQLDB=$1/;      # the renaming wasn't carried out in all PASA scripts, so provide both versions
+	    s/<__MYSQLDB__>/$pasaDBname/;
 	    s/<__MAX_INTRON_LENGTH__>/$maxIntronLen/;
 	    s/<__MIN_PERCENT_ALIGNED__>/0.8/;
 	    s/<__MIN_AVG_PER_ID__>/0.9/;
@@ -415,7 +400,7 @@ sub construct_training_set{
   
 	$cmdString="rm alignAssembly.config; mv temp alignAssembly.config; chmod a+x alignAssembly.config";
 	print "3 $cmdString\n" if ($verbose>=3);
-	system("$cmdString")==0 or die ("failed to execute: $cmdString\n");
+	system("$cmdString")==0 or die ("failed to execute: $!\n");
 	print "3 Adjusted alignAssembly.config\n" if ($verbose>=3); 
     } else {
 	print ("2 Using existing alignAssembly.config.\n") if ($verbose>=3);
@@ -424,31 +409,30 @@ sub construct_training_set{
     # executing the Alignment Assembly
 
     if (!uptodate([$genome_clean, "alignAssembly.config", "transcripts.fasta", "transcripts.fasta.clean"],
-		  ["$pasaDBname.assemblies.fasta.transdecoder.genome.gff3", "pasa_asmbls_to_training_set.stdout"])){
+		  ["trainingSetCandidates.gff", "pasa_asmbls_to_training_set.stdout"])){
 	$cmdString="ln -fs $genome_clean genome.fasta";
 	print "3 $cmdString\n" if ($verbose>=3);
-	system("$cmdString")==0 or die("\nfailed to execute $cmdString\n");
+	system("$cmdString")==0 or die("\nfailed to execute $!\n");
 	
-	my $gmapoption = "blat";
-	$gmapoption = "gmap" if ($useGMAPforPASA);
+	my $gmapoption = "";
+	$gmapoption = "--USE_GMAP" if ($useGMAPforPASA);
 	
 	print "3 Reading MySQL variables from $PASAHOME/pasa_conf/\n" if ($verbose>=3);
-	open(my $config_fh, "<", "$PASAHOME/pasa_conf/conf.txt") or die("\nCould not open $PASAHOME/pasa_conf/conf.txt!\n");
+	open(CONFIG, "$PASAHOME/pasa_conf/conf.txt") or die("\nCould not open $PASAHOME/pasa_conf/conf.txt!\n");
 	my $MYSQLSERVER;
 	my $MYSQL_RO_USER;
 	my $MYSQL_RO_PASSWORD;
 	my $MYSQL_RW_USER;
 	my $MYSQL_RW_PASSWORD;
-	while(my $line = <$config_fh>){
-	    next if ($line =~ /^\s*#/); # discard comments
-	    $MYSQLSERVER=$1       if ($line =~ /MYSQLSERVER=(.*)/);
-	    $MYSQL_RO_USER=$1     if ($line =~ /MYSQL_RO_USER=(.*)/);
-	    $MYSQL_RO_PASSWORD=$1 if ($line =~ /MYSQL_RO_PASSWORD=(.*)/);
-	    $MYSQL_RW_USER=$1     if ($line =~ /MYSQL_RW_USER=(.*)/);
-	    $MYSQL_RW_PASSWORD=$1 if ($line =~ /MYSQL_RW_PASSWORD=(.*)/);
+	while(<CONFIG>){
+	    $MYSQLSERVER=$1       if /MYSQLSERVER=(.*)/;
+	    $MYSQL_RO_USER=$1     if /MYSQL_RO_USER=(.*)/;
+	    $MYSQL_RO_PASSWORD=$1 if /MYSQL_RO_PASSWORD=(.*)/;
+            $MYSQL_RW_USER=$1      if /MYSQL_RW_USER=(.*)/;
+            $MYSQL_RW_PASSWORD=$1 if /MYSQL_RW_PASSWORD=(.*)/;
 	    
 	}
-	close($config_fh);
+	close(CONFIG);
 	print "0 WARNING: MYSQL_RO_PASSWORD is empty!\n" if (! $MYSQL_RO_PASSWORD);
 	
 	my $dbh;
@@ -456,75 +440,31 @@ sub construct_training_set{
 	    &DropDataBase("$MYSQLSERVER","$pasaDBname","$MYSQL_RW_USER","$MYSQL_RW_PASSWORD",\$dbh);
         }
 
-	if (! -e "$PASAHOME/Launch_PASA_pipeline.pl"){
-	    die("Error: Script Launch_PASA_pipeline.pl not found. Ensure that this script exists in PASAHOME folder: $PASAHOME.\n");
-	}
-	$perlCmdString = "perl $PASAHOME/Launch_PASA_pipeline.pl "
-	    ."-c alignAssembly.config -C -R -g $genome_clean "
-	    ."-t transcripts.fasta.clean -T -u transcripts.fasta --ALIGNERS $gmapoption --CPU $cpus "
-	    ."1>Launch_PASA_pipeline.stdout 2>Launch_PASA_pipeline.stderr";
+	$perlCmdString="perl $PASAHOME/scripts/Launch_PASA_pipeline.pl -c alignAssembly.config -C -R -g $genome_clean "
+	    ."-t transcripts.fasta.clean -T -u transcripts.fasta $gmapoption 1>Launch_PASA_pipeline.stdout 2>Launch_PASA_pipeline.stderr";
 	
+	print "2 Executing the Alignment Assembly: $perlCmdString ..." if ($verbose>=2);
+	print "2 A test output...\n";
 	my $abortString;
 	$abortString = "\nFailed to execute, possible reasons could be:\n";
-	$abortString.= "1. Fasta headers in cDNA or genome file were not unique";
-	$abortString.= " (the sequence name up to the first space).\n";
-	$abortString.= "2. Fasta headers in cDNA file were too long";
-	$abortString.= " (max 90 characters)(the sequence name up to the first space).\n";
-	$abortString.= "3. Fasta headers in cDNA file contains square brackets, commas or other non-letter or non-number characters.";
-	$abortString.= " (in sequence name up to the first space).\n";
-	if (!$webaugustus) {
-		$abortString.= "4. There is already a database named \"$pasaDBname\" on your mysql host.\n";
-		$abortString.= "5. The software \"slclust\" is not installed correctly, try to install it";
-		$abortString.= " again (see the details in the PASA documentation).\n";
-		$abortString.= "Inspect $trainDir/pasa/Launch_PASA_pipeline.stderr for PASA error messages.\n";	
-	}
+	$abortString.= "1. There is already a database named \"$pasaDBname\" in your mysql host.\n";
+	$abortString.= "2. The software \"slclust\" is not installed correctly, try to install it";
+	$abortString.= " again (see the details in the PASA documentation).\n";
+        $abortString.= "3. The fasta headers in cDNA or genome file were not unique.\n";
+	$abortString.= "Inspect $trainDir/pasa/Launch_PASA_pipeline.stderr for PASA error messages.\n";
 	
-	print "2 Executing the Alignment Assembly: \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
 	system("$perlCmdString")==0 or die ("$abortString");
-	print " Finished ".(scalar localtime())."\n" if ($verbose>=2);
+	print " Finished\n" if ($verbose>=2);
   	
 
-    $perlCmdString="perl $PASAHOME/scripts/pasa_asmbls_to_training_set.dbi "
-        ."--pasa_transcripts_fasta $pasaDBname.assemblies.fasta "
-        ."--pasa_transcripts_gff3 $pasaDBname.pasa_assemblies.gff3 "
-        ."1>pasa_asmbls_to_training_set.stdout 2>pasa_asmbls_to_training_set.stderr";
-    
-    print "2 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
-    
-    if (system("$perlCmdString") != 0) {
-        # check if it is an error like here: https://github.com/TransDecoder/TransDecoder/issues/71 and try to circumvent it
-        if (! -e "pasa_asmbls_to_training_set.stderr") { # check if error file exists
-            print "\n2 file pasa_asmbls_to_training_set.stderr doesn't exists.\n" if ($verbose>=2);
-            die (" failed to execute: $perlCmdString\n");
-        }
-        open CHK_ARRAY, "pasa_asmbls_to_training_set.stderr"; # check if a TransDecoder.Predict error occured
-        my @chk_array = <CHK_ARRAY>;
-        close CHK_ARRAY;
-        if (grep(/^Error.*TransDecoder\.Predict.*/,@chk_array) eq 0) {
-            print "\n2 This is not a TransDecoder.Predict Error\n" if ($verbose>=2);
-            die (" failed to execute: $perlCmdString\n");
-        }
-        print "\n2 failed to execute: $perlCmdString\n" if ($verbose>=2);
-        print "2 Try pasa asmbls to training set without refinement - see https://github.com/TransDecoder/TransDecoder/issues/71\n" if ($verbose>=2);
-        if (! -e "$PASAHOME/scripts/pasa_asmbls_to_training_set_no_refine_starts.dbi") {
-            my $sedCmdString = "sed 's#\\(.*TransDecoder\\.Predict.*\\)#    \$transdecoder_params \\.= \" --no_refine_starts \";\\n\\1#g' $PASAHOME/scripts/pasa_asmbls_to_training_set.dbi > $PASAHOME/scripts/pasa_asmbls_to_training_set_no_refine_starts.dbi";
-            print "2 Create asmbl script without refinement: $sedCmdString\n" if ($verbose>=2);
-            system($sedCmdString);
-            if (! -e "$PASAHOME/scripts/pasa_asmbls_to_training_set_no_refine_starts.dbi") {
-                print "2 Could not create script \"$PASAHOME/scripts/pasa_asmbls_to_training_set_no_refine_starts.dbi\"\n" if ($verbose>=2);
-                die (" failed to execute: $perlCmdString\n");
-            }
-        }
         
-        $perlCmdString="perl $PASAHOME/scripts/pasa_asmbls_to_training_set_no_refine_starts.dbi "
-            ."--pasa_transcripts_fasta $pasaDBname.assemblies.fasta "
-            ."--pasa_transcripts_gff3 $pasaDBname.pasa_assemblies.gff3 "
-            ."1>pasa_asmbls_to_training_set_no_refine_starts.stdout 2>pasa_asmbls_to_training_set_no_refine_starts.stderr";
-        
-        print "2 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
-        system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
-    }
-    print " Finished ".(scalar localtime())."\n" if ($verbose>=2);
+
+	$perlCmdString="perl $PASAHOME/scripts/pasa_asmbls_to_training_set.dbi -M \"$pasaDBname:$MYSQLSERVER\" -p "
+	    ."\"$MYSQL_RO_USER:$MYSQL_RO_PASSWORD\" -g $genome_clean 1>pasa_asmbls_to_training_set.stdout 2>pasa_asmbls_to_training_set.stderr";
+	
+	print "2 Running $perlCmdString ..." if ($verbose>=2);
+	system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
+	print " Finished\n" if ($verbose>=2);
 	
 	print ("2 Cleaning up after PASA ...\n") if ($verbose>=2);
 	my @filesToDelete=("output.assembly_building.out" ,
@@ -536,79 +476,85 @@ sub construct_training_set{
 			   "output.subclusters.out");
 	foreach my $file (@filesToDelete) {         
 	    $perlCmdString="rm -rf $file";
-	    print "3 Deleting $file\n" if ($verbose>=3);
+	    print "3 Deleting $file" if ($verbose>=3);
 	    system("$perlCmdString");
 	}
     #dropping pasa database 
     &DropDataBase("$MYSQLSERVER","$pasaDBname","$MYSQL_RW_USER","$MYSQL_RW_PASSWORD",\$dbh);
     } else {
- 	print ("2 Skipping PASA training set creation. Using existing $pasaDBname.assemblies.fasta.transdecoder.genome.gff3.\n") if ($verbose>=2);
+ 	print ("2 Skipping PASA training set creation. Using existing trainingSetCandidates.gff.\n") if ($verbose>=2);
     }
     
     # find complete genes in candidate training file
-    if (!uptodate(["$pasaDBname.assemblies.fasta.transdecoder.genome.gff3"], ["trainingSetComplete.gff"])){
+    if (!uptodate((["trainingSetCandidates.gff"] or ["trainingSetCandidates.gff3"]), ["trainingSetComplete.gff"])){
 	print "3 cd ../training\n" if ($verbose>=3);
 	chdir "../training" or die ("Could not change directory to training!\n");
-	$cmdString = "grep complete ../pasa/$pasaDBname.assemblies.fasta.transdecoder.cds | perl -pe ".'\'s/>(\S+).*/$1\$/\' | perl -pe \'s#\\.#\\\\.#g\' 1> pasa.complete.lst';
-	# lines in file pasa.complete.lst are later used as regex in grep - so all metacharachters have to be escaped (currently only for done for dots as PASA uses no other metacharachters)
-	print "3 $cmdString\n" if ($verbose>=3);
-	system("$cmdString")==0 or die("\nfailed to execute $cmdString\n");
+	# old PASA version (at least before January 2011, probably older) produce different output files than new PASA version:
+	if(-e "../pasa/trainingSetCandidates.fasta"){
+		$cmdString = 'grep complete ../pasa/trainingSetCandidates.fasta | perl -pe \'s/>(\S+).*/$1\$/\'';
+	}else{
+		$cmdString = 'grep complete ../pasa/trainingSetCandidates.cds | perl -pe \'s/>(\S+).*/$1\$/\'';
+	}
+	print "3 $cmdString 1> pasa.complete.lst\n" if ($verbose>=3);
+	system("$cmdString 1> pasa.complete.lst")==0 or die("\nfailed to execute $!\n");
 	if (! -e "pasa.complete.lst" || -z "pasa.complete.lst"){
             die ("PASA has not constructed any complete training gene. Training aborted because of insufficient data.\n");
         }
-
-	# $cmdString="grep -f pasa.complete.lst ../pasa/$pasaDBname.assemblies.fasta.transdecoder.genome.gff3 >trainingSetComplete.temp.gff";
-	# replaced by this much faster code:
-	$cmdString="split -l 100 pasa.complete.lst pasa.complete.lst.split. ;"
-            ."for FILE in pasa.complete.lst.split.* ; do grep -f \"\$FILE\" ../pasa/$pasaDBname.assemblies.fasta.transdecoder.genome.gff3 >> trainingSetComplete.temp.gff; done ; "
-            ."rm -f pasa.complete.lst.split.*";
-	print "2 Running \"$cmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
-	system("$cmdString")==0 or die("\nfailed to execute $cmdString\n");
-	print " Finished! ".(scalar localtime())."\n" if ($verbose>=2);
+	# old PASA version (at least before January 2011, probably older) produce different output files than new PASA version:
+	if(-e "../pasa/trainingSetCandidates.gff"){
+		$cmdString="grep -f pasa.complete.lst ../pasa/trainingSetCandidates.gff >trainingSetComplete.temp.gff";
+	}else{
+		$cmdString="grep -f pasa.complete.lst ../pasa/trainingSetCandidates.gff3 >trainingSetComplete.temp.gff";
+	}
+	print "2 Running \"$cmdString\" ..." if ($verbose>=2);
+	system("$cmdString")==0 or die("\nfailed to execute $!\n");
+	print " Finished!\n" if ($verbose>=2);
 	
 	# sort trainingSetComplete.temp.gff for gff2gbSmallDNA.pl later
 	
 	$cmdString='cat trainingSetComplete.temp.gff | perl -pe \'s/\t\S*(asmbl_\d+).*/\t$1/\' | sort '
 	    .'-n -k 4 | sort -s -k 9 | sort -s -k 1,1 > trainingSetComplete.gff';
     
-	print "2 Running \"$cmdString\" ".(scalar localtime())." ..." if ($verbose >=2);
+	print "2 Running \"$cmdString\" ..." if ($verbose >=2);
 	system("$cmdString")==0 or die("\nfailed to execute $cmdString\n");
-	print " Finished! ".(scalar localtime())."\n" if ($verbose >=2);
+	print " Finished!\n" if ($verbose >=2);
     }
 
-    # calculate the average gene length
-    my $file_fh;
-    open($file_fh, "<", "../pasa/$pasaDBname.assemblies.fasta.transdecoder.genome.gff3") or die("\nCould not open ../pasa/$pasaDBname.assemblies.fasta.transdecoder.genome.gff3\n");
+    # calculate the a average gene length
+    if(-e "../pasa/trainingSetCandidates.gff"){
+    	open(FILE, "../pasa/trainingSetCandidates.gff") or die("\nCould not open ../pasa/trainingSetCandidates.gff\n");
+    }else{
+	open(FILE, "../pasa/trainingSetCandidates.gff3") or die("\nCould not open ../pasa/trainingSetCandidates.gff\n");
+    }
     my $sum=0;
     my $n=0;
-    while(my $line = <$file_fh>){
-        if($line =~ /\tgene\t/){
-            my @fields = split(/\t/, $line);
-            my $len=$fields[4]-$fields[3]+1;
-            $sum+=$len;
-            $n++;
-        }
+    while(<FILE>){
+	if(/\tgene\t/){
+	    split;
+	    my $len=$_[4]-$_[3]+1;
+	    $sum+=$len;
+	    $n++;
+	}
     }
-    close($file_fh);
     print "1 Average gene length in the training set is " . sprintf ("%.2f", ($sum/$n)) . "\n" if ($verbose >=1);
     
     # set flanking DNA
 
-    $flanking_DNA = int($sum/$n);
+    my $flanking_DNA = int($sum/$n);
     $flanking_DNA = 10000 if ($flanking_DNA > 10000);
     $flanking_DNA = 1000 if ($flanking_DNA < 1000);
     print "2 The length of flanking DNA is set as $flanking_DNA accordingly.\n" if ($verbose>=2);
 
     # convert file format from gff to gb
 
-    $string=find("gff2gbSmallDNA.pl");
+    my $string=find("gff2gbSmallDNA.pl");
     print "3 Found script $string.\n" if ($verbose>=3);
     
     $perlCmdString="perl $string trainingSetComplete.gff $genome_clean $flanking_DNA "
     ."trainingSetComplete.gb 1>gff2gbSmallDNA.stdout 2>gff2gbSmallDNA.stderr";
     
     print "3 $perlCmdString\n" if ($verbose>=3);
-    system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
+    system("$perlCmdString")==0 or die ("failed to execute: $!\n");
     
     # let etraining find prolematic genbank entries
     
@@ -622,19 +568,16 @@ sub construct_training_set{
   
     print "2 Now trying to find out whether the CDS in the training set contain or exclude the stop codon.\n" if ($verbose >=2);
     my $genericPath="$AUGUSTUS_CONFIG_PATH/species/generic";
-    my $genericPathTrain="$AUGUSTUS_CONFIG_PATH/species/${species}_generic";
-    $cmdString = "cp -r $genericPath $genericPathTrain";
-    print "3 $cmdString\n" if ($verbose>=3);
-    system("$cmdString")==0 or die ("failed to execute: $cmdString\n");
+    chdir "$genericPath" or die ("Could not change directory to $scriptPath\n");
+    print "3 cd $genericPath\n" if ($verbose>=3);
 
-    chdir "$genericPathTrain" or die ("Could not change directory to $genericPathTrain\n");
-    print "3 cd $genericPathTrain\n" if ($verbose>=3);
-
-    $cmdString='cat generic_parameters.cfg | perl -pe \'s/(stopCodonExcludedFromCDS ).*/$1true /\' > '."${species}_generic_parameters.cfg";
+    $cmdString="cat generic_parameters.cfg | perl -pe 's/(stopCodonExcludedFromCDS )(\s+) /$1true /' > temp_1";
+    system("$cmdString")==0 or die ("failed to execute: $!\n");
     print "3 $cmdString\n" if ($verbose>=3);
-    system("$cmdString")==0 or die ("failed to execute: $cmdString\n");
     
-    print "3 Set value of \"stopCodonExcludedFromCDS\" in ${species}_generic_parameters.cfg to \"true\"\n" if ($verbose>=3);
+    system("mv temp_1 generic_parameters.cfg")==0 or die("\nfailed to execute: $!\n");
+    print "3 mv temp_1 generic_parameters.cfg\n" if ($verbose>=3);
+    print "3 Set value of \"stopCodonExcludedFromCDS\" in generic_parameters.cfg to \"true\"\n" if ($verbose>=3);
     
     # first try with etraining
   #  print "3 mv $trainDir/pasa/trainingSetComplete.gb $trainDir/training/trainingSetComplete.gb\n";   
@@ -642,10 +585,10 @@ sub construct_training_set{
    # system("$cmdString")==0 or die("\nfailed to move trainingSetComplete.gb to $trainDir/training\n");
     print "3 cd $trainDir/training\n" if ($verbose>=3);
     chdir "$trainDir/training" or die ("Could not change directory to $trainDir/training\n");
-    $cmdString="etraining --species=${species}_generic trainingSetComplete.gb 1>train.out 2>train.err";
-    print "3 Running \"$cmdString\" ".(scalar localtime())." ... " if ($verbose>=3);
-    system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>=3); 
+    $cmdString="etraining --species=generic trainingSetComplete.gb 1>train.out 2>train.err";
+    print "3 Running \"$cmdString\" ... " if ($verbose>=3);
+    system("$cmdString")==0 or die("\nfailed to execute: $!\n");
+    print " Finished!\n" if ($verbose>=3); 
     print "3 train.out and train.err have been made under $trainDir/training.\n" if ($verbose>=3);
     
     # set "stopCodonExcludedFromCDS" to false and run etraining again if necessary
@@ -654,35 +597,29 @@ sub construct_training_set{
     print "3 Error rate caused by \"exon doesn't end in stop codon\" is $err_rate\n" if ($verbose>=3);
     if($err_rate>=0.5){
 	print "3 The appropriate value for \"stopCodonExcludedFromCDS\" seems to be \"false\".\n" if ($verbose>=3);
-        chdir "$genericPathTrain" or die ("Can not chdir to $genericPathTrain.\n");
-        system('cat generic_parameters.cfg | perl -pe \'s/(stopCodonExcludedFromCDS ).*/$1false /\' > '."${species}_generic_parameters.cfg")==0 or die ("failed to execute: $!\n");
-        print "3 Set value of \"stopCodonExcludedFromCDS\" in ${species}_generic_parameters.cfg to \"false\"\n" if ($verbose>=3);
-        print "3 Try etraining again: \"etraining --species=${species}_generic training.gb.train >train.out \" ..." if ($verbose>=3);
+        chdir "$scriptPath" or die ("Can not chdir to $scriptPath.\n");
+        system("cat generic_parameters.cfg | perl -pe 's/(stopCodonExcludedFromCDS )(\s+) /$1false /' > temp_1")==0 or die ("failed to execute: $!\n");
+        system("mv temp_1 generic_parameters.cfg")==0 or die("\nfailed to execute: $!\n");
+        print "3 Setted value of \"stopCodonExcludedFromCDS\" in generic_parameters.cfg to \"false\"\n" if ($verbose>=3);
+        print "3 Try etraining again: etraining --species=$species training.gb.train >train.out ..." if ($verbose>=3);
         chdir "$trainDir/training/" or die ("Can not change directory to $trainDir/training.");
-        $cmdString="etraining --species=${species}_generic trainingSetComplete.gb 1>train.out 2>train.err";
-        print "3 Running \"$cmdString\" ".(scalar localtime())."... " if ($verbose>=3);
-        system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
-        print " Finished! ".(scalar localtime())."\n" if ($verbose>=3);
+        system("etraining --species=generic trainingSetComplete.gb 1>train.out 2>train.err")==0 or die("\nfailed to execute: $!\n");
+        print " Finished!\n" if ($verbose>=3);
         print "3 train.out and train.err have been made again under $trainDir/training.\n" if ($verbose>=3);
 	print "2 Stop codons seem to be contained by CDS. Setting stopCodonExcludedFromCDS to false\n" if ($verbose>=2);
     }
     else{
 	print "2 Stop codons seem to be exluded from CDS. Setting stopCodonExcludedFromCDS to true\n" if ($verbose>=2); 
     }
-		
-    $cmdString = "rm -rf $genericPathTrain";
-    print "3 $cmdString\n" if ($verbose>=3);
-    system("$cmdString")==0 or die ("failed to execute: $cmdString\n");
 
     print "1 Now filtering problematic genes from training set...\n" if ($verbose>=1);
 
     # extract badlist
-    $perlCmdString='cat train.err | perl -ne \'print "$1\n" if /in sequence (\S+):/\' > badlist';
-    print "3 Running \"$perlCmdString\" ...\n" if ($verbose>=3);
-    system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
+    print '3 cat train.err | perl -ne \'print \"'."$1".'\n\" if /in sequence (\S+):/\' > badlist' if ($verbose>=3);
+    system("cat train.err | perl -ne 'print \"$1\n\" if /in sequence (\S+):/' > badlist")==0 or die ("failed to execute: $!\n");
 
     # check whether only a small fraction of all entries created a problem, if >10%, output a warning
-    my $bad_num=`wc -l < badlist`;
+    my $bad_num=`wc -l badlist`;
     $bad_num*=1;
     print "3 The number of all entries that created a problem is $bad_num\n" if ($verbose>=3);
     my $frac=$bad_num/$num_TSC;
@@ -694,11 +631,12 @@ sub construct_training_set{
     $string=find("filterGenes.pl");
     print "3 Found script $string.\n" if ($verbose>=3);
     $perlCmdString="perl $string badlist trainingSetComplete.gb > training.gb";
-    print "3 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=3);
+    print "3 Running $perlCmdString ..." if ($verbose>=3);
     system("$perlCmdString")==0 or die("\nfailed to execute: $perlCmdString!\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>=3);
+    print " Finished!\n" if ($verbose>=3);
 
-    print "\n1 ####### Finished step 0 at ".(scalar localtime()).": All files are stored in $trainDir #######\n\n" if ($verbose>=1);
+    print "\n1 ####### Finished step 0 at " .(scalar localtime()) .
+	". All files are stored in $trainDir #######\n" if ($verbose>=1);
 }
 
 
@@ -708,15 +646,14 @@ sub prepare_genome{
     chdir "$rootDir/seq" or die ("Could not change directory to ../seq\n");
     my $string=find("summarizeACGTcontent.pl");
     $perlCmdString="perl $string $rootDir/seq/genome_clean.fa > genome.summary";
-    print "3 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=3);
+    print "3 Running $perlCmdString ..." if ($verbose>=3);
     system("$perlCmdString")==0 or die("\nfailed to execute: $perlCmdString!\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>=3);
-
+    
     # create contigs gbrowse file
     $cmdString='cat genome.summary | grep "bases." | perl -pe \'s/(\d+)\sbases.\s+(\S*) BASE.*/$2\tassembly\tcontig\t1\t$1\t.\t.\t.\tContig $2/\' > contigs.gff';
-    print "3 Running \"$cmdString\" ".(scalar localtime())." ..." if ($verbose>=3);
+    print "3 Running $cmdString ..." if ($verbose>=3);
     system("$cmdString")==0 or die("\nfailed to execute: $cmdString!\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>=3);
+    print " Finished!\n" if ($verbose>=3);
 }
 
 sub alignments_and_hints{
@@ -732,19 +669,13 @@ sub alignments_and_hints{
     # maxIntron=5000 to be determined
     if (!uptodate(["../seq/genome_clean.fa", "cdna.fa"], ["cdna.psl"])){
 	print "1 Aligning cDNA to genome with BLAT...\n" if ($verbose>=1); 
-	if ($cpus > 1 && check_command_exists("pblat")) {
-		$cmdString="pblat -threads=$cpus";
-	}
-	else {
-		$cmdString="blat";
-	}	
-	$cmdString.=" -noHead  -minIdentity=80 -maxIntron=$maxIntronLen ../seq/genome_clean.fa cdna.fa cdna.psl 1>blat.stdout 2>blat.stderr";
-	print "3 Running \"$cmdString\" ".(scalar localtime())." ..." if ($verbose>=3);
+	$cmdString="blat -noHead  -minIdentity=80 -maxIntron=$maxIntronLen ../seq/genome_clean.fa cdna.fa cdna.psl 1>blat.stdout 2>blat.stderr"; 
+	print "3 $cmdString ..." if ($verbose>=3);
 	
 	my $abortString = "\nProgram aborted. BLAT threw an error message.\nPossibly \"BLAT\" is not installed or not in your PATH or your genome or cDNA file contained non-unique fasta headers.\n";  
 	
 	system("$cmdString")==0 or die("$abortString");
-	print "Finished! ".(scalar localtime())."\n" if ($verbose>=3);
+	print "Finished!\n" if ($verbose>=3);
 
 	if($verbose>=2){
 	    open(BLAT, "blat.stdout") or die ("Cannot open blat.stdout!\n");
@@ -768,21 +699,21 @@ sub alignments_and_hints{
 	system("ln -s cdna.psl cdna.f.psl");
     }
     # create gbrowse files
-    $string=find("blat2gbrowse.pl");
+    my $string=find("blat2gbrowse.pl");
     print "3 Found script $string.\n" if ($verbose>=3);
     $perlCmdString="perl $string --source=CDNA cdna.f.psl cdna.gbrowse";
-    print "3 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>3);
+    print "3 Running $perlCmdString ..." if ($verbose>3);
     system("$perlCmdString")==0 or die("\nFailed to execute: $perlCmdString!\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>3);
+    print " Finished!\n" if ($verbose>3);
     
     # create hints
-    print "1 Creating hints from cDNA alignments ...\n" if ($verbose>=1);
+    print "1 Creating hints from cDNA alignments....\n" if ($verbose>=1);
     chdir "../hints" or die("\nCould not change directory to ../hints\n");
     $string=find("blat2hints.pl");
     $perlCmdString="perl $string --in=../cdna/cdna.f.psl --out=hints.E.gff --minintronlen=35 --trunkSS 1>blat2hints.stdout 2>blat2hints.stderr";
-    print "2 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
+    print "2 Running $perlCmdString ..." if ($verbose>=2);
     system("$perlCmdString")==0 or die("\nfailed to execute: $perlCmdString!\n");
-    print " Finished! ".(scalar localtime())."\n" if ($verbose>=2);
+    print " Finished!\n" if ($verbose>=2);
     
     if ($pasapolyAhints) {
       chdir "../trainingSet" or die ("\nCould not change directory to ../\n");
@@ -791,9 +722,9 @@ sub alignments_and_hints{
         print "2 Converting $pasapolyAfile into a hintfile\n" if ($verbose>=2);
         $string=find("pasapolyA2hints.pl");
 	$perlCmdString="perl $string $pasapolyAfile > pasa/output.polyAsites.gff";
-        print "2 Running \"$perlCmdString\" ".(scalar localtime())." ..." if ($verbose>=2);
+        print "2 Running $perlCmdString ..." if ($verbose>=2);
 	system("$perlCmdString")==0 or die("\nfailed to execute: $perlCmdString!\n");
-	print " Finished! ".(scalar localtime())."\n" if ($verbose>=2);
+	print " Finished!\n" if ($verbose>=2);
 	my $pasapolyAhintfile=checkFile("pasa/output.polyAsites.gff");
 	if (defined $pasapolyAhintfile) {
           print "2 Appending PASA-polyA-hint file to the cDNA hint file\n";
@@ -815,16 +746,17 @@ sub alignments_and_hints{
 
 sub autoTrain_no_utr{
     
-    print "\n1 ####### Step 1 at ".(scalar localtime()).": Training AUGUSTUS (no UTR models) #######\n" if ($verbose>=1);
+    print "\n1 ####### Step 1: Training AUGUSTUS (no UTR models) #######\n" if ($verbose>=1);
     
     $trainingset   =   checkFile($trainingset, "training", $usage);
 
     # run autoAugTrain.pl
-    $perlCmdString="perl $scriptPath/autoAugTrain.pl --cpus=$cpus -t=$trainingset -s=$species $useexistingopt -g=$genome_clean -w=$rootDir $verboseString --opt=$optrounds";
+    $perlCmdString="perl $scriptPath/autoAugTrain.pl -t=$trainingset -s=$species $useexistingopt -g=$genome_clean -w=$rootDir $verboseString --opt=$optrounds";
     print "\n2 $perlCmdString\n" if ($verbose>=2);
-    system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
+    system("$perlCmdString")==0 or die ("failed to execute: $!\n");
 
-    print "\n1 ####### Finished step 1 at ".(scalar localtime()).": All files are stored in $rootDir/autoAugTrain #######\n" if ($verbose>=1);
+    print "\n1 ####### Finished step 1 at " .(scalar localtime()) . 
+	". All files are stored in $rootDir/autoAugTrain #######\n" if ($verbose>=1);
 }
 
 
@@ -838,11 +770,11 @@ sub autoAug_prepareScripts{
 
     if($verbose>=1){
 	my $string="Preparing scripts for AUGUSTUS";
-        print "\n\n1 ";
-        print "####### Step 2 at ".(scalar localtime()).": $string without hints and UTR #######"      if (!$hints_switch && !$utr_switch);
-        print "####### Step 4 at ".(scalar localtime()).": $string with hints, without UTR #######"    if ( $hints_switch && !$utr_switch);
-        print "####### Step 7 at ".(scalar localtime()).": $string with hints and UTR #######"         if ( $hints_switch &&  $utr_switch);
-        print "\n";
+	print "\n\n1 ";
+        print "####### Step 2: $string without hints and UTR #######"      if (!$hints_switch && !$utr_switch);
+        print "####### Step 4: $string with hints, without UTR #######"    if ( $hints_switch && !$utr_switch);
+	print "####### Step 7: $string with hints and UTR #######"         if ( $hints_switch &&  $utr_switch);
+	print "\n";
     }
     
     $autoAugDir = $autoAugDir_abinitio  if (!$hints_switch && !$utr_switch);
@@ -850,24 +782,21 @@ sub autoAug_prepareScripts{
     $autoAugDir = $autoAugDir_hints_utr if ($hints_switch && $utr_switch);
     $autoAugDir = $autoAugDir_utr       if (!$hints_switch && $utr_switch);
 
-    my $hintsString = "";
-    my $utrString  = "";
-    $hintsString = "--hints=$hints" if ($hints_switch);
-    $utrString   = "--utr"          if ($utr_switch);
+    my $hintsString ="--hints=$hints" if ($hints_switch);
+    my $utrString   ="--utr"          if ($utr_switch);
    
     
     $perlCmdString = "perl $scriptPath/autoAugPred.pl -g=$genome_clean --species=$species -w=$rootDir $utrString " . 
 	"$verboseString $hintsString $useexistingopt";
     $perlCmdString .= " --singleCPU" if ($singleCPU);
-    $perlCmdString .= " --cpus=$cpus";
-    print "2 $perlCmdString\n" if ($verbose>=2);
-    system("$perlCmdString")==0 or die("\nfailed to execute $perlCmdString\n");
+    print "2 $perlCmdString" if ($verbose>=2);
+    system("$perlCmdString")==0 or die("\nfailed to execute $!\n");
     
     my $stepNum;
     $stepNum=2 if (!$hints_switch && !$utr_switch);
     $stepNum=4 if ( $hints_switch && !$utr_switch);
     $stepNum=7 if ( $hints_switch &&  $utr_switch);
-    print "\n1 ####### Finished step $stepNum at ".(scalar localtime()).": The scripts are stored in $autoAugDir/shells #######\n" if ($verbose>=1);
+    print "\n1 ####### Finished step $stepNum. The scripts are stored in $autoAugDir/shells #######\n" if ($verbose>=1);
 	
     my $estString;
     $estString = "--estali=your.cdna.psl" if ($index==1 && !defined($estali));
@@ -897,16 +826,14 @@ sub autoAug_continue{
     if($verbose>=1){
 	my $string="Continue to predict genome structure with AUGUSTUS";
         print "\n1 ";
-        print "####### Step 3 at ".(scalar localtime()).": $string without hints, no UTR #######"       if (!$hints_switch && !$utr_switch);
-        print "####### Step 5 at ".(scalar localtime()).": $string with hints, no UTR #######"          if ( $hints_switch && !$utr_switch);
-        print "####### Step 8 at ".(scalar localtime()).": $string with hints, containing UTR #######"  if ( $hints_switch &&  $utr_switch);
+        print "####### Step 3: $string without hints, no UTR #######"       if (!$hints_switch && !$utr_switch);
+        print "####### Step 5: $string with hints, no UTR #######"          if ( $hints_switch && !$utr_switch);
+        print "####### Step 8: $string with hints, containing UTR #######"  if ( $hints_switch &&  $utr_switch);
         print "\n";
     }
 
-    my $hintsString = "";
-    my $utrString = "";
-    $hintsString = "--hints=$hints" if ($hints_switch);
-    $utrString = " --utr" if ($utr_switch);
+    my $hintsString="--hints=$hints" if ($hints_switch);
+    my $utrString=" --utr" if ($utr_switch);
 
     $estali="$rootDir/cdna/cdna.f.psl" if ($pasa);
 
@@ -915,12 +842,11 @@ sub autoAug_continue{
     $mainDir = "$autoAugDir_hints"     if ($index==2);
     $mainDir = "$autoAugDir_utr"       if ($index==3);
  
-    $shellDir = "$mainDir/shells";
+    my $shellDir = "$mainDir/shells";
 
 
     $perlCmdString = "perl $scriptPath/autoAugPred.pl --species=$species --genome=$rootDir/seq/genome_clean.fa --continue --workingdir=$rootDir $verboseString $hintsString $utrString $useexistingopt";
     $perlCmdString .= " --singleCPU" if ($singleCPU);
-    $perlCmdString .= " --cpus=$cpus";
     my $abortString = "\nError executing\n$perlCmdString\n";
     print "3 $perlCmdString\n" if ($verbose >= 3);
     chdir $positionWD;
@@ -933,7 +859,7 @@ sub autoAug_continue{
     $stepNum=5 if ( $hints_switch && !$utr_switch);
     $stepNum=8 if ( $hints_switch &&  $utr_switch);
 
-    print "\n1 ####### Finished step $stepNum at ".(scalar localtime()).": All files are stored in $mainDir #######\n" if ($verbose>=1);
+    print "\n1 ####### Finished step $stepNum. All files are stored in $mainDir #######\n" if ($verbose>=1);
 
 }
 
@@ -942,7 +868,7 @@ sub autoAug_continue{
 
 
 
-       ################## run AUGUSTUS completely automatically ##################
+       ################## run AUGUGUS completely automatically ##################
 
 
 sub autoAug_noninteractive{
@@ -950,10 +876,8 @@ sub autoAug_noninteractive{
     my $hints_switch=shift;       # for AUGUSTUS with hints
     my $utr_switch=shift;         # for AUGUSTUS with UTR
 
-    my $hintsString="";
-    my $utrString="";
-    $hintsString="--hints=$hints" if ($hints_switch);
-    $utrString="--utr"            if ($utr_switch);
+    my $hintsString="--hints=$hints" if ($hints_switch);
+    my $utrString="--utr"            if ($utr_switch);
 
     my $string;
     $string="ab initio (without hints and utr)" if(!$hints_switch && !$utr_switch);
@@ -962,8 +886,7 @@ sub autoAug_noninteractive{
 
     print "\n\n1 ####### Now predicting genes $string in the whole sequence...#######\n" if ($verbose>=1);
     $perlCmdString="perl $scriptPath/autoAugPred.pl -g=$genome_clean --species=$species $hintsString $utrString --noninteractive --cname=$cname -w=$rootDir $verboseString $useexistingopt";
-    $perlCmdString .= " --cpus=$cpus";
-    print "2 \"$perlCmdString\" ...\n" if ($verbose>1);
+    print "2 $perlCmdString ...\n" if ($verbose>1);
     system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString!\n");
 
     print "\n####### Finished predicting genes $string #######\n";	
@@ -984,20 +907,20 @@ sub autoTrain_with_utr{
     $stepNum=6 if (!$noninteractive);
     $stepNum=8 if ( $noninteractive);
 
-    print "\n1 ####### Step $stepNum at ".(scalar localtime()).": Training AUGUSTUS with UTR #######\n" if ($verbose>=1);
+    print "\n1 ####### Step $stepNum: Training AUGUSTUS with UTR #######\n" if ($verbose>=1);
 
     my $augString;
     $augString="--aug=$autoAugDir_hints/predictions/augustus.gff";
 
     if(-d $rootDir){
-  	  $perlCmdString="perl $scriptPath/autoAugTrain.pl --cpus=$cpus -g=$genome_clean -s=$species --utr -e=$estali $augString -w=$rootDir $verboseString --opt=$optrounds --useexisting";
+  	  $perlCmdString="perl $scriptPath/autoAugTrain.pl -g=$genome_clean -s=$species --utr -e=$estali $augString -w=$rootDir $verboseString --opt=$optrounds --useexisting";
     }else{
-  	  $perlCmdString="perl $scriptPath/autoAugTrain.pl --cpus=$cpus -g=$genome_clean -s=$species --utr -e=$estali $augString -w=$rootDir $verboseString --opt=$optrounds $useexistingopt";
+  	  $perlCmdString="perl $scriptPath/autoAugTrain.pl -g=$genome_clean -s=$species --utr -e=$estali $augString -w=$rootDir $verboseString --opt=$optrounds $useexistingopt";
     }
     print "\n2 $perlCmdString\n" if ($verbose>=2);
-    system("$perlCmdString")==0 or die ("failed to execute: $perlCmdString\n");
+    system("$perlCmdString")==0 or die ("failed to execute: $!\n");
 
-    print "\n1 ####### Finished step $stepNum at ".(scalar localtime()).": All files are stored in $rootDir/training/utr #######\n" if ($verbose>=1);
+    print "\n1 ####### Finished step $stepNum, all files are stored in $rootDir/training/utr #######\n" if ($verbose>=1);
     
 }
 
@@ -1012,7 +935,7 @@ sub collect{
     $stepNum=7 if (!$noninteractive);
     $stepNum=9 if ( $noninteractive);
 
-    print "\n1 ####### Step $stepNum at ".(scalar localtime()).": Collecting important files #######\n" if ($verbose>=1);
+    print "\n1 ####### Step $stepNum: Collecting important files #######\n" if ($verbose>=1);
 
     my $summary_dir = "$rootDir/results";
     if (!$useexisting && -d $summary_dir){
@@ -1024,8 +947,8 @@ sub collect{
     # build subdir structure
 
     chdir "$summary_dir" or die("\nError: cannot change directory to $summary_dir!\n");
-    for(("gbrowse", "hints","predictions","seq", "genes", "config")){mkdir "$_" if (! -d $_);}
-    print "3 All necessary directories have been created under $summary_dir.\n" if ($verbose>=3);
+    for(("gbrowse", "hints","predictions","seq", "genes", "config")){mkdir "$_"}
+    print "3 All necessary diretories have been created unter $summary_dir.\n" if ($verbose>=3);
     
     # collect gbrowse files
     print "3 cd gbrowse\n" if ($verbose>=3);
@@ -1034,14 +957,14 @@ sub collect{
 
 
     $cmdString = "cp $rootDir/seq/contigs.gff contigs.gff";
-    system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+    system("$cmdString")==0 or die("\nfailed to execute: $!\n");
 
     if (-f "$rootDir/cdna/cdna.gbrowse"){
 	$cmdString = "ln -sf $rootDir/cdna/cdna.gbrowse cdna.gbrowse";
 	system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
     }
     
-    if (defined($fasta_cdna) && -f $fasta_cdna){
+    if (-f $fasta_cdna){
 	$cmdString = "ln -sf $fasta_cdna cdna.fa";
 	system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
     }
@@ -1063,11 +986,11 @@ sub collect{
     chdir "../hints";
     if($pasa){
 	$cmdString="ln -sf $rootDir/hints/hints.E.gff hints.E.gff";
-	system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+	system("$cmdString")==0 or die("\nfailed to execute: $!\n");
         print "3 $cmdString\n" if ($verbose>=3);
     } elsif ($havehints) {
 	$cmdString="ln -sf  $hints hints.E.gff";
-	system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+	system("$cmdString")==0 or die("\nfailed to execute: $!\n");
 	print "3 $cmdString\n" if ($verbose>=3);
     }
     
@@ -1092,7 +1015,7 @@ sub collect{
     chdir "../seq";
     $cmdString="ln -s $genome genome.fa" if (!uptodate([$genome], ["genome.fa"]));
 
-    system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+    system("$cmdString")==0 or die("\nfailed to execute: $!\n");
     print "3 $cmdString\n" if ($verbose>=3);
     
     # collect config files
@@ -1120,19 +1043,19 @@ sub collect{
 	$i =~ /^(\/.*\/)(.*)\n$/;
 	if(-f "$2"){
 	    $cmdString="ln -fs $1$2 $2"."_another";
-	    system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+	    system("$cmdString")==0 or die("\nfailed to execute: $!\n");
 	    print "3 $cmdString\n" if ($verbose>=3);
 	}
 	else{
 	    $cmdString="ln -s $1$2 $2";
-	    system("$cmdString")==0 or die("\nfailed to execute: $cmdString\n");
+	    system("$cmdString")==0 or die("\nfailed to execute: $!\n");
             print "3 $cmdString\n" if ($verbose>=3);
 	}
     }
     print "3 rm tempgbn\n" if ($verbose>=3);
     system("rm tempgbn")==0 or die die("failed to execute: $!\n");
     
-    print "\n1 ####### Finished step $stepNum at ".(scalar localtime()).": All files are stored in $summary_dir #######\n" if ($verbose>=1);
+    print "\n1 ####### Finished step $stepNum. All files are stored in $summary_dir #######\n" if ($verbose>=1);
     print "\n1 ####### Done autoAug.pl #######\n" if ($verbose>=1);
     print "" . (scalar localtime()) . "\n" if ($verbose>=1);
 }
@@ -1146,9 +1069,14 @@ sub check_upfront{
     die("Error: The environment variable AUGUSTUS_CONFIG_PATH is not defined.\n") unless $ENV{'AUGUSTUS_CONFIG_PATH'};
     die("Error: The environment variable PASAHOME is undefined.\n") if ($pasa && !defined($ENV{'PASAHOME'}));
     
-    if (system("which augustus > /dev/null") != 0){
-        print STDERR "Error: augustus not installed. Please install first.\n";
-        exit (1);
+    my $augpath = "$ENV{'AUGUSTUS_CONFIG_PATH'}/../bin/augustus";
+    if (system("$augpath > /dev/null 2> /dev/null") != 0){
+	if (! -f $augpath){
+	    print STDERR "Error: augustus executable not found at $augpath.\n";
+	} else {
+	    print STDERR "Error: $augpath not executable on this machine.\n";
+	}
+	exit (1);
     }
     if (defined($fasta_cdna)){
 	if (system("which blat > /dev/null") != 0){
@@ -1162,15 +1090,42 @@ sub check_upfront{
 	    exit(1);
 	}
     }
-    if ($pasa){
-        if (system("which seqclean > /dev/null") != 0){
-            print STDERR "Error: seqclean script not installed. Install seqclean first or if it is available in a PASAHOME subdirectory add this to PATH.\n";
-            exit(1);
-        }
-    }
     find("gff2gbSmallDNA.pl");
     find("summarizeACGTcontent.pl");
     print "ok.\n" if ($verbose>=2);
+}
+
+sub check_fasta_headers{
+    my $fastaFile=shift;
+    my $someThingWrongWithHeader = 0;
+    my $spaces = 0;
+    my $orSign = 0;
+    my $stdStr = "This may later on cause problems! If the pipeline turns out to crash, please clean up the fasta headers, e.g. by using simplifyFastaHeaders.pl. This message will be suppressed from now on!\n";
+    print "1 Checking fasta headers in file $fastaFile...\n" if ($verbose>=1);
+    open(FASTA, "<", $fastaFile) or die("Could not open fasta file $fastaFile!\n");
+    while(<FASTA>){
+	chomp;
+	if($_=~m/\s/){
+	    if($spaces == 0){
+		print "1 - WARNING: Detected whitespace in fasta header of file $fastaFile. ".$stdStr;
+		$spaces++;
+	    }
+	}
+	if($_=~m/\|/){
+	    if($orSign == 0){
+		print "1 - WARNING: Detected | in fasta header of file $fastaFile. ".$stdStr;
+		$orSign++;
+	    }
+	}
+	if($_=!m/[>a-zA-Z0123456789]/){
+	    if($someThingWrongWithHeader==0){
+		print "1 - WARNING: Fasta headers inf file $fastaFile seem to contain non-letter and non-number characters. That means they may contain some kind of special character. ".$stdStr;
+		$someThingWrongWithHeader++;
+	    }
+	}
+   }
+    close(FASTA) or die("Could not close fasta file $fastaFile!\n");
+    
 }
 
 sub count_fasta_entries{
@@ -1181,11 +1136,5 @@ sub count_fasta_entries{
 	if(m/^>/){$fc++;}
     }
     close(FASTA) or die("Could not close fasta file $fastaFile!\n");
-    if($fc<=100){print STDERR "WARNING: Fasta file $fastaFile contained less than 100 entries. At least 100 genes are required for training AUGUSTUS. It is impossible to generate this number of genes with the given data! If PASA will be unable to generate at least one gene structure, the pipeline will die, later!\n";}
-}
-
-sub check_command_exists { 
-    my $command=shift;
-    my $status = system("which $command > /dev/null");
-    return !$status;
+    if($fc<=100){print STDERR "WARNING: Fasta file $fastaFile contained less than 100 entries. At least 100 genes are required for training AUGUSTUS. It is impossible to generate this numbere of genes with the given data! If PASA will be unable to generate at least one gene structure, the pipeline will die, later!\n";}
 }

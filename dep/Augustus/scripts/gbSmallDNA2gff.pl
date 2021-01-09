@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # create a genome-scale gff file from a gb file that created for AUGUSTUS training (has a flanking region, coordinates of the origin of sequence are given in the LOCUS tag)
 #

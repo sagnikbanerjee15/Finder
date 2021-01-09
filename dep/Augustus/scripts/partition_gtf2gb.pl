@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # Partition a gff file into gene clusters of a specified minimal number of genes,
 # clusters shall not end in another gene.

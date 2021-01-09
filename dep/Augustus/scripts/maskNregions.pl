@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # create a gff-like file that marks regions in a fasta file
 # that contain "N" or "n".

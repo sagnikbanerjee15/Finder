@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # combine two psl files transitively
 # 
 #     map target (genome)

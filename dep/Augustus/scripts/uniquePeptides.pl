@@ -1,8 +1,8 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 # Creates a fasta file with unique peptides from a fasta input file
 # where identical peptide match multiple positions. The first found 
-# peptide occurrence is used for counting multiplicity.
+# peptide occurence is used for counting multiplicity.
 # Input format fasta header examples:
 # >scaffold4083_450 [15866 - 17011]  (65.81)
 # >au14.g511.t1 (46.17)

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 ################################################################################
 #
 #   Name:    prints2prfl.pl
@@ -18,7 +18,6 @@
 #
 
 use strict;
-use warnings;
 use Getopt::Long;
 use List::Util "sum";
 

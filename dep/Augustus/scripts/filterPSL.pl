@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # filter a psl file (from BLAT,GMAP)
 #

@@ -48,19 +48,6 @@ FINDER runs BRAKER2 which depends on GeneMark-ES. FINDER also needs GeneMarkS/T 
 15. Execute the following commands:
 
 ```bash
-tar -xvzf gmst_linux_64.tar.gz
-tar -xvzf gmes_linux_64.tar.gz
-gunzip gm_key_64.gz
-
-# Remove the downloaded tar.gz files
-rm gm*.tar.gz
-
-# The key needs to be in the home directory
-mv gm_key_64 .gm_key
-mv .gm_key ~
-
-# Install all other dependencies
-cd ..
 ./install.sh
 ```
 

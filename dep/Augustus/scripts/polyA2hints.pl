@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # Convert a polyA polyT position table to tts hints
 # This is for the polyA/T tables from Chun Liang

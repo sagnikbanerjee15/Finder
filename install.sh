@@ -26,3 +26,19 @@ cd ../..
 cd $PWD/dep/GUSHR
 chmod -R a+x *
 cd ../..
+
+tar -xvzf gmst_linux_64.tar.gz
+tar -xvzf gmes_linux_64.tar.gz
+chmod -R a+x *
+cd gmes_linux_64
+perl change_path_in_perl_scripts.pl "/usr/bin/env perl"
+cd ..
+gunzip gm_key_64.gz
+
+# Remove the downloaded tar.gz files
+rm gm*.tar.gz
+
+# The key needs to be in the home directory
+mv gm_key_64 .gm_key
+mv .gm_key ~
+cd ..

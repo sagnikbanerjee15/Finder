@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # Mario Stanke, 26.01.2007
 # convert a transmap output file (tab format) to a hints file

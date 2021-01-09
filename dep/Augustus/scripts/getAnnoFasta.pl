@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 # getAnnoFast.pl
 # Creates fasta sequence files from the AUGUSTUS output.

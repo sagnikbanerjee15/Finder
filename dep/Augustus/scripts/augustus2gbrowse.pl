@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # convert AUGUSTUS output to Gbrowse format GFF file
 # Mario Stanke
 

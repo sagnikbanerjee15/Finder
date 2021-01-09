@@ -558,7 +558,9 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     ################################################################################
     cmd="cp -r "+options.softwares["augustus_main_dir"]+" "
     cmd+=options.output_braker+"/"
-    os.system(cmd)
+    os.system(cmd)    
+    with logging_mutex:
+        logger_proxy.info(f"Running command - {cmd}")
     
     with logging_mutex:
         logger_proxy.info("BRAKER run started")
@@ -589,7 +591,7 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     cmd+=" 2> "+options.output_braker+".error"
     #print(cmd)
     with logging_mutex:
-        logger_proxy.info("Running BRAKER2 "+cmd)
+        logger_proxy.info(f"Running BRAKER2 - {cmd}")
     os.system(cmd)
     time.sleep(5)
 
@@ -600,6 +602,8 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     cmd+=" -E "+options.output_braker+"/braker.gff3"
     cmd+=" -T -o "+options.output_braker+"/braker.gtf"
     os.system(cmd)
+    with logging_mutex:
+        logger_proxy.info(f"Running command - {cmd}")
     
     cmd="cp "+options.output_braker+"/braker.gtf "
     cmd+=options.output_assemblies_psiclass_terminal_exon_length_modified+"/"

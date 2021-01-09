@@ -1,21 +1,21 @@
-#!/usr/bin/perl
-
+#!/usr/bin/env perl
+#
+##############################################################################
+## filterGenesIn_mRNAname.pl
+## filter genes from a genbank flat file database
+## those genes whose mRNA names are given in a gtf file
+## are printed to STDOUT.
+##
+## This script is used by the braker.pl pipeline.
+## Please be extremely careful when changing this script because the braker.pl
+## pipeline may fail upon custom modification of this script.
+## In case of doubt, contact katharina.hoff@uni-greifswald.de 
+##
+## usage: fileterGenesIn_mRNAname.pl gtffile dbfile
+##
+##
+## Mario Stanke, Simone Lange, Katharina Hoff; 20.02.2018
 #############################################################################
-# filterGenesIn_mRNAname.pl
-# filter genes from a genbank flat file database
-# those genes whose mRNA names are given in a gtf file
-# are printed to STDOUT.
-#
-# This script is used by the braker.pl pipeline.
-# Please be extremely careful when changing this script because the braker.pl
-# pipeline may fail upon custom modification of this script.
-# In case of doubt, contact katharina.hoff@uni-greifswald.de 
-#
-# usage: fileterGenesIn_mRNAname.pl gtffile dbfile
-#
-#
-# Mario Stanke, Simone Lange, Katharina Hoff; 20.02.2018
-############################################################################
 
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ my %goodids;
 open( GOODFILE, "<", "$goodfilename" )
     || die "Couldn't open goodfile $goodfilename\n";
 while (<GOODFILE>) {
-    if ( $_ =~ m/transcript_id \"(.*)\"/ ) {
+    if ( $_ =~ m/transcript_id \"([^"]*)\"/ ) {
         if (not (defined $goodids{$1})){
 	    $goodids{$1} = 1;
 	}
@@ -104,4 +104,7 @@ foreach (@data) {
         print $_;
     }
 }
+
+
+
 

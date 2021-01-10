@@ -25,7 +25,8 @@ def mergeTwoTranscripts(whole_annotations,transcript_id_i,transcript_id_j,chromo
                                                       "TPM":whole_annotations[transcript_id_i]["TPM"],
                                                       "FPKM":whole_annotations[transcript_id_i]["FPKM"],
                                                       "direction":whole_annotations[transcript_id_i]["direction"],
-                                                      "chromosome":chromosome
+                                                      "chromosome":chromosome,
+                                                      "annotator":"FINDER"
                                                       }
     
     whole_annotations[new_transcript_id]["exons"][-1]=[whole_annotations[transcript_id_i]["exons"][-1][0],

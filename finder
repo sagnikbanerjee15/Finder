@@ -906,7 +906,7 @@ def main():
     configureAndRunBRAKER(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info("BRAKER run completed")
-    return
+    
     findCDS(options)
     with logging_mutex:
         logger_proxy.info("Finding CDS completed")

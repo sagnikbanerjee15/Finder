@@ -464,17 +464,22 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     
     cmd="exonerate --model protein2genome --percent 90 --showcigar no -D 1000 "
     #cmd+=" --exhaustive "
-    cmd+=" --showquerygff  no --showtargetgff yes --showalignment no --showvulgar no --softmasktarget yes "
+    cmd+=" --showquerygff  no --showtargetgff yes --showalignment no --showvulgar no --softmasktarget yes --softmaskquery yes "
     cmd+=" --minintron 20 " 
     cmd+=" -c "+options.cpu+" "
     cmd+=" -q "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta "
     cmd+=" -t "+options.genome
     cmd+=" > "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "
+    cmd+=" 2> "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.error "
+    with logging_mutex:
+        logger_proxy.info(f"Running command - {cmd}")
     os.system(cmd)
     
     cmd=options.softwares["convert_exonerate_gff_to_gtf"]
     cmd+=" -i "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "
     cmd+=" -o "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gtf "
+    with logging_mutex:
+        logger_proxy.info(f"Running command - {cmd}")
     os.system(cmd)
     
     fhr=open(options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gtf","r")

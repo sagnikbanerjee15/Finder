@@ -21,13 +21,13 @@ bash Anaconda3-2020.02-Linux-x86_64.sh # do not install VS. You may replace it w
 git clone https://github.com/sagnikbanerjee15/finder.git
 cd finder
 conda env create -f environment.yml # This will create an environment named finder_conda_env
-conda activate finder
+conda activate finder_conda_env
 echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the bashrc file
 export PATH=$PATH:$(pwd)
 cd dep
 ```
 
-FINDER runs BRAKER2 which depends on GeneMark-ES. FINDER also needs GeneMarkS/T to predict coding regions of genes. Both GeneMark-ES and GeneMarkS/T are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the src sub-directory. Please follow the instructions below to download the softwares and the key:
+FINDER runs BRAKER2 which depends on GeneMark-ES. FINDER also needs GeneMarkS/T to predict coding regions of genes. Both GeneMark-ES and GeneMarkS/T are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the `dep` sub-directory. Please follow the instructions below to download the softwares and the key:
 
 1. Open a browser of your choice
 2. Go to [this](http://topaz.gatech.edu/GeneMark/license_download.cgi) website

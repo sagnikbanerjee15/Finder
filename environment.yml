@@ -29,7 +29,7 @@ dependencies:
   - cryptography=3.3.1=py37h3c74f83_0
   - curl=7.67.0=hbc83047_0
   - diamond=0.9.14=h8b12597_3
-  - exonerate=2.4.0=haf93ef1_3
+  - exonerate=2.2.0=1
   - expat=2.2.10=he6710b0_2
   - fontconfig=2.13.0=h9420a91_0
   - freetype=2.10.4=h5ab3b9f_0

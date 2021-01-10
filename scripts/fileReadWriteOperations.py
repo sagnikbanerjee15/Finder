@@ -7,6 +7,8 @@
 import os
 import time
 
+from scripts.fixOverlappingAndMergedTranscripts import *
+
 
 def samtoolsQuickCheck(filename,options):
     cmd="samtools "+" quickcheck "
@@ -373,3 +375,16 @@ def translate(seq):
             else:
                 protein+= table[codon] 
     return protein
+
+def splitFasta(input_filename,output_file_prefix,number_of_splits):
+    all_sequences = readFastaFile(input_filename)
+    all_sequence_ids = list(all_sequences.keys())
+    all_sequence_ids_split = divide_chunks(all_sequence_ids, len(all_sequence_ids)//number_of_splits)
+    for i,each_split in enumerate(all_sequence_ids_split):
+        output_filename = f"{output_file_prefix}_{i}.fasta"
+        proteins_in_split = {}
+        for id in each_split:
+            proteins_in_split[id] = all_sequences[id]
+        writeFastaFile(output_filename, proteins_in_split)
+    return i
+        

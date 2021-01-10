@@ -1,9 +1,45 @@
 
 from pathlib import Path
 from scripts.fileReadWriteOperations import *
+from scripts.runCommand import *
+import glob
 import os
 import time
 
+
+def mapProteinsToGenomeUsingExonerate(protein_file,options,logger_proxy,logging_mutex):
+    """
+    """
+    all_proteins = readFastaFile(protein_file)
+    # Split proteins into small files
+    number_of_files = splitFasta(protein_file,protein_file[:-4],int(options.cpu)-1)
+    
+    pool = multiprocessing.Pool(processes=int(options.cpu))
+    allinputs = []
+    for i in range(number_of_files):
+        cmd="exonerate --model protein2genome --percent 90 --showcigar no -D 1000 "
+        cmd+=" --showquerygff  no --showtargetgff yes --showalignment no --showvulgar no --softmasktarget yes --softmaskquery yes "
+        cmd+=" --minintron 20 " 
+        #cmd+=" -c "+options.cpu+" "
+        cmd+=" -q "+f"{protein_file[:-4]}_{i}.fasta"
+        cmd+=" -t "+options.genome
+        cmd+=" > "+f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/proteins_for_alignment_{i}.gff3 "
+        cmd+=" 2> "+f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/proteins_for_alignment_{i}.error "
+        with logging_mutex:
+            logger_proxy.info(f"Running command - {cmd}")
+        allinputs.append(["dummy",cmd])
+    pool.map(runCommand,allinputs)
+    
+    
+    fhw=open(f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/proteins_for_alignment.gff3","w")
+    for i in range(number_of_files):
+        mapped_input_filename = f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/proteins_for_alignment_{i}.gff3"
+        fhr=open(mapped_input_filename,"r")
+        fhw.write(fhr.read())
+        fhr.close()
+        os.system(f"rm {mapped_input_filename} {protein_file[:-4]}_{i}.fasta")
+    fhw.close()
+    
 
 def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     """
@@ -462,6 +498,8 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
         fhw.write(">"+protein+"\n"+proteins_for_alignment[protein]+"\n")
     fhw.close()
     
+    mapProteinsToGenomeUsingExonerate(options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta",options,logger_proxy,logging_mutex)
+    """
     cmd="exonerate --model protein2genome --percent 90 --showcigar no -D 1000 "
     #cmd+=" --exhaustive "
     cmd+=" --showquerygff  no --showtargetgff yes --showalignment no --showvulgar no --softmasktarget yes --softmaskquery yes "
@@ -474,7 +512,7 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     with logging_mutex:
         logger_proxy.info(f"Running command - {cmd}")
     os.system(cmd)
-    
+    """
     cmd=options.softwares["convert_exonerate_gff_to_gtf"]
     cmd+=" -i "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "
     cmd+=" -o "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gtf "

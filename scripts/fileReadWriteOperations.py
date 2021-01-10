@@ -7,8 +7,12 @@
 import os
 import time
 
-from scripts.fixOverlappingAndMergedTranscripts import *
 
+def divide_chunks(l, n): 
+      
+    # looping till length l 
+    for i in range(0, len(l), n):  
+        yield l[i:i + n] 
 
 def samtoolsQuickCheck(filename,options):
     cmd="samtools "+" quickcheck "
@@ -387,4 +391,3 @@ def splitFasta(input_filename,output_file_prefix,number_of_splits):
             proteins_in_split[id] = all_sequences[id]
         writeFastaFile(output_filename, proteins_in_split)
     return i
-        

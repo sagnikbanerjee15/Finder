@@ -3,6 +3,7 @@ from pathlib import Path
 from scripts.fileReadWriteOperations import *
 from scripts.runCommand import *
 import glob
+import multiprocessing
 import os
 import time
 
@@ -407,8 +408,7 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     cmd+=" -num_threads "+ ("32" if int(options.cpu)>=32 else options.cpu )
     cmd+=" -out "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/finder_to_protein.out "
     cmd+=" -query "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_with_CDS_prot.fasta "
-    if os.path.exists(options.output_assemblies_psiclass_terminal_exon_length_modified+"/finder_to_protein.out")==False:
-        os.system(cmd)
+    os.system(cmd)
     
     braker_fasta=readFastaFile(options.output_assemblies_psiclass_terminal_exon_length_modified+"/braker.fa")
     all_braker_ids=list(braker_fasta.keys())
@@ -435,8 +435,7 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     cmd+=" -num_threads "+ ("32" if int(options.cpu)>=32 else options.cpu )
     cmd+=" -out "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/braker_to_protein.out "
     cmd+=" -query "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/braker_prot.fa "
-    if os.path.exists(options.output_assemblies_psiclass_terminal_exon_length_modified+"/braker_to_protein.out")==False:
-        os.system(cmd)
+    os.system(cmd)
 
     cmd="cat "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/braker_to_protein.out "
     cmd+="| grep -A 1 \"hits found\"|grep -v \"#\"|grep -v \"\\-\\-\"|awk '$3>=90 && $4>=90' "
@@ -499,20 +498,7 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     fhw.close()
     
     mapProteinsToGenomeUsingExonerate(options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta",options,logger_proxy,logging_mutex)
-    """
-    cmd="exonerate --model protein2genome --percent 90 --showcigar no -D 1000 "
-    #cmd+=" --exhaustive "
-    cmd+=" --showquerygff  no --showtargetgff yes --showalignment no --showvulgar no --softmasktarget yes --softmaskquery yes "
-    cmd+=" --minintron 20 " 
-    cmd+=" -c "+options.cpu+" "
-    cmd+=" -q "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta "
-    cmd+=" -t "+options.genome
-    cmd+=" > "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "
-    cmd+=" 2> "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.error "
-    with logging_mutex:
-        logger_proxy.info(f"Running command - {cmd}")
-    os.system(cmd)
-    """
+    
     cmd=options.softwares["convert_exonerate_gff_to_gtf"]
     cmd+=" -i "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "
     cmd+=" -o "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gtf "

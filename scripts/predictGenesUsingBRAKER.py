@@ -41,7 +41,6 @@ def mapProteinsToGenomeUsingExonerate(protein_file,options,logger_proxy,logging_
         os.system(f"rm {mapped_input_filename} {protein_file[:-4]}_{i}.fasta")
     fhw.close()
     
-
 def addBRAKERPredictions(options,logger_proxy,logging_mutex):
     """
     """

@@ -13,6 +13,10 @@ import pandas as pd
 
 
 def reArrangeDataForAssembly(options,logger_proxy,logging_mutex):
+    all_runs=[os.path.exists(options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/psiclass_output_sample_"+Run+".gtf") for condition in options.mrna_md for Run in options.mrna_md[condition]]
+    all_runs.append(os.path.exists(options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined.gtf"))
+    if False not in all_runs:return
+    
     #########################################################################################################
     # Create list of introns
     #########################################################################################################

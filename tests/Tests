@@ -27,6 +27,6 @@ TestA24 - Run FINDER with 700 cores
 TestA25 - Run FINDER with 750 cores
 TestA26 - Run FINDER with 800 cores
 
-TestB1 - Examine the various checkpoints
+TestB1 - Examine the various checkpoints (PASSED)
 TestC1 - Examine the -preserve and -no_clean arguments
 TestD1 - Run FINDER without protein sequences 

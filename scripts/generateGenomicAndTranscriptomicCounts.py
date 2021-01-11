@@ -6,6 +6,7 @@ import os
 
 
 def generateGenomicAndTranscriptomicCounts(options,logger_proxy,logging_mutex):
+    if os.path.exists(options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf")==True:return
     gtffilename=options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_transcripts_connecting_two_transcripts.gtf"
     writeTranscriptsToFile([readAllTranscriptsFromGTFFileInParallel([gtffilename,"dummy","dummy"])[0],gtffilename[:-4]+"_appended_info.gtf",0])
     exons_overlapping_with_introns_bedfilename=gtffilename[:-4]+"_exons_overlapping_with_introns.bed"

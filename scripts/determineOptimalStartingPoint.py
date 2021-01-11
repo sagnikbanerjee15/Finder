@@ -38,7 +38,7 @@ def determineOptimalStartingPoint(options,logger_proxy,logging_mutex):
     For all other values of options.checkpoint, pre-generated data will be overwritten
     """
     flag = checkForNewData(options)
-    options.checkpoint = 0 # Nothing will be deleted and nothing will be regenerated. Computation will start from the beginning and skip the steps already computed.
+    #options.checkpoint = 0 # Nothing will be deleted and nothing will be regenerated. Computation will start from the beginning and skip the steps already computed.
     
     if flag == 2:
         pass # No new RNA-Seq samples. PsiCLASS, FINDER and BRAKER2 runs have completed successfully. No need to change `options.checkpoint` can go ahead with user request 
@@ -55,25 +55,29 @@ def determineOptimalStartingPoint(options,logger_proxy,logging_mutex):
     if options.checkpoint == 0:
         pass # Do Nothing
     elif options.checkpoint == 1: # Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
-        os.system(f"rm {options.output_star}/*") # Delete contents of alignment folder
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/*") # Delete contents of assembly folder
-        os.system(f"rm {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_star}/*") # Delete contents of alignment folder
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/*") # Delete contents of assembly folder
+        os.system(f"rm -rf {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/braker.gtf")
     elif options.checkpoint == 2: # Assemble with PsiCLASS (Will remove all assemblies)
-        os.system(f"rm {options.output_star}/*_counts_all_info.pkl") # Removing genomic read counts file
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/*") # Delete contents of assembly folder
-        os.system(f"rm {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_star}/*_counts_all_info.pkl") # Removing genomic read counts file
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/*") # Delete contents of assembly folder
+        os.system(f"rm -rf {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/braker.gtf")
     elif options.checkpoint == 3: # Find genes with FINDER (entails changepoint detection) 
-        os.system(f"rm {options.output_star}/*_counts_all_info.pkl") # Removing genomic read counts file
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_*gtf") # Delete contents of assembly folder
-        os.system(f"rm {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_star}/*_counts_all_info.pkl") # Removing genomic read counts file
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_*gtf") # Delete contents of assembly folder
+        os.system(f"rm -rf {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/braker.gtf")
     elif options.checkpoint == 4: # Predict genes using BRAKER2
-        os.system(f"rm {options.output_braker}/*") # Delete contents of BRAKER2 folder
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS*.gtf") 
+        os.system(f"rm -rf {options.output_braker}/*") # Delete contents of BRAKER2 folder
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS*.gtf")
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/braker.gtf") 
     elif options.checkpoint == 5: # Annotate coding regions
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS*.gtf") 
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS*.gtf") 
     elif options.checkpoint == 6: # Merge FINDER annotations with BRAKER2 predictions and protein sequences
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS_*.gtf")
-        os.system(f"rm {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/FINDER_BRAKER_PROT.gtf")
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_with_CDS_*.gtf")
+        os.system(f"rm -rf {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/FINDER_BRAKER_PROT.gtf")
     with logging_mutex:
         logger_proxy.info(f"Starting FINDER from {options.checkpoint} checkpoint")
         

@@ -99,6 +99,8 @@ def parseCommandLineArguments():
     5. Annotate coding regions
     6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
     """,default = None,type =int)
+    optionalNamed.add_argument("--perform_post_completion_data_cleanup","-pc_clean",help="Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ",action="store_true")
+    
     #optionalNamed.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
     #optionalNamed.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
     #optionalNamed.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")
@@ -476,6 +478,7 @@ def aggregateOutputFiles(options,logger_proxy,logging_mutex):
     """
     options.final_GTF_files
     files_to_be_copied = [options.output_braker+"/braker.gtf", # BRAKER2 final GTF file
+                          options.output_braker+"/braker_utr.gtf", # BRAKER2 final GTF file
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_redundant_transcripts_removed.gtf", # GTF file from PsiCLASS output
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf", # FINDER output without CDS
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_with_CDS.gtf", # FINDER output with CDS
@@ -484,10 +487,75 @@ def aggregateOutputFiles(options,logger_proxy,logging_mutex):
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_with_CDS_high_and_low_confidence_merged.gtf", # FINDER+BRAKER2+Protein
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_with_CDS_BRAKER_appended_high_conf.gtf", # High confidence set
                           options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/FINDER_BRAKER_PROT.gtf", # 
+                          options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/transcript_to_condition"
                           ]
     
     for file in files_to_be_copied:
         os.system(f"cp {file} {options.final_GTF_files}")
+       
+def cleanUpAfterPipelineCompletion(options,logger_proxy,logging_mutex):
+    """
+    """
+    # Remove all files downloaded from NCBI
+    cmd=f"rm -rf {options.raw_data_downloaded_from_NCBI}"
+    os.system(cmd)
+    with logging_mutex:
+        logger_proxy.info(f"Running command - {cmd}")
+        logger_proxy.info("Files downloaded from NCBI has been removed")
+    
+    cmd="rm -rf "
+    cmd+=options.output_star+"/*_round*_Aligned.sortedByCoord.out.bam"
+    os.system(cmd)
+                    
+    cmd="rm -rf "
+    cmd+=options.output_star+"/*_round*__STARgenome"
+    os.system(cmd)
+    
+    cmd="rm -rf "
+    cmd+=options.output_star+"/*_round*_Unmapped.out.mate*"
+    os.system(cmd)
+    
+    cmd="rm -rf "
+    cmd+=options.output_star+"/*_olego_round5.sorted.bam"
+    os.system(cmd)
+        
+    cmd="rm -rf "
+    cmd+=options.output_star+"/*STARtmp"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*.bed"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*pkl"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*_exons"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*_intron*"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*tab"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/*sam"
+    os.system(cmd)
+    
+    cmd="rm -rf "+options.temp_dir
+    os.system(cmd)
+    
+    cmd="rm -rf "+options.indices
+    os.system(cmd)
+        
+    with logging_mutex:
+        logger_proxy.info("Removing intermediate alignment files completed ")
+           
             
 def main():
     commandLineArg=sys.argv
@@ -505,10 +573,20 @@ def main():
         logger_proxy.info("readMetaDataFile execution successful")
     
     determineOptimalStartingPoint(options,logger_proxy,logging_mutex)
+    with logging_mutex:
+        logger_proxy.info(f" Program params - {options}")
     
     orchestrateGeneModelPrediction(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info("orchestrateGeneModelPrediction execution successful")
+    
+    if options.preserve_raw_input_data==False:
+        # Remove all the files downloaded from NCBI
+        cmd=f"rm -rf {options.raw_data_downloaded_from_NCBI}"
+        os.system(cmd)
+        with logging_mutex:
+            logger_proxy.info(f"Running command - {cmd}")
+            logger_proxy.info("Files downloaded from NCBI has been removed")
     
     configureAndRunBRAKER(options,logger_proxy,logging_mutex)
     with logging_mutex:
@@ -529,6 +607,11 @@ def main():
     aggregateOutputFiles(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info("Aggregating GTF files completed")
+        
+    if options.perform_post_completion_data_cleanup==True:
+        cleanUpAfterPipelineCompletion(options,logger_proxy,logging_mutex)
+        with logging_mutex:
+            logger_proxy.info("Removing all intermediate files after completion of execution")
     
 
 if __name__ == "__main__":

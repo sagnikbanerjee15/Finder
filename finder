@@ -258,6 +258,11 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=" "+options.genome
         cmd+=" "+options.indices+"/bowtie_index "
         os.system(cmd)"""
+    if options.protein is None:
+        cmd=f"touch {options.temp_dir}/dummy_protein.fasta"
+        options.protein = f"{options.temp_dir}/dummy_protein.fasta"
+        with logging_mutex:
+            logger_proxy.info("Adding dummy file since no protein evidence was provided")
     
     ################################################################################
     # Set up main files for ncRNA computation

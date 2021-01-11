@@ -8,8 +8,7 @@ import os
 import time
 
 
-def divide_chunks(l, n): 
-      
+def divide_chunks(l, n):  
     # looping till length l 
     for i in range(0, len(l), n):  
         yield l[i:i + n] 

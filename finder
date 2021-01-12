@@ -32,23 +32,6 @@ from copy import deepcopy
 from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
-from scripts.alignReads import *
-from scripts.determineOptimalStartingPoint import *
-from scripts.fileReadWriteOperations import *
-from scripts.findGenesFromExpression import *
-from scripts.findTranscriptsInEachSampleNotReportedInCombinedAnnotations import *
-from scripts.fixOverlappingAndMergedTranscripts import *
-from scripts.fixTranscriptsConnectingTwoTranscripts import *
-from scripts.generateGenomicAndTranscriptomicCounts import *
-from scripts.mergeCloselySpacedTranscripts import *
-from scripts.performAssembly import *
-from scripts.predictCDS import *
-from scripts.predictGenesUsingBRAKER import *
-from scripts.removeRedundantTranscripts import *
-from scripts.removeSpuriousTranscriptsBasedOnCDS import *
-from scripts.runCommand import *
-from scripts.splitTranscriptsWithQuestionableSpliceJunctions import *
-from scripts.transcriptToConditions import *
 import argparse
 import collections
 import copy
@@ -69,6 +52,23 @@ import time
 
 from ruffus.proxy_logger import *
 
+from scripts.alignReads import *
+from scripts.determineOptimalStartingPoint import *
+from scripts.fileReadWriteOperations import *
+from scripts.findGenesFromExpression import *
+from scripts.findTranscriptsInEachSampleNotReportedInCombinedAnnotations import *
+from scripts.fixOverlappingAndMergedTranscripts import *
+from scripts.fixTranscriptsConnectingTwoTranscripts import *
+from scripts.generateGenomicAndTranscriptomicCounts import *
+from scripts.mergeCloselySpacedTranscripts import *
+from scripts.performAssembly import *
+from scripts.predictCDS import *
+from scripts.predictGenesUsingBRAKER import *
+from scripts.removeRedundantTranscripts import *
+from scripts.removeSpuriousTranscriptsBasedOnCDS import *
+from scripts.runCommand import *
+from scripts.splitTranscriptsWithQuestionableSpliceJunctions import *
+from scripts.transcriptToConditions import *
 import numpy as np
 import pandas as pd
 
@@ -564,8 +564,7 @@ def cleanUpAfterPipelineCompletion(options,logger_proxy,logging_mutex):
         
     with logging_mutex:
         logger_proxy.info("Removing intermediate alignment files completed ")
-           
-            
+                      
 def main():
     commandLineArg=sys.argv
     if len(commandLineArg)==1:

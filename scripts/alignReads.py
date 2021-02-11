@@ -5,7 +5,6 @@ from scripts.runCommand import *
 import os
 import sys
 
-
 def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mutex):
     if (os.path.exists(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "

@@ -27,6 +27,7 @@ cd $PWD/dep/GUSHR
 chmod -R a+x *
 cd ../..
 
+cd dep
 tar -xvzf gmst_linux_64.tar.gz
 tar -xvzf gmes_linux_64.tar.gz
 chmod -R a+x *

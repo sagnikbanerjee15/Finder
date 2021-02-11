@@ -51,7 +51,6 @@ import sys
 import time
 
 from ruffus.proxy_logger import *
-
 from scripts.alignReads import *
 from scripts.determineOptimalStartingPoint import *
 from scripts.fileReadWriteOperations import *
@@ -175,6 +174,7 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     cmd="whereis finder > "+options.temp_dir+"/finding_finder"
     os.system(cmd)
     finder_directory=open(options.temp_dir+"/finding_finder","r").read().split(":")[-1].strip()
+    
     if finder_directory!="":
         # PATH NOT set to downloaded directory
         dep_path="/".join(finder_directory.split("/")[:-1])+"/dep"

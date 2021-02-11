@@ -6,7 +6,7 @@ import sys
 
 
 def parseCommandLineArguments():
-    parser = argparse.ArgumentParser(prog="verify_inputs_to_finder.py",description="Verifies whether all the data are transcriptomic and from the organism under consideration")
+    parser = argparse.ArgumentParser(prog="verifyInputsToFINDER.py",description="Verifies whether all the data are transcriptomic and from the organism under consideration")
     
     # Mandatory arguments
     parser.add_argument("--metadatafile","-mf",help="Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject,Run,tissue_group,tissue,description,Date,read_length,ended (PE or SE),directorypath,download,skip. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ",required=True)

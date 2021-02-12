@@ -24,8 +24,6 @@ git clone https://github.com/sagnikbanerjee15/finder.git
 cd Finder
 conda env create -f environment.yml # This will create an environment named finder_conda_env
 conda activate finder_conda_env
-echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the bashrc file
-export PATH=$PATH:$(pwd)
 cd dep
 ```
 

@@ -43,3 +43,6 @@ rm gm*.tar.gz
 mv gm_key_64 .gm_key
 mv .gm_key ~
 cd ..
+
+# Make everything executable
+chmod -R a+x *

@@ -34,7 +34,6 @@ for i,each_installation in enumerate(finder_installation_locations):
 
 #print(remove_these_indices)
 for i in remove_these_indices[::-1]:
-    print(f"{finder_installation_locations[i]} will be removed from $PATH")
     finder_installation_locations.pop(i)
     
 
@@ -45,6 +44,8 @@ if len(finder_installation_locations)>0:
     for line in fhr:
         if "export" in line and "Finder" in line:
             if line.strip().split("$PATH:")[-1] in finder_installation_locations:
+                loc=line.strip().split("$PATH:")[-1] 
+                print(f"{loc} will be removed from $PATH")
                 continue
             else:
                 fhw.write(line)
@@ -59,14 +60,54 @@ if len(finder_installation_locations)>0:
     os.system(cmd)
     
 pwd = os.getcwd()
+
 # Install OLego
 os.chdir(pwd+"/dep/olego")
-print(f"Currently in {os.getcwd()}")
 os.system("make")
 os.system("chmod -R a+x *")
 os.chdir(pwd)
-print(f"Currently in {os.getcwd()}")
-#os.system("./install.sh")
+
+# Install PsiCLASS
+os.chdir(pwd+"/dep/psiclass_terminal_exon_length_modified")
+os.system("make")
+os.system("chmod -R a+x *")
+os.chdir(pwd)
+
+# Install Augustus
+os.chdir(pwd+"/Augustus")
+os.system("chmod -R a+x *")
+os.chdir(pwd)
+
+# Install BRAKER2
+os.chdir(pwd+"/BRAKER")
+os.system("chmod -R a+x *")
+os.chdir(pwd) 
+
+# Install GUSHR
+os.chdir(pwd+"/GUSHR")
+os.system("chmod -R a+x *")
+os.chdir(pwd)
+
+os.chdir(pwd+"/dep")
+os.system("tar -xvzf gmst_linux_64.tar.gz")
+os.system("tar -xvzf gmes_linux_64.tar.gz")
+os.system("chmod -R a+x *")
+os.chdir(pwd+"/dep/gmes_linux_64")
+os.system("perl change_path_in_perl_scripts.pl \"/usr/bin/env perl\"")
+os.chdir(pwd+"/dep")
+os.system("gunzip gm_key_64.gz")
+
+# Remove the downloaded tar.gz files
+os.system("rm gm*.tar.gz")
+
+# The key needs to be in the home directory
+os.system("mv gm_key_64 .gm_key")
+os.system("mv .gm_key ~")
+os.chdir(pwd)
+
+# Make everything executable
+os.system("chmod -R a+x *")
+
 
 
 

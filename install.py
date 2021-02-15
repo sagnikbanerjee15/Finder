@@ -79,12 +79,12 @@ os.system("chmod -R a+x *")
 os.chdir(pwd)
 
 # Install BRAKER2
-os.chdir(pwd+"/BRAKER")
+os.chdir(pwd+"/dep/BRAKER")
 os.system("chmod -R a+x *")
 os.chdir(pwd) 
 
 # Install GUSHR
-os.chdir(pwd+"/GUSHR")
+os.chdir(pwd+"/dep/GUSHR")
 os.system("chmod -R a+x *")
 os.chdir(pwd)
 

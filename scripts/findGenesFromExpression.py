@@ -179,6 +179,7 @@ def performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filen
         fhw1 = open(output_filename1,"w")
         while True:
             line1_1 = fhr1.readline()
+            if not line1_1:break
             line1_2 = fhr1.readline()
             line1_3 = fhr1.readline()
             line1_4 = fhr1.readline()
@@ -196,6 +197,7 @@ def performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filen
         fhw2 = open(output_filename2,"w")
         while True:
             line1_1 = fhr1.readline()
+            if not line1_1:break
             line1_2 = fhr1.readline()
             line1_3 = fhr1.readline()
             line1_4 = fhr1.readline()
@@ -219,19 +221,22 @@ def performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filen
         fhr2.close()
         fhw2.close()
 
-def selectReadsAtRandom(sraids_filenames,location_directory,options,condition):
+def selectReadsAtRandom(sraids_filenames,location_directory,options,condition,logger_proxy,logging_mutex):
     """
     Randomly select reads from fastq
     """
     proportion_of_reads_to_be_selected=0.2
     fhr = open(sraids_filenames,"r")
     for Run in fhr:
-        if options[condition][Run]["Ended"]=="SE":
+        Run=Run.strip()
+        with logging_mutex:
+            logger_proxy.info(f"Randomly selecting {proportion_of_reads_to_be_selected} reads from {Run}")
+        if options.mrna_md[condition][Run]["Ended"]=="SE":
             input_filename1 = location_directory+"/"+Run+".fastq"
             output_filename1 = location_directory+"/"+Run+".fastq.reduced"
             performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filename1,output_filename1)
             os.system(f"mv {output_filename1} {input_filename1}")
-        elif options[condition][Run]["Ended"]=="PE":
+        elif options.mrna_md[condition][Run]["Ended"]=="PE":
             input_filename1 = location_directory+"/"+Run+"_1.fastq"
             output_filename1 = location_directory+"/"+Run+"_1.fastq.reduced"
             input_filename2 = location_directory+"/"+Run+"_2.fastq"
@@ -292,7 +297,7 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
         
         
         if options.run_tests==True:
-            selectReadsAtRandom(options.temp_dir+"/download_these_runs",options.raw_data_downloaded_from_NCBI,options,condition)
+            selectReadsAtRandom(options.temp_dir+"/download_these_runs",options.raw_data_downloaded_from_NCBI,options,condition,logger_proxy,logging_mutex)
         rerun_selection_of_high_confidence_SJ=0 # Assumes that all the Runs have been aligned
         #########################################################################################################
         # Align reads with STAR round1 & compress adapter trimmed reads

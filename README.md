@@ -179,7 +179,7 @@ This program will download and run the entire process of annotation. The duratio
 Run the following command to remove all intermediate files. We recommend that while you run `finder`, you preserve all intermediate files and then run the following command to remove all the intermediate files.
 
 ```bash
-finder -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -gdir_star $PWD/star_index_without_transcriptome -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -gdir_olego olego_index -preserve -pc_clean 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error
+finder --run_tests -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -gdir_star $PWD/star_index_without_transcriptome -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -gdir_olego olego_index -preserve -pc_clean 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error
 ```
 
 ### Enforcing running of FINDER from preset checkpoints
@@ -227,7 +227,7 @@ FINDER generates several intermediate files and folders. This section contains a
 
 `finder` offers users with 2 utilites which could be used independently. 
 
-1. `downloadAndDumpFastqFromSRA.py` - A python program that optimizes the download of data from SRA. Ids of RNA-Seq (or any sequencing for that matter) needs to be provided as a newline separated file. The program will download the RNA-Seq files, using the requested number of cores, convert those to fastq and remove the `.sra` files. 
+1. `downloadAndDumpFastqFromSRA.py` - A python program that optimizes the download of data from SRA. Ids of RNA-Seq (or any sequencing for that matter) needs to be provided as a newline separated file. The program will download the RNA-Seq files, using the requested number of cores, convert those to fastq and remove the `.sra` files. `downloadAndDumpFastqFromSRA.py` will continuosly query the SRA database in the event of a failure.
 
    ```
    python downloadAndDumpFastqFromSRA.py -h

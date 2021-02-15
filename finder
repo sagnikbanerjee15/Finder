@@ -68,29 +68,29 @@ from scripts.removeSpuriousTranscriptsBasedOnCDS import *
 from scripts.runCommand import *
 from scripts.splitTranscriptsWithQuestionableSpliceJunctions import *
 from scripts.transcriptToConditions import *
+from scripts.verifyInstallations import *
 import numpy as np
 import pandas as pd
 
-
 def parseCommandLineArguments():
     parser = argparse.ArgumentParser(prog="finder",description="Generates gene annotation from RNA-Seq data",formatter_class=RawTextHelpFormatter)
-    requiredNamed = parser.add_argument_group('Required arguments')
-    optionalNamed = parser.add_argument_group('Optional arguments')
+    required_named = parser.add_argument_group('Required arguments')
+    optional_named = parser.add_argument_group('Optional arguments')
     
     # Mandatory arguments
-    requiredNamed.add_argument("--metadatafile","-mf",help="Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ",required=True)
-    requiredNamed.add_argument("--output_directory","-out_dir",help="Enter the name of the directory where all other operations will be performed",required=True)
-    requiredNamed.add_argument("--genome","-g",help="Enter the SOFT-MASKED genome file of the organism",required=True)
+    required_named.add_argument("--metadatafile","-mf",help="Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ",required=True)
+    required_named.add_argument("--output_directory","-out_dir",help="Enter the name of the directory where all other operations will be performed",required=True)
+    required_named.add_argument("--genome","-g",help="Enter the SOFT-MASKED genome file of the organism",required=True)
     
     # Optional arguments
-    optionalNamed.add_argument("--cpu","-n",help="Enter the number of CPUs to be used.",default=1)
-    optionalNamed.add_argument("--genome_dir_star","-gdir_star",help="Please enter the location of the genome index directory of STAR")
-    optionalNamed.add_argument("--genome_dir_olego","-gdir_olego",help="Please enter the location of the genome index directory of OLego")    
-    optionalNamed.add_argument("--verbose","-verb",default=1,help="Enter a verbosity level")
-    optionalNamed.add_argument("--protein","-p",help="Enter the protein fasta")
-    optionalNamed.add_argument("--no_cleanup","-no_cleanup",help="Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space",action="store_true")
-    optionalNamed.add_argument("--preserve_raw_input_data","-preserve",help="Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. ",action="store_true")
-    optionalNamed.add_argument("--checkpoint","-c",help="""Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous checkpoint. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+    optional_named.add_argument("--cpu","-n",help="Enter the number of CPUs to be used.",default=1)
+    optional_named.add_argument("--genome_dir_star","-gdir_star",help="Please enter the location of the genome index directory of STAR")
+    optional_named.add_argument("--genome_dir_olego","-gdir_olego",help="Please enter the location of the genome index directory of OLego")    
+    optional_named.add_argument("--verbose","-verb",default=1,help="Enter a verbosity level")
+    optional_named.add_argument("--protein","-p",help="Enter the protein fasta")
+    optional_named.add_argument("--no_cleanup","-no_cleanup",help="Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space",action="store_true")
+    optional_named.add_argument("--preserve_raw_input_data","-preserve",help="Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. ",action="store_true")
+    optional_named.add_argument("--checkpoint","-c",help="""Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous checkpoint. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
     1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
     2. Assemble with PsiCLASS (Will remove all assemblies) 
     3. Find genes with FINDER (entails changepoint detection) 
@@ -98,11 +98,12 @@ def parseCommandLineArguments():
     5. Annotate coding regions
     6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
     """,default = None,type =int)
-    optionalNamed.add_argument("--perform_post_completion_data_cleanup","-pc_clean",help="Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ",action="store_true")
+    optional_named.add_argument("--perform_post_completion_data_cleanup","-pc_clean",help="Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ",action="store_true")
+    optional_named.add_argument("--run_tests","-rt",help="Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations",action="store_true")
     
-    #optionalNamed.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
-    #optionalNamed.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
-    #optionalNamed.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")
+    #optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
+    #optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
+    #optional_named.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")
     
     # Suppressed arguments
     parser.add_argument("--md","-md",help=argparse.SUPPRESS)# Metadata to store all the requested processing
@@ -575,6 +576,11 @@ def main():
     validateCommandLineArguments(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info("validateCommandLineArguments execution successful")
+    
+    if options.run_tests == True:
+        verifyInstallations(options,logger_proxy,logging_mutex)
+        with logging_mutex:
+            logger_proxy.info("verifyInstallations execution successful")
     
     readMetaDataFile(options,logger_proxy,logging_mutex)
     with logging_mutex:

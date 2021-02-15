@@ -9,6 +9,7 @@ from scripts.fileReadWriteOperations import *
 import multiprocessing
 import os
 import sys
+import random
 
 
 def selectHighConfidenceSpliceJunctionsPerCondition(eachinput):
@@ -172,6 +173,74 @@ def mergeAllAlignments(options,condition):
         if os.path.exists(bam_filename_final+".csi")==False:
             os.system(cmd)
 
+def performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filename1,output_filename1,input_filename2=None,output_filename2=None):
+    if input_filename2==None and output_filename2==None: # single ended
+        fhr1 = open(input_filename1,"r")
+        fhw1 = open(output_filename1,"w")
+        while True:
+            line1_1 = fhr1.readline()
+            line1_2 = fhr1.readline()
+            line1_3 = fhr1.readline()
+            line1_4 = fhr1.readline()
+            if random.uniform(0,1) < proportion_of_reads_to_be_selected:
+                fhw1.write(line1_1)
+                fhw1.write(line1_2)
+                fhw1.write(line1_3)
+                fhw1.write(line1_4)
+        fhr1.close()
+        fhw1.close()
+    else:
+        fhr1 = open(input_filename1,"r")
+        fhr2 = open(input_filename2,"r")
+        fhw1 = open(output_filename1,"w")
+        fhw2 = open(output_filename2,"w")
+        while True:
+            line1_1 = fhr1.readline()
+            line1_2 = fhr1.readline()
+            line1_3 = fhr1.readline()
+            line1_4 = fhr1.readline()
+            
+            line2_1 = fhr2.readline()
+            line2_2 = fhr2.readline()
+            line2_3 = fhr2.readline()
+            line2_4 = fhr2.readline()
+            if random.uniform(0,1) < proportion_of_reads_to_be_selected:
+                fhw1.write(line1_1)
+                fhw1.write(line1_2)
+                fhw1.write(line1_3)
+                fhw1.write(line1_4)
+                
+                fhw2.write(line2_1)
+                fhw2.write(line2_2)
+                fhw2.write(line2_3)
+                fhw2.write(line2_4)
+        fhr1.close()
+        fhw1.close()
+        fhr2.close()
+        fhw2.close()
+
+def selectReadsAtRandom(sraids_filenames,location_directory,options,condition):
+    """
+    Randomly select reads from fastq
+    """
+    proportion_of_reads_to_be_selected=0.2
+    fhr = open(sraids_filenames,"r")
+    for Run in fhr:
+        if options[condition][Run]["Ended"]=="SE":
+            input_filename1 = location_directory+"/"+Run+".fastq"
+            output_filename1 = location_directory+"/"+Run+".fastq.reduced"
+            performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filename1,output_filename1)
+            os.system(f"mv {output_filename1} {input_filename1}")
+        elif options[condition][Run]["Ended"]=="PE":
+            input_filename1 = location_directory+"/"+Run+"_1.fastq"
+            output_filename1 = location_directory+"/"+Run+"_1.fastq.reduced"
+            input_filename2 = location_directory+"/"+Run+"_2.fastq"
+            output_filename2 = location_directory+"/"+Run+"_2.fastq.reduced"
+            performRandomSelectionOfReads(proportion_of_reads_to_be_selected,input_filename1,output_filename1,input_filename2,output_filename2)
+            os.system(f"mv {output_filename1} {input_filename1}")
+            os.system(f"mv {output_filename2} {input_filename2}")
+    fhr.close()
+
 def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
     
     for condition_num,condition in enumerate(options.mrna_md):
@@ -221,6 +290,9 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
         with logging_mutex:
             logger_proxy.info("Downloading missing data from NCBI finished for "+condition)
         
+        
+        if options.run_tests==True:
+            selectReadsAtRandom(options.temp_dir+"/download_these_runs",options.raw_data_downloaded_from_NCBI,options,condition)
         rerun_selection_of_high_confidence_SJ=0 # Assumes that all the Runs have been aligned
         #########################################################################################################
         # Align reads with STAR round1 & compress adapter trimmed reads

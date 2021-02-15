@@ -74,7 +74,7 @@ os.system("chmod -R a+x *")
 os.chdir(pwd)
 
 # Install Augustus
-os.chdir(pwd+"/Augustus")
+os.chdir(pwd+"/dep/Augustus")
 os.system("chmod -R a+x *")
 os.chdir(pwd)
 

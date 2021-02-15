@@ -39,8 +39,6 @@ conda activate finder_conda_env
 cd dep
 ```
 
-In the event of multiple installations of `finder` there might be software clashes. Please make sure you keep only one installation. Also remember to remove all the `export` statements of previous installation from the `~/.bashrc` file.
-
 `finder` runs `BRAKER2` which depends on `GeneMark-ES`. `finder` also needs `GeneMarkS/T` to predict coding regions of genes. Both `GeneMark-ES` and `GeneMarkS/T` are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the `dep` sub-directory. Please follow the instructions below to download the softwares and the key:
 
 1. Open a browser of your choice

@@ -13,8 +13,8 @@ FINDER requires a number of softwares which needs to be installed. This might ca
 Execute the following commands to download and install Anaconda
 
 ```bash
-wget https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
-bash Anaconda3-2020.02-Linux-x86_64.sh # do not install VS. You may replace it with the latest version of Anaconda from https://www.anaconda.com/distribution/. Also, conda will default to the home directory, but make sure you choose a directory that has sufficient disk space to install all the software packages. 
+wget https://repo.anaconda.com/archive/Anaconda3-2020.21-Linux-x86_64.sh
+bash Anaconda3-2020.21-Linux-x86_64.sh # do not install VS. You may replace it with the latest version of Anaconda from https://www.anaconda.com/distribution/. Also, conda will default to the home directory, but make sure you choose a directory that has sufficient disk space to install all the software packages. 
 ```
 
 ## Downloading `finder` and creating a conda environment
@@ -53,10 +53,10 @@ In the event of multiple installations of `finder` there might be software clash
 8. Go to step 2
 9. Select the option **GeneMarkS-T** (last option) and **LINUX 64**
 10. Repeat steps 4-6
-11. This command will download the file **gmst_linux_64.tar.gz** in the `src` sub-directory
+11. This command will download the file **gmst_linux_64.tar.gz** in the `dep` sub-directory
 12. Now, right click on the link that says **64_bit** and select **Copy Link Address**
 13. Then type in `wget` and paste the path you just copied
-14. This command will download the file **gm_key_64.tar.gz** in the `src` sub-directory. This license key will serve for both the programs. Please note that this key will expire after one year from the date of download.
+14. This command will download the file **gm_key_64.tar.gz** in the `dep` sub-directory. This license key will serve for both the programs. Please note that this key will expire after one year from the date of download.
 15. Execute the following commands:
 
 ```bash

@@ -15,7 +15,7 @@ for line in fhr:
         finder_installation_locations.append(line.strip().split("$PATH:")[-1])
 fhr.close()
 
-print(finder_installation_locations)
+#print(finder_installation_locations)
 remove_these_indices=[]
 for i,each_installation in enumerate(finder_installation_locations):
     check_this_file="software_identity"
@@ -32,11 +32,13 @@ for i,each_installation in enumerate(finder_installation_locations):
         print("File not found")
         remove_these_indices.append(i)
 
-print(remove_these_indices)
+#print(remove_these_indices)
 for i in remove_these_indices[::-1]:
+    print(f"{finder_installation_locations[i]} will be removed from $PATH")
     finder_installation_locations.pop(i)
+    
 
-print(finder_installation_locations)
+#print(finder_installation_locations)
 if len(finder_installation_locations)>0:
     fhr=open(os.path.expanduser('~')+"/"+ '.bashrc',"r")
     fhw = open(os.path.expanduser('~')+"/"+ '.bashrc.temp',"w")
@@ -56,7 +58,15 @@ if len(finder_installation_locations)>0:
     cmd=f"rm {temp_file}"
     os.system(cmd)
     
-os.system("./install.sh")
+pwd = os.getcwd()
+# Install OLego
+os.chdir(pwd+"/dep/olego")
+print(f"Currently in {os.getcwd()}")
+os.system("make")
+os.system("chmod -R a+x *")
+os.chdir(pwd)
+print(f"Currently in {os.getcwd()}")
+#os.system("./install.sh")
 
 
 

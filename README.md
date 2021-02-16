@@ -79,9 +79,9 @@ Please follow the following the instructions to generate gene annotations using 
 | Ended            | Enter either PE or SE for Paired ended reads or single neded reads. No other value should be entered. | **YES**   |
 | RNA-Seq          | Enter 1 for all the rows. This field is included for future extensions. | **YES**   |
 | process          | Enter 1 if you wish to process the sample. If a value of 0 is present, then FINDER will ignore the sample | **YES**   |
-| Location         | Enter the location of the directory. For samples to be downloaded from NCBI, this field should be left empty. If the location of a directory is provided here then FINDER will assume that the sample is present in it. FINDER will generate an error if the sample is not found in this directory. It is *not* necessary to have all the samples in the same directory. To illustrate this, the template has 6 samples located in diferent folder locations. If you want to use pre-downloaded datat which is also available in NCBI, just provide the directory where the samples can be found. FINDER is configured to skip downloading from NCBI, if a local directory is specified. | **YES**   |
+| Location         | Enter the location of the directory. For samples to be downloaded from NCBI, this field should be left empty. If the location of a directory is provided here then `finder` will assume that the sample is present in it. `finder` will generate an error if the sample is not found in this directory. It is *not* necessary to have all the samples in the same directory. | **YES**   |
 
-To optimize disk space usage FINDER will process read samples from each bioproject at a time. Once the data is downloaded and reads are mapped, FINDER will remove all those data (if `-no-cleanup` is not specificied) to save disk space. But samples that were locally present will not be removed.
+To optimize disk space usage `finder` will process read samples from each bioproject at a time. Once the data is downloaded and reads are mapped, FINDER will remove all those data (if `-no-cleanup` is not specificied) to save disk space. But samples that were locally present will not be removed.
 
 ### Preparing the genome index
 

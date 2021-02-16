@@ -17,6 +17,7 @@
 # are printed to a file bad_genes.lst. Option -s allows to exclude bad genes
 # from the FASTA output file, automatically.
 # Beware: the script assumes that the gtf input file is sorted by coordinates!
+#
 
 try:
     import argparse

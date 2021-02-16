@@ -6,7 +6,7 @@ Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise
 
 ## Installation
 
-FINDER requires a number of softwares which needs to be installed. This might cause version conflicts with softwares that are already installed in your system. Hence, the developers have decided to enforce the use of FINDER within a conda environment. 
+`finder` requires a number of softwares which needs to be installed. This might cause version conflicts with softwares that are already installed in your system. Hence, the developers have decided to enforce the use of `finder` within a conda environment. 
 
 ### Downloading and installing Anaconda (skip if you already have Anaconda installed)
 
@@ -14,7 +14,7 @@ Execute the following commands to download and install Anaconda
 
 ```bash
 wget https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
-bash Anaconda3-2020.21-Linux-x86_64.sh # do not install VS. You may replace it with the latest version of Anaconda from https://www.anaconda.com/distribution/. Also, conda will default to the home directory, but make sure you choose a directory that has sufficient disk space to install all the software packages. 
+bash Anaconda3-2020.11-Linux-x86_64.sh # do not install VS. You may replace it with the latest version of Anaconda from https://www.anaconda.com/distribution/. Also, conda will default to the home directory, but make sure you choose a directory that has sufficient disk space to install all the software packages. 
 ```
 
 ## Downloading `finder` and creating a conda environment

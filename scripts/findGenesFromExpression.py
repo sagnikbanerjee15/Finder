@@ -225,7 +225,7 @@ def selectReadsAtRandom(sraids_filenames,location_directory,options,condition,lo
     """
     Randomly select reads from fastq
     """
-    proportion_of_reads_to_be_selected=0.2
+    proportion_of_reads_to_be_selected=0.1
     fhr = open(sraids_filenames,"r")
     for Run in fhr:
         Run=Run.strip()

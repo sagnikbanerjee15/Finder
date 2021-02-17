@@ -14,7 +14,7 @@ def transcriptToConditions(options):
     #filename=options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_merged_transcripts.gtf"
     filename=options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf"
     final_transcripts_temp,useless1,useless2=readAllTranscriptsFromGTFFileInParallel([filename,"dummy","dummy"])
-    final_transcripts=[transcript_id for chromosome in final_transcripts_temp for transcript_id in final_transcripts_temp[chromosome]]
+    final_transcripts=[transcript_id for transcript_id in final_transcripts_temp]
     
     transcripts_from_individual_runs={}
     allinputs=[]
@@ -27,7 +27,7 @@ def transcriptToConditions(options):
     results=pool.map(readAllTranscriptsFromGTFFileInParallel,allinputs)
     for result in results:
         info,Run,condition=result
-        transcripts_from_individual_runs[condition].extend([transcript_id for chromosome in info for transcript_id in info[chromosome]])
+        transcripts_from_individual_runs[condition].extend([transcript_id for transcript_id in info])
         
     for condition in transcripts_from_individual_runs:
         transcripts_from_individual_runs[condition]=dict(collections.Counter(transcripts_from_individual_runs[condition]))

@@ -102,7 +102,7 @@ To optimize disk space usage `finder` will process read samples from each biopro
 
 ### Preparing the genome index
 
-`finder` uses `STAR` and `OLego` for aligning and `PsiCLASS` for assembling. Users have the choice of generating the genome index and providing it to `finder` or allowing `finder` to generate the index. For some organisms with large genomes, `STAR` might require more memory. Hence users might be forced to transfer the STAR genome index generated in a computer that permits the usage of a large enough memory for index generation.  Download the *Arabidopsis thaliana* genome using the following command:
+`finder` uses `STAR` and `OLego` for aligning and `PsiCLASS` for assembling. Users have the choice of generating the genome index and providing it to `finder` or allowing `finder` to generate the index. For some organisms with large genomes, `STAR` might require more memory. Hence users might be forced to transfer the STAR genome index generation to a computer that permits the usage of a large enough memory.  Download the *Arabidopsis thaliana* genome using the following command:
 
 ```bash
 cd example

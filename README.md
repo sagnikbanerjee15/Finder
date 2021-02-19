@@ -39,6 +39,23 @@ conda activate finder_conda_env
 cd dep
 ```
 
+While running `conda env create -f environment.yml` you might get an error about conflicts. Follow the following steps to get rid of that error.
+
+```bash
+cat /dev/null > ~/.condarc
+vim ~/.condarc
+# Copy paste the following part
+channels:
+ - defaults
+ - conda-forge
+channel_priority: true
+
+conda update --all
+conda env create -f environment.yml # This will create an environment named finder_conda_env
+conda activate finder_conda_env
+cd dep
+```
+
 `finder` runs `BRAKER2` which depends on `GeneMark-ES`. `finder` also needs `GeneMarkS/T` to predict coding regions of genes. Both `GeneMark-ES` and `GeneMarkS/T` are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the `dep` sub-directory. Please follow the instructions below to download the softwares and the key:
 
 1. Open a browser of your choice
@@ -66,7 +83,7 @@ export PATH=$PATH:$(pwd)
 
 ## Executing FINDER with Sample data
 
-Please follow the following the instructions to generate gene annotations using *Arabidopsis thaliana*. A `csv` file template has been provided with the release in `example/Arabidopsis_thaliana_metadata.csv`. Keep all the headers intact and replace the data with your samples of choice. Also note, that FINDER can work with both data downloaded from `NCBI` and also with data on local directories. Below is a detailed description of the each column of the metadata file.
+Please follow the following the instructions to generate gene annotations using *Arabidopsis thaliana*. A `csv` file template has been provided with the release in `example/Arabidopsis_thaliana_metadata.csv`. Keep all the headers intact and replace the data with your samples of choice. Also note, that FINDER can work with both data downloaded from `NCBI` and also with data on local directories. Below is a detailed description of the each column of the metadata file. All the fields must be present in the metadata file. Mandatory fields must have some valid data whereas other fields like `Description`, `Date` and `Read Length` can be left vacant. 
 
 | Column Name      | Column Description                                           | Mandatory |
 | :--------------- | :----------------------------------------------------------- | :-------- |

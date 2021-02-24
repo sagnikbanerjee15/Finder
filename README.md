@@ -139,7 +139,57 @@ Help menu for FINDER can be launched by the following command:
 ```bash
 finder -h
 
+usage: finder [-h] --metadatafile METADATAFILE --output_directory
+              OUTPUT_DIRECTORY --genome GENOME [--cpu CPU]
+              [--genome_dir_star GENOME_DIR_STAR]
+              [--genome_dir_olego GENOME_DIR_OLEGO] [--verbose VERBOSE]
+              [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data]
+              [--checkpoint CHECKPOINT]
+              [--perform_post_completion_data_cleanup] [--run_tests]
+              [--addUTR] [--skip_cpd]
 
+Generates gene annotation from RNA-Seq data
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Required arguments:
+  --metadatafile METADATAFILE, -mf METADATAFILE
+                        Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. 
+  --output_directory OUTPUT_DIRECTORY, -out_dir OUTPUT_DIRECTORY
+                        Enter the name of the directory where all other operations will be performed
+  --genome GENOME, -g GENOME
+                        Enter the SOFT-MASKED genome file of the organism
+
+Optional arguments:
+  --cpu CPU, -n CPU     Enter the number of CPUs to be used.
+  --genome_dir_star GENOME_DIR_STAR, -gdir_star GENOME_DIR_STAR
+                        Please enter the location of the genome index directory of STAR
+  --genome_dir_olego GENOME_DIR_OLEGO, -gdir_olego GENOME_DIR_OLEGO
+                        Please enter the location of the genome index directory of OLego
+  --verbose VERBOSE, -verb VERBOSE
+                        Enter a verbosity level
+  --protein PROTEIN, -p PROTEIN
+                        Enter the protein fasta
+  --no_cleanup, -no_cleanup
+                        Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space
+  --preserve_raw_input_data, -preserve
+                        Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. 
+  --checkpoint CHECKPOINT, -c CHECKPOINT
+                        Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous checkpoint. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+                            1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
+                            2. Assemble with PsiCLASS (Will remove all assemblies) 
+                            3. Find genes with FINDER (entails changepoint detection) 
+                            4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
+                            5. Annotate coding regions
+                            6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
+                            
+  --perform_post_completion_data_cleanup, -pc_clean
+                        Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. 
+  --run_tests, -rt      Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations
+  --addUTR, --addUTR    Turn on this option if you wish BRAKER to add UTR sequences
+  --skip_cpd, --skip_cpd
+                        Turn on this option to skip changepoint detection. Could be effective for grasses
 ```
 
 `finder` can be launched using the following command:

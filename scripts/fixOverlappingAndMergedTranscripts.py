@@ -220,6 +220,9 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
     # Selecting the first Run from the first condition
     gtffilename=options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_transcripts_connecting_two_transcripts.gtf"
     output_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/combined_cov_opp_split.gtf"
+    if options.skip_cpd==True:
+        os.system(f"mv {gtffilename} {output_gtf_filename}")
+        continue
     if os.path.exists(output_gtf_filename)==True:return
     exons_overlapping_with_introns_bedfilename=gtffilename[:-4]+"_exons_overlapping_with_introns.bed"
     overlaps={}

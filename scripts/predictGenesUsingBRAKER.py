@@ -339,7 +339,8 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     cmd+=" --workingdir="+options.output_braker
     cmd+=" --overwrite "
     cmd+=" --gff3 "
-    cmd+=" --addUTR=on "
+    if options.addUTR==True:
+        cmd+=" --addUTR=on "
     #cmd+=" --UTR=on "
     cmd+=" > "+options.output_braker+".output"
     cmd+=" 2> "+options.output_braker+".error"

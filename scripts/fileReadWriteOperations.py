@@ -27,6 +27,17 @@ def samtoolsQuickCheck(filename,options):
     os.system("rm "+filename+".quickcheck")
     return 0
 
+def isValidLocation(location):
+    """
+    Checks if the location provided is valid
+    """
+    if (".." in location):
+        return 1
+    elif ("/" in location):
+        return 1
+    elif (len(set(location))==1 and location[0]==' '):
+        return 0
+
 def readMetaDataFile(options,logger_proxy,logging_mutex):
     all_samples={}
     small_rna_samples={}
@@ -51,7 +62,7 @@ def readMetaDataFile(options,logger_proxy,logging_mutex):
                                      "read_length":read_length,
                                      "error_corrected":0,
                                      "location_directory":options.raw_data_downloaded_from_NCBI if location=="" else location,
-                                     "downloaded_from_NCBI":1 if location=="" else 0
+                                     "downloaded_from_NCBI":1 if isValidLocation(location)==0 else 0
                                      }
         else:
             small_rna_samples[condition][Run]={"bioproject":BioProject,

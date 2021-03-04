@@ -61,7 +61,7 @@ def readMetaDataFile(options,logger_proxy,logging_mutex):
                                      "desc":desc,
                                      "read_length":read_length,
                                      "error_corrected":0,
-                                     "location_directory":options.raw_data_downloaded_from_NCBI if location=="" else location,
+                                     "location_directory":options.raw_data_downloaded_from_NCBI if isValidLocation(location)==0 else location,
                                      "downloaded_from_NCBI":1 if isValidLocation(location)==0 else 0
                                      }
         else:
@@ -72,8 +72,8 @@ def readMetaDataFile(options,logger_proxy,logging_mutex):
                                      "desc":desc,
                                      "read_length":read_length,
                                      "error_corrected":0,
-                                     "location_directory":options.raw_data_downloaded_from_NCBI if location=="" else location,
-                                     "downloaded_from_NCBI":1 if location=="" else 0
+                                     "location_directory":options.raw_data_downloaded_from_NCBI if isValidLocation(location)==0 else location,
+                                     "downloaded_from_NCBI":1 if isValidLocation(location)==0 else 0
                                      }
     fhr.close()
     options.mrna_md=all_samples

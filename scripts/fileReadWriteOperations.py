@@ -37,6 +37,8 @@ def isValidLocation(location):
         return 1
     elif (len(set(location))==1 and location[0]==' '):
         return 0
+    elif (len(set(location))==0):
+        return 0
 
 def readMetaDataFile(options,logger_proxy,logging_mutex):
     all_samples={}

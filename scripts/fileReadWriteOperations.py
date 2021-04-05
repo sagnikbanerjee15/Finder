@@ -40,6 +40,23 @@ def isValidLocation(location):
     elif (len(set(location))==0):
         return 0
 
+def expandGzippedFiles(options,logger_proxy,logging_mutex):
+    for condition in options.mrna_md:
+        for Run in options.mrna_md[condition]:
+            if options.mrna_md[condition][Run]["downloaded_from_NCBI"] == 0:
+                location = options.mrna_md[condition][Run]["location"]
+                if os.path.exists(f"{location}/{Run}.fastq.gz") == True:
+                    cmd = f"gunzip -c "
+                    cmd += f"{location}/{Run}.fastq.gz "
+                    cmd += " > "
+                    cmd += f"{options.raw_data_downloaded_from_NCBI}/{Run}.fastq"
+                    with logging_mutex:
+                        logger_proxy.info("Fastq data is expanded")
+                    os.system(cmd)
+                    options.mrna_md[condition][Run]["location"] = options.raw_data_downloaded_from_NCBI
+                    options.mrna_md[condition][Run]["downloaded_from_NCBI"] = 1
+    
+
 def readMetaDataFile(options,logger_proxy,logging_mutex):
     all_samples={}
     small_rna_samples={}

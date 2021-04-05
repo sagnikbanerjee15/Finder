@@ -8,3 +8,5 @@ PRJNA556865,SRR9844300,leaf,cDNA;Illumina HiSeq 2000,1/8/20,300,PE,1,1,
 PRJNA513852,SRR8422200,cold,PCR;Illumina HiSeq 2000,1/23/19,140,PE,1,1,
 PRJNA513852,SRR8422201,cold,PCR;Illumina HiSeq 2000,1/23/19,140,PE,1,1,
 PRJNA513852,SRR8422202,cold,PCR;Illumina HiSeq 2000,1/23/19,140,PE,1,1,
+Dummy1,dummy_data1,leaf,PCR;Illumina HiSeq 2000,1/23/19,140,SE,1,1,raw_data
+Dummy2,dummy_data2,leaf,PCR;Illumina HiSeq 2000,1/23/19,140,SE,1,1,raw_data

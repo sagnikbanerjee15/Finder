@@ -247,7 +247,6 @@ def selectReadsAtRandom(sraids_filenames,location_directory,options,condition,lo
     fhr.close()
 
 def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
-    
     for condition_num,condition in enumerate(options.mrna_md):
         with logging_mutex:
             logger_proxy.info("Started processing data for "+condition)

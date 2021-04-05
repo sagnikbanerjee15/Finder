@@ -44,7 +44,7 @@ def expandGzippedFiles(options,logger_proxy,logging_mutex):
     for condition in options.mrna_md:
         for Run in options.mrna_md[condition]:
             if options.mrna_md[condition][Run]["downloaded_from_NCBI"] == 0:
-                location = options.mrna_md[condition][Run]["location"]
+                location = options.mrna_md[condition][Run]["location_directory"]
                 if os.path.exists(f"{location}/{Run}.fastq.gz") == True:
                     cmd = f"gunzip -c "
                     cmd += f"{location}/{Run}.fastq.gz "
@@ -53,7 +53,7 @@ def expandGzippedFiles(options,logger_proxy,logging_mutex):
                     with logging_mutex:
                         logger_proxy.info("Fastq data is expanded")
                     os.system(cmd)
-                    options.mrna_md[condition][Run]["location"] = options.raw_data_downloaded_from_NCBI
+                    options.mrna_md[condition][Run]["location_directory"] = options.raw_data_downloaded_from_NCBI
                     options.mrna_md[condition][Run]["downloaded_from_NCBI"] = 1
     
 

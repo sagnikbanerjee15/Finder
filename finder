@@ -591,6 +591,7 @@ def main():
     with logging_mutex:
         logger_proxy.info("expandGzippedFiles execution successful")
     
+    pprint.pprint(options.mrna_md)
     determineOptimalStartingPoint(options,logger_proxy,logging_mutex)
     with logging_mutex:
         logger_proxy.info(f" Program params - {options}")

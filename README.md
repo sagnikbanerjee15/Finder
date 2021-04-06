@@ -190,6 +190,8 @@ Optional arguments:
   --addUTR, --addUTR    Turn on this option if you wish BRAKER to add UTR sequences
   --skip_cpd, --skip_cpd
                         Turn on this option to skip changepoint detection. Could be effective for grasses
+  --exonerate_gff3 EXONERATE_GFF3, -egff3 EXONERATE_GFF3
+                        Enter the exonerate output in gff3 format
 ```
 
 `finder` can be launched using the following command:

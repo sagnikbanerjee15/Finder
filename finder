@@ -102,6 +102,7 @@ def parseCommandLineArguments():
     optional_named.add_argument("--run_tests","-rt",help="Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations",action="store_true")
     optional_named.add_argument("--addUTR","--addUTR",help="Turn on this option if you wish BRAKER to add UTR sequences",action="store_true")
     optional_named.add_argument("--skip_cpd","--skip_cpd",help="Turn on this option to skip changepoint detection. Could be effective for grasses",action="store_true")
+    optional_named.add_argument("--exonerate_gff3","-egff3",help="Enter the exonerate output in gff3 format")
     #optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
     #optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
     #optional_named.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")

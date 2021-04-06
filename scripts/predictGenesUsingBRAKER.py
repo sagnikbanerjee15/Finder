@@ -222,7 +222,11 @@ def addBRAKERPredictions(options,logger_proxy,logging_mutex):
         fhw.write(">"+protein+"\n"+proteins_for_alignment[protein]+"\n")
     fhw.close()
     
-    mapProteinsToGenomeUsingExonerate(options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta",options,logger_proxy,logging_mutex)
+    if options.exonerate_gff3 is None:
+        mapProteinsToGenomeUsingExonerate(options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.fasta",options,logger_proxy,logging_mutex)
+    else:
+        cmd=f"cp {options.exonerate_gff3} {options.output_assemblies_psiclass_terminal_exon_length_modified}/proteins_for_alignment.gff3"
+        os.system(cmd)
     
     cmd=options.softwares["convert_exonerate_gff_to_gtf"]
     cmd+=" -i "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/proteins_for_alignment.gff3 "

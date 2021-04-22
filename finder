@@ -236,6 +236,7 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=" --runMode genomeGenerate "
         cmd+=" --genomeDir "+options.genome_dir_star
         cmd+=" --genomeFastaFiles "+options.genome
+        cmd+=" --limitGenomeGenerateRAM 50000000000"
         cmd+=" > "+options.genome_dir_star+".output "
         cmd+=" 2> "+options.genome_dir_star+".error "
         os.system(cmd)

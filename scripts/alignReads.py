@@ -44,6 +44,13 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=options.output_star+"/"+Run+"_round1_Log.out "
     os.system(cmd)
     
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
+    os.system(cmd)
+    
     with logging_mutex:
         logger_proxy.info("STAR Round1 run for "+Run+" completed")
 
@@ -120,6 +127,13 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
     cmd+=options.output_star+"/"+Run+"_final_Log.final.out "
     cmd+=options.output_star+"/"+Run+"_round3_Log.final.out"
     os.system(cmd)
+    
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
+    os.system(cmd)
     with logging_mutex:
         logger_proxy.info("STAR relaxed alignment run for "+Run+" completed")
               
@@ -172,6 +186,13 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" 2> "+options.output_star+"/"+Run+"_round2.error"
     #print(cmd)
     #sys.stdout.flush()
+    os.system(cmd)
+    
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
     os.system(cmd)
     
     cmd="rm "
@@ -232,6 +253,13 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     sys.stdout.flush()
     os.system(cmd)
     
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
+    os.system(cmd)
+    
     cmd="rm "
     cmd+=options.output_star+"/"+Run+"_round3_Log.progress.out "+options.output_star+"/"+Run+"_round3_Log.out"
     os.system(cmd)
@@ -272,6 +300,13 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
         cmd+=" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate2"
     cmd+=" > "+options.output_star+"/"+Run+"_round4.output"
     cmd+=" 2> "+options.output_star+"/"+Run+"_round4.error"
+    os.system(cmd)
+    
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
     os.system(cmd)
     
     cmd="rm "

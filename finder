@@ -243,6 +243,13 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         with logging_mutex:
             logger_proxy.info("STAR index generation complete")
     
+    # Remove a pre-loaded genome
+    cmd  = "STAR "
+    cmd += f" --runThreadN {options.cpu} "
+    cmd += f" --genomeLoad Remove "
+    cmd += f" --genomeDir {options.genome_dir_star} "
+    os.system(cmd)
+    
     if options.genome_dir_olego is None:  
         with logging_mutex:
             logger_proxy.info("Generating OLego index")

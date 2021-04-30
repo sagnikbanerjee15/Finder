@@ -239,7 +239,8 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=" --limitGenomeGenerateRAM 50000000000"
         cmd+=" > "+options.genome_dir_star+".output "
         cmd+=" 2> "+options.genome_dir_star+".error "
-        os.system(cmd)
+        if os.path.exists(f"{options.genome_dir_star}/SAindex")==False:
+            os.system(cmd)
         with logging_mutex:
             logger_proxy.info("STAR index generation complete")
     
@@ -258,7 +259,8 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=options.genome
         cmd+=" > "+options.indices+"_olego_index.output "
         cmd+=" 2> "+options.indices+"_olego_index.error "
-        os.system(cmd)
+        if os.path.exists(f"{options.indices}/olego_index.rsa")==False:
+            os.system(cmd)
         options.genome_dir_olego=options.indices+"/olego_index"
         
         with logging_mutex:

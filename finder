@@ -134,6 +134,7 @@ def parseCommandLineArguments():
     return parser.parse_args()
 
 def validateCommandLineArguments(options,logger_proxy,logging_mutex):
+    options.output_directory = os.path.abspath(options.output_directory)
     #options.output_trimmomatic=options.output_directory+"/trimmomatic_output"
     options.output_star=options.output_directory+"/alignments"
     options.output_assemblies_psiclass_terminal_exon_length_modified=options.output_directory+"/assemblies_psiclass_modified"
@@ -153,7 +154,7 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     options.files_for_ncrna={}
     #options.ncrna_dir=options.output_directory+"/ncrna"
     
-    options.output_directory = os.path.abspath(options.output_directory)
+    
     os.system("mkdir -p "+options.output_directory)
     os.system("mkdir -p "+options.output_star)
     os.system("mkdir -p "+options.output_assemblies_psiclass_terminal_exon_length_modified)

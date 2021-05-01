@@ -508,6 +508,9 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
     sys.stdout.flush()
     
     for file_num,chunk in enumerate(chunked_file):
+        length_of_interest = len("\n".join(chunk))
+        print(f"{length_of_interest}")
+        sys.stdout.flush()
         fhw=open(inputfile_for_CPD+"_"+str(file_num),"w")
         fhw.write("\n".join(chunk))
         fhw.close()

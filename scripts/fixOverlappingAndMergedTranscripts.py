@@ -512,6 +512,8 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
         if len(chunked_file)!=1:
             fhw.write("\n".join(chunk))
         else:
+            print(chunk[0])
+            sys.stdout.flush()
             fhw.write(chunk[0])
         fhw.close()
     

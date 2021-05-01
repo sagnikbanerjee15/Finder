@@ -502,26 +502,16 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
     outputfile_for_CPD=options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined/"+"outputfileforCPD"
     pool = multiprocessing.Pool(processes=int(options.cpu))
     # Split inputfile into chunks
-    chunked_file=list(divide_chunks(open(inputfile_for_CPD,"r").read().split("\n"),5000))
-    time.sleep(5)
-    print(f"Length of chunks {len(chunked_file)} {chunked_file}")
-    sys.stdout.flush()
-    print(open(inputfile_for_CPD,"r").read().split("\n"))
-    
-    for file_num,chunk in enumerate(chunked_file):
-        fhw=open(inputfile_for_CPD+"_"+str(file_num),"w")
-        if len(chunked_file)!=1:
+    if len(open(inputfile_for_CPD,"r").read().split("\n"))>5000:
+        chunked_file=list(divide_chunks(open(inputfile_for_CPD,"r").read().split("\n"),5000))
+        time.sleep(5)
+        
+        for file_num,chunk in enumerate(chunked_file):
+            fhw=open(inputfile_for_CPD+"_"+str(file_num),"w")
             fhw.write("\n".join(chunk))
-        else:
-            print("chunked_file")
-            print(chunked_file)
-            print("chunk")
-            print(chunk)
-            print("chunk[0]")
-            print(chunk[0])
-            sys.stdout.flush()
-            fhw.write(chunk[0])
-        fhw.close()
+            fhw.close()
+    else:
+        os.system(f"cp {inputfile_for_CPD} {inputfile_for_CPD}_0")
     
     with logging_mutex:
         logger_proxy.info("inputfileforCPD generation is complete")

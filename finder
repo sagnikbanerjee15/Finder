@@ -242,6 +242,8 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=" > "+options.genome_dir_star+".output "
         cmd+=" 2> "+options.genome_dir_star+".error "
         if os.path.exists(f"{options.genome_dir_star}/SAindex")==False:
+            with logging_mutex:
+                logger_proxy.info(f"Running cmd - {cmd}")
             os.system(cmd)
             with logging_mutex:
                 logger_proxy.info("STAR index generation complete")
@@ -262,6 +264,8 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd+=" > "+options.indices+"_olego_index.output "
         cmd+=" 2> "+options.indices+"_olego_index.error "
         if os.path.exists(f"{options.indices}/olego_index.rsa")==False:
+            with logging_mutex:
+                logger_proxy.info(f"Running cmd - {cmd}")
             os.system(cmd)
             with logging_mutex:
                 logger_proxy.info("OLego index built")

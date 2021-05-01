@@ -512,6 +512,7 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
             fhw.close()
     else:
         os.system(f"cp {inputfile_for_CPD} {inputfile_for_CPD}_0")
+        chunked_file=[]
     
     with logging_mutex:
         logger_proxy.info("inputfileforCPD generation is complete")

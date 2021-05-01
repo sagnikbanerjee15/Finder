@@ -233,12 +233,25 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
             logger_proxy.info("Generating STAR index")
         options.genome_dir_star=options.indices+"/star_index_without_transcriptome"
         os.system("mkdir -p "+options.genome_dir_star)
-        cmd="STAR "
-        cmd+=" --runThreadN "+options.cpu
-        cmd+=" --runMode genomeGenerate "
-        cmd+=" --genomeDir "+options.genome_dir_star
-        cmd+=" --genomeFastaFiles "+options.genome
-        cmd+=" --limitGenomeGenerateRAM 50000000000"
+        number_of_reference_sequences = 0
+        genome_length = 0
+        fhr=open(options.genome,"r")
+        for line in fhr:
+            if line[0]=='>':
+                number_of_reference_sequences+=1
+            else:
+                genome_length += len(line.strip())
+        fhr.close()
+        genomeChrBinNbits_value = min(18,math.log2(genome_length/number_of_reference_sequences))
+        genomeSAindexNbases_value = min(14,math.log2(genome_length)/2-1)
+        
+        cmd  = f"STAR "
+        cmd += f" --runThreadN {options.cpu}"
+        cmd += f" --runMode genomeGenerate "
+        cmd += f" --genomeDir {options.genome_dir_star}"
+        cmd += f" --genomeFastaFiles {options.genome}"
+        cmd += f" --genomeChrBinNbits {genomeChrBinNbits_value}"
+        cmd += f" --genomeSAindexNbases {genomeSAindexNbases_value}"
         cmd+=" > "+options.genome_dir_star+".output "
         cmd+=" 2> "+options.genome_dir_star+".error "
         if os.path.exists(f"{options.genome_dir_star}/SAindex")==False:

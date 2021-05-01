@@ -504,6 +504,8 @@ def fixOverlappingAndMergedTranscripts(options,logger_proxy,logging_mutex):
     # Split inputfile into chunks
     chunked_file=list(divide_chunks(open(inputfile_for_CPD,"r").read().split("\n"),5000))
     time.sleep(5)
+    print(f"Length of chunks {len(chunked_file)}")
+    sys.stdout.flush()
     
     for file_num,chunk in enumerate(chunked_file):
         fhw=open(inputfile_for_CPD+"_"+str(file_num),"w")

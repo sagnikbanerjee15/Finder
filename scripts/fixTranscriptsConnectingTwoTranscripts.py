@@ -222,7 +222,7 @@ f="""+dir_for_denovo_assemblies+"/for_denovo_assembly_"+str(region_number)+".fas
         # Align de novo assemblies using GMAP
         ###################################################################################
         cmd="gmap "
-        cmd+=" -t "+options.cpu
+        cmd+=" -t "+str(options.cpu)
         cmd+=" -D "+options.genome_dir_gmap
         cmd+=" -d gmap_index "
         cmd+=" -f samse "
@@ -255,7 +255,7 @@ f="""+dir_for_denovo_assemblies+"/for_denovo_assembly_"+str(region_number)+".fas
         fhr.close()
         
         cmd="gmap "
-        cmd+=" -t "+options.cpu
+        cmd+=" -t "+str(options.cpu)
         cmd+=" -D "+options.genome_dir_gmap
         cmd+=" -d gmap_index "
         cmd+=" -f gff3_gene "

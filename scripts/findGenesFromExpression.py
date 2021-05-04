@@ -151,7 +151,7 @@ def mergeAllAlignments(options,condition):
         
         if os.path.exists(bam_filename_final)==True:
             continue
-        cmd="samtools "+" merge -@ "+options.cpu+" "
+        cmd="samtools "+" merge -@ "+str(options.cpu)+" "
         cmd+=" -f "+bam_filename_final+" "
         cmd+=bam_filename_round1+" "
         cmd+=bam_filename_round2+" "
@@ -164,11 +164,11 @@ def mergeAllAlignments(options,condition):
             
     for Run in options.mrna_md[condition]:
         bam_filename_final=options.output_star+"/"+Run+"_final.sortedByCoord.out.bam"  
-        cmd="samtools "+" index -@ "+options.cpu+" "
+        cmd="samtools "+" index -@ "+str(options.cpu)+" "
         cmd+=bam_filename_final
         if os.path.exists(bam_filename_final+".bai")==False:
             os.system(cmd)
-        cmd="samtools "+" index -c -@ "+options.cpu+" "
+        cmd="samtools "+" index -c -@ "+str(options.cpu)+" "
         cmd+=bam_filename_final
         if os.path.exists(bam_filename_final+".csi")==False:
             os.system(cmd)
@@ -284,7 +284,7 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
             cmd=options.softwares["download_and_dump_fastq_from_SRA"]
             cmd+=" -s "+options.temp_dir+"/download_these_runs "
             cmd+=" -o "+options.raw_data_downloaded_from_NCBI
-            cmd+=" -n "+options.cpu
+            cmd+=" -n "+str(options.cpu)
             cmd+=" > "+options.temp_dir+"/download_these_runs.output "
             cmd+=" 2> "+options.temp_dir+"/download_these_runs.error "
             

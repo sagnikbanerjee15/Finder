@@ -8,7 +8,7 @@ import sys
 def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mutex):
     if (os.path.exists(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
-    cmd+=" --runThreadN "+options.cpu
+    cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
@@ -58,7 +58,7 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
     
     if os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam",options)==0:return
     cmd="STAR "
-    cmd+=" --runThreadN "+options.cpu
+    cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     """if Run_num==0:
         cmd+=" --genomeDir "+options.genome_dir_star
@@ -141,7 +141,7 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     
     if (os.path.exists(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
-    cmd+=" --runThreadN "+options.cpu
+    cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     """if Run_num==0:
         cmd+=" --genomeDir "+options.genome_dir_star
@@ -206,7 +206,7 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     
     if (os.path.exists(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
-    cmd+=" --runThreadN "+options.cpu
+    cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     """if Run_num==0:
         cmd+=" --genomeDir "+options.genome_dir_star
@@ -270,7 +270,7 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
 def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mutex): 
     if (os.path.exists(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam",options)==0):return
     cmd="STAR "
-    cmd+=" --runThreadN "+options.cpu
+    cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
@@ -319,7 +319,7 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
 def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_mutex,min_micro_exon): 
     if (os.path.exists(options.output_star+"/"+Run+"_olego_round5.sorted.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_olego_round5.sorted.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return 1
     cmd=options.softwares["olego"]
-    cmd+=" -t "+options.cpu
+    cmd+=" -t "+str(options.cpu)
     cmd+=" -e "+str(min_micro_exon) # Minimum micro-exon size to be searched
     cmd+=" -M 0 " # No mismatches allowed
     cmd+=" -I 10000 " # Max intron size
@@ -347,12 +347,12 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
         os.system(cmd)
         
         cmd="samtools "+" view "
-        cmd+=" -@ "+options.cpu
+        cmd+=" -@ "+str(options.cpu)
         cmd+=" -Sbh "
         cmd+=options.output_star+"/"+Run+"_olego_round5.sam "
         cmd+="|"
         cmd+="samtools "+" sort "
-        cmd+=" -@ "+options.cpu
+        cmd+=" -@ "+str(options.cpu)
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sorted.bam"
         os.system(cmd)
     else:
@@ -392,12 +392,12 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
         os.system(cmd)
         
         cmd="samtools "+" view "
-        cmd+=" -@ "+options.cpu
+        cmd+=" -@ "+str(options.cpu)
         cmd+=" -Sbh "
         cmd+=options.output_star+"/"+Run+"_olego_round5.sam "
         cmd+="|"
         cmd+="samtools "+" sort "
-        cmd+=" -@ "+options.cpu
+        cmd+=" -@ "+str(options.cpu)
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sorted.bam"
         os.system(cmd)
     

@@ -266,12 +266,14 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
             if options.mrna_md[condition][Run]["downloaded_from_NCBI"]==0:continue
             #print(options.mrna_md[condition][Run])
             if options.mrna_md[condition][Run]["Ended"]=="SE":
-                if os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+".fastq")==False and os.path.exists(options.output_fasta_N_removed+"/"+Run+".fasta")==False:
+                if os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+".fastq")==False and os.path.exists(options.output_fasta_N_removed+"/"+Run+".fasta")==False and os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+".fq")==False:
                     fhw.write(Run+"\n")
                     download_these.append(Run)
                     #options.mrna_md[condition][Run]["location_directory"]=options.raw_data_downloaded_from_NCBI
             elif options.mrna_md[condition][Run]["Ended"]=="PE":
-                if (os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_1.fastq")==False or os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_2.fastq")==False) and (os.path.exists(options.output_fasta_N_removed+"/"+Run+"_1.fasta")==False or os.path.exists(options.output_fasta_N_removed+"/"+Run+"_2.fasta")==False):
+                if (os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_1.fastq")==False or os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_2.fastq")==False) \
+                and (os.path.exists(options.output_fasta_N_removed+"/"+Run+"_1.fasta")==False or os.path.exists(options.output_fasta_N_removed+"/"+Run+"_2.fasta")==False) \
+                and (os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_1.fq")==False or os.path.exists(options.raw_data_downloaded_from_NCBI+"/"+Run+"_2.fq")==False):
                     fhw.write(Run+"\n")
                     download_these.append(Run)
                     #options.mrna_md[condition][Run]["location_directory"]=options.raw_data_downloaded_from_NCBI

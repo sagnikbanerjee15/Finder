@@ -2,7 +2,7 @@
 
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. If you use `finder` for your research please cite 
 
-Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise, and Carson M Andorf.  [FINDER: An automated software package to annotate eukaryotic genes from RNA-Seq data and associated protein sequences](https://www.biorxiv.org/content/10.1101/2021.02.04.429837v1).bioRxiv, page 2021.02.04.429837, 2 2021.
+Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise, and Carson M Andorf.  FINDER: an automated software package to annotate eukaryotic genes from RNA-Seq data and associated protein sequences. https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04120-9 BMC Bioinformatics
 
 ## Installation
 

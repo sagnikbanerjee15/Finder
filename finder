@@ -90,14 +90,15 @@ def parseCommandLineArguments():
     optional_named.add_argument("--protein","-p",help="Enter the protein fasta")
     optional_named.add_argument("--no_cleanup","-no_cleanup",help="Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space",action="store_true")
     optional_named.add_argument("--preserve_raw_input_data","-preserve",help="Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. ",action="store_true")
-    optional_named.add_argument("--checkpoint","-c",help="""Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous checkpoint. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+    optional_named.add_argument("--checkpoint","-c",help="""Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous 
+. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
     1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
     2. Assemble with PsiCLASS (Will remove all assemblies) 
     3. Find genes with FINDER (entails changepoint detection) 
     4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
     5. Annotate coding regions
     6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
-    """,default = None,type =int)
+    """,default = 1,type =int)
     optional_named.add_argument("--perform_post_completion_data_cleanup","-pc_clean",help="Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ",action="store_true")
     optional_named.add_argument("--run_tests","-rt",help="Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations",action="store_true")
     optional_named.add_argument("--addUTR","--addUTR",help="Turn on this option if you wish BRAKER to add UTR sequences",action="store_true")

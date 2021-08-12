@@ -23,7 +23,8 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSJfilterOverhangMin 12 12 12 12 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
-    cmd+=" --genomeLoad LoadAndKeep "
+    if options.star_shared_mem == True:
+        cmd+=" --genomeLoad LoadAndKeep "
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round1_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 "
     cmd+=" --outSJfilterCountTotalMin 1 1 1 1 "
@@ -44,12 +45,13 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=options.output_star+"/"+Run+"_round1_Log.out "
     os.system(cmd)
     
-    # Remove a pre-loaded genome
-    cmd  = "STAR "
-    cmd += f" --runThreadN {options.cpu} "
-    cmd += f" --genomeLoad Remove "
-    cmd += f" --genomeDir {options.genome_dir_star} "
-    os.system(cmd)
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        os.system(cmd)
     
     with logging_mutex:
         logger_proxy.info("STAR Round1 run for "+Run+" completed")
@@ -86,7 +88,8 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
     """
     
     """if Run_num!=0:
-        cmd+=" --genomeLoad LoadAndKeep "
+        if options.star_shared_mem == True:
+            cmd+=" --genomeLoad LoadAndKeep "
     """    
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_final_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 " 
@@ -128,12 +131,14 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
     cmd+=options.output_star+"/"+Run+"_round3_Log.final.out"
     os.system(cmd)
     
-    # Remove a pre-loaded genome
-    cmd  = "STAR "
-    cmd += f" --runThreadN {options.cpu} "
-    cmd += f" --genomeLoad Remove "
-    cmd += f" --genomeDir {options.genome_dir_star} "
-    os.system(cmd)
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        os.system(cmd)
+
     with logging_mutex:
         logger_proxy.info("STAR relaxed alignment run for "+Run+" completed")
               
@@ -169,7 +174,8 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round1_SJ.out.tab "
     
     """if Run_num!=0:
-        cmd+=" --genomeLoad LoadAndKeep "
+        if options.star_shared_mem == True:
+            cmd+=" --genomeLoad LoadAndKeep "
     """    
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round2_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 " 
@@ -188,12 +194,13 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     #sys.stdout.flush()
     os.system(cmd)
     
-    # Remove a pre-loaded genome
-    cmd  = "STAR "
-    cmd += f" --runThreadN {options.cpu} "
-    cmd += f" --genomeLoad Remove "
-    cmd += f" --genomeDir {options.genome_dir_star} "
-    os.system(cmd)
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        os.system(cmd)
     
     cmd="rm "
     cmd+=options.output_star+"/"+Run+"_round2_Log.progress.out "+options.output_star+"/"+Run+"_round2_Log.out"
@@ -234,7 +241,8 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round2_SJ.out.tab "
     
     """if Run_num!=0:
-        cmd+=" --genomeLoad LoadAndKeep "
+        if options.star_shared_mem == True:
+            cmd+=" --genomeLoad LoadAndKeep "
     """    
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round3_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 " 
@@ -253,12 +261,13 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     sys.stdout.flush()
     os.system(cmd)
     
-    # Remove a pre-loaded genome
-    cmd  = "STAR "
-    cmd += f" --runThreadN {options.cpu} "
-    cmd += f" --genomeLoad Remove "
-    cmd += f" --genomeDir {options.genome_dir_star} "
-    os.system(cmd)
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        os.system(cmd)
     
     cmd="rm "
     cmd+=options.output_star+"/"+Run+"_round3_Log.progress.out "+options.output_star+"/"+Run+"_round3_Log.out"
@@ -286,7 +295,8 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
     cmd+=" --outSAMattrRGline ID:4 "
-    cmd+=" --genomeLoad LoadAndKeep "
+    if options.star_shared_mem == True:
+        cmd+=" --genomeLoad LoadAndKeep "
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round4_"
     cmd+=" --outSJfilterCountUniqueMin 3 3 3 3 " # Stricter bounds than round1
     cmd+=" --outSJfilterCountTotalMin 5 5 5 5 " # Stricter bounds than round1
@@ -302,12 +312,13 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" 2> "+options.output_star+"/"+Run+"_round4.error"
     os.system(cmd)
     
-    # Remove a pre-loaded genome
-    cmd  = "STAR "
-    cmd += f" --runThreadN {options.cpu} "
-    cmd += f" --genomeLoad Remove "
-    cmd += f" --genomeDir {options.genome_dir_star} "
-    os.system(cmd)
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        os.system(cmd)
     
     cmd="rm "
     cmd+=options.output_star+"/"+Run+"_round4_Log.progress.out "+options.output_star+"/"+Run+"_round4_Log.out"

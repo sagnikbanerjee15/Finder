@@ -256,6 +256,7 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd += f" --genomeFastaFiles {options.genome}"
         cmd += f" --genomeChrBinNbits {genomeChrBinNbits_value}"
         cmd += f" --genomeSAindexNbases {genomeSAindexNbases_value}"
+        cmd += f" --outFileNamePrefix {options.output_star}/indexGenome"
         cmd+=" > "+options.genome_dir_star+".output "
         cmd+=" 2> "+options.genome_dir_star+".error "
         if os.path.exists(f"{options.genome_dir_star}/SAindex")==False:
@@ -271,6 +272,7 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
 
     if options.genome_dir_olego is None:  

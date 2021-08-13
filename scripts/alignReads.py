@@ -51,6 +51,7 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
     
     with logging_mutex:
@@ -137,6 +138,7 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
 
     with logging_mutex:
@@ -200,6 +202,7 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
     
     cmd="rm "
@@ -267,6 +270,7 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
     
     cmd="rm "
@@ -318,6 +322,7 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
         cmd += f" --runThreadN {options.cpu} "
         cmd += f" --genomeLoad Remove "
         cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
         os.system(cmd)
     
     cmd="rm "

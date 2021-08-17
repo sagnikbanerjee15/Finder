@@ -5,58 +5,6 @@ from scripts.runCommand import *
 import os
 import sys
 
-def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mutex):
-    if (os.path.exists(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
-    cmd="STAR "
-    cmd+=" --runThreadN "+str(options.cpu)
-    cmd+=" --genomeDir "+options.genome_dir_star
-    cmd+=" --outSAMtype BAM SortedByCoordinate "
-    cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 0  " # For round 1 no mismatches are allowed --> done to capture the most confident junction
-    cmd+=" --alignIntronMin 20  "
-    cmd+=" --alignIntronMax 10000 "
-    cmd+=" --limitBAMsortRAM 107374182400"
-    cmd+=" --alignEndsType EndToEnd " # Disallow soft clipping 
-    cmd+=" --outSAMprimaryFlag AllBestScore "
-    #cmd+=" --outFilterScoreMinOverLread 0.90 "
-    #cmd+=" --outFilterMatchNminOverLread 0.90 "
-    cmd+=" --outSJfilterOverhangMin 12 12 12 12 "
-    cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
-    cmd+=" --outReadsUnmapped Fastx "
-    if options.star_shared_mem == True:
-        cmd+=" --genomeLoad LoadAndKeep "
-    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round1_"
-    cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 "
-    cmd+=" --outSJfilterCountTotalMin 1 1 1 1 "
-    cmd+=" --alignSJoverhangMin 12 " # For round 1 a high overhang ensures reads mapping with high confidence    
-    cmd+=" --outSAMattrRGline ID:1 "
-    
-    if ended=="SE":
-        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+".fastq"
-    else:
-        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_1.fastq "
-        cmd+=" "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_2.fastq "
-    cmd+=" > "+options.output_star+"/"+Run+"_round1.output"
-    cmd+=" 2> "+options.output_star+"/"+Run+"_round1.error"
-    os.system(cmd)
-    
-    cmd="rm "
-    cmd+=options.output_star+"/"+Run+"_round1_Log.progress.out "
-    cmd+=options.output_star+"/"+Run+"_round1_Log.out "
-    os.system(cmd)
-    
-    if options.star_shared_mem == True:
-        # Remove a pre-loaded genome
-        cmd  = "STAR "
-        cmd += f" --runThreadN {options.cpu} "
-        cmd += f" --genomeLoad Remove "
-        cmd += f" --genomeDir {options.genome_dir_star} "
-        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
-        os.system(cmd)
-    
-    with logging_mutex:
-        logger_proxy.info("STAR Round1 run for "+Run+" completed")
-
 def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_mutex):
     
     if os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam",options)==0:return
@@ -144,7 +92,64 @@ def alignReadsWithSTARRelaxed(options,Run,ended,condition,logger_proxy,logging_m
     with logging_mutex:
         logger_proxy.info("STAR relaxed alignment run for "+Run+" completed")
               
-def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mutex):
+
+
+def alignReadsWithSTARRound0(options,Run,ended,condition,logger_proxy,logging_mutex):
+    """
+    Deprecated
+    """
+    if (os.path.exists(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
+    cmd="STAR "
+    cmd+=" --runThreadN "+str(options.cpu)
+    cmd+=" --genomeDir "+options.genome_dir_star
+    cmd+=" --outSAMtype BAM SortedByCoordinate "
+    cmd+=" --outFilterMultimapNmax 500 " 
+    cmd+=" --outFilterMismatchNmax 0  " # For round 1 no mismatches are allowed --> done to capture the most confident junction
+    cmd+=" --alignIntronMin 20  "
+    cmd+=" --alignIntronMax 10000 "
+    cmd+=" --limitBAMsortRAM 107374182400"
+    cmd+=" --alignEndsType EndToEnd " # Disallow soft clipping 
+    cmd+=" --outSAMprimaryFlag AllBestScore "
+    #cmd+=" --outFilterScoreMinOverLread 0.90 "
+    #cmd+=" --outFilterMatchNminOverLread 0.90 "
+    cmd+=" --outSJfilterOverhangMin 12 12 12 12 "
+    cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
+    cmd+=" --outReadsUnmapped Fastx "
+    if options.star_shared_mem == True:
+        cmd+=" --genomeLoad LoadAndKeep "
+    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round1_"
+    cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 "
+    cmd+=" --outSJfilterCountTotalMin 1 1 1 1 "
+    cmd+=" --alignSJoverhangMin 12 " # For round 1 a high overhang ensures reads mapping with high confidence    
+    cmd+=" --outSAMattrRGline ID:1 "
+    
+    if ended=="SE":
+        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+".fastq"
+    else:
+        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_1.fastq "
+        cmd+=" "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_2.fastq "
+    cmd+=" > "+options.output_star+"/"+Run+"_round1.output"
+    cmd+=" 2> "+options.output_star+"/"+Run+"_round1.error"
+    os.system(cmd)
+    
+    cmd="rm "
+    cmd+=options.output_star+"/"+Run+"_round1_Log.progress.out "
+    cmd+=options.output_star+"/"+Run+"_round1_Log.out "
+    os.system(cmd)
+    
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd  = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
+        os.system(cmd)
+    
+    with logging_mutex:
+        logger_proxy.info("STAR Round1 run for "+Run+" completed")
+
+def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mutex):
     
     if (os.path.exists(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
@@ -168,7 +173,7 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
-    cmd+=" --outSAMattrRGline ID:2 "
+    cmd+=" --outSAMattrRGline ID:1 "
     """if Run_num==0:
         cmd+=" --sjdbInsertSave All "
         cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round1_SJ.out.tab "
@@ -179,19 +184,19 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
         if options.star_shared_mem == True:
             cmd+=" --genomeLoad LoadAndKeep "
     """    
-    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round2_"
+    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round1_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 " 
     cmd+=" --outSJfilterCountTotalMin 1 1 1 1 " 
     cmd+=" --alignSJoverhangMin 12 " # For round 2 same high overhang is used as in round 1
     cmd+=" --alignSJDBoverhangMin 8 " # 
     
     if ended=="SE":
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate1"
+        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+".fastq"
     else:
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate1 "
-        cmd+=" "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate2"
-    cmd+=" > "+options.output_star+"/"+Run+"_round2.output"
-    cmd+=" 2> "+options.output_star+"/"+Run+"_round2.error"
+        cmd+=" --readFilesIn "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_1.fastq "
+        cmd+=" "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_2.fastq "
+    cmd+=" > "+options.output_star+"/"+Run+"_round1.output"
+    cmd+=" 2> "+options.output_star+"/"+Run+"_round1.error"
     #print(cmd)
     #sys.stdout.flush()
     os.system(cmd)
@@ -206,13 +211,13 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
         os.system(cmd)
     
     cmd="rm "
-    cmd+=options.output_star+"/"+Run+"_round2_Log.progress.out "+options.output_star+"/"+Run+"_round2_Log.out"
+    cmd+=options.output_star+"/"+Run+"_round1_Log.progress.out "+options.output_star+"/"+Run+"_round1_Log.out"
     os.system(cmd)
     
     with logging_mutex:
-        logger_proxy.info("STAR Round2 run for "+Run+" completed")
+        logger_proxy.info("STAR Round1 run for "+Run+" completed")
     
-def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mutex):
+def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mutex):
     
     if (os.path.exists(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
@@ -236,30 +241,30 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
-    cmd+=" --outSAMattrRGline ID:3 "
+    cmd+=" --outSAMattrRGline ID:2 "
     """if Run_num==0:
         cmd+=" --sjdbInsertSave All "
         cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round2_SJ.out.tab "
     """
-    cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round2_SJ.out.tab "
+    cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round1_SJ.out.tab "
     
     """if Run_num!=0:
         if options.star_shared_mem == True:
             cmd+=" --genomeLoad LoadAndKeep "
     """    
-    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round3_"
+    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round2_"
     cmd+=" --outSJfilterCountUniqueMin 1 1 1 1 " 
     cmd+=" --outSJfilterCountTotalMin 1 1 1 1 " 
     cmd+=" --alignSJoverhangMin 1000 " # Very high theshold used to prevent creation of new junctions
     cmd+=" --alignSJDBoverhangMin 8 " # 
     
     if ended=="SE":
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate1"
+        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate1"
     else:
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate1 "
-        cmd+=" "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate2"
-    cmd+=" > "+options.output_star+"/"+Run+"_round3.output"
-    cmd+=" 2> "+options.output_star+"/"+Run+"_round3.error"
+        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate1 "
+        cmd+=" "+options.output_star+"/"+Run+"_round1_Unmapped.out.mate2"
+    cmd+=" > "+options.output_star+"/"+Run+"_round2.output"
+    cmd+=" 2> "+options.output_star+"/"+Run+"_round2.error"
     #print(cmd)
     sys.stdout.flush()
     os.system(cmd)
@@ -274,13 +279,13 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
         os.system(cmd)
     
     cmd="rm "
-    cmd+=options.output_star+"/"+Run+"_round3_Log.progress.out "+options.output_star+"/"+Run+"_round3_Log.out"
+    cmd+=options.output_star+"/"+Run+"_round2_Log.progress.out "+options.output_star+"/"+Run+"_round2_Log.out"
     os.system(cmd)
     
     with logging_mutex:
-        logger_proxy.info("STAR Round3 run for "+Run+" completed")
+        logger_proxy.info("STAR Round2 run for "+Run+" completed")
 
-def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mutex): 
+def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mutex): 
     if (os.path.exists(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam",options)==0):return
     cmd="STAR "
     cmd+=" --runThreadN "+str(options.cpu)
@@ -298,7 +303,7 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
-    cmd+=" --outSAMattrRGline ID:4 "
+    cmd+=" --outSAMattrRGline ID:3 "
     if options.star_shared_mem == True:
         cmd+=" --genomeLoad LoadAndKeep "
     cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round4_"
@@ -308,12 +313,12 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
     #cmd+=" --alignSJDBoverhangMin 8 "
     
     if ended=="SE":
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate1"
+        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate1"
     else:
-        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate1"
-        cmd+=" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate2"
-    cmd+=" > "+options.output_star+"/"+Run+"_round4.output"
-    cmd+=" 2> "+options.output_star+"/"+Run+"_round4.error"
+        cmd+=" --readFilesIn "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate1"
+        cmd+=" "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate2"
+    cmd+=" > "+options.output_star+"/"+Run+"_round3.output"
+    cmd+=" 2> "+options.output_star+"/"+Run+"_round3.error"
     os.system(cmd)
     
     if options.star_shared_mem == True:
@@ -326,11 +331,11 @@ def alignReadsWithSTARRound4(options,Run,ended,condition,logger_proxy,logging_mu
         os.system(cmd)
     
     cmd="rm "
-    cmd+=options.output_star+"/"+Run+"_round4_Log.progress.out "+options.output_star+"/"+Run+"_round4_Log.out"
+    cmd+=options.output_star+"/"+Run+"_round3_Log.progress.out "+options.output_star+"/"+Run+"_round3_Log.out"
     os.system(cmd)  
     
     with logging_mutex:
-        logger_proxy.info("STAR Round4 run for "+Run+" completed")     
+        logger_proxy.info("STAR Round3 run for "+Run+" completed")     
 
 def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_mutex,min_micro_exon): 
     if (os.path.exists(options.output_star+"/"+Run+"_olego_round5.sorted.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_olego_round5.sorted.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return 1

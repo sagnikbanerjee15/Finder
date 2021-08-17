@@ -145,7 +145,7 @@ def mergeAllAlignments(options,condition):
         bam_filename_round2=options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam"
         bam_filename_round3=options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam"
         #bam_filename_round4=options.output_star+"/"+Run+"_round4_Aligned_portcullis_filtered.sortedByCoord.out.bam"
-        bam_filename_round4=options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam"
+        #bam_filename_round4=options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam"
         bam_filename_round5=options.output_star+"/"+Run+"_olego_round5.sorted.bam"
         bam_filename_final=options.output_star+"/"+Run+"_final.sortedByCoord.out.bam"
         
@@ -156,7 +156,7 @@ def mergeAllAlignments(options,condition):
         cmd+=bam_filename_round1+" "
         cmd+=bam_filename_round2+" "
         cmd+=bam_filename_round3+" "
-        cmd+=bam_filename_round4+" "
+        #cmd+=bam_filename_round4+" "
         cmd+=bam_filename_round5+" "
         allinputs.append([Run,cmd])
     if len(allinputs)>0:
@@ -389,7 +389,7 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
         else:
             with logging_mutex:
                 logger_proxy.info("High confidence junctions after round3 mapping is present for "+condition)
-        
+        """
         #########################################################################################################
         # Align reads with STAR round4
         #########################################################################################################
@@ -409,7 +409,7 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
         else:
             with logging_mutex:
                 logger_proxy.info("High confidence junctions after round4 mapping is present for "+condition)
-        
+        """
         #########################################################################################################
         # Align reads with OLego round5
         #########################################################################################################

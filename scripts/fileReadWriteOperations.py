@@ -65,6 +65,42 @@ def expandGzippedFiles(options,logger_proxy,logging_mutex):
                     os.system(cmd)
                     options.mrna_md[condition][Run]["location_directory"] = options.raw_data_downloaded_from_NCBI
                     options.mrna_md[condition][Run]["downloaded_from_NCBI"] = 1
+                elif os.path.exists(f"{location}/{Run}_1.fastq.gz") == True and os.path.exists(f"{location}/{Run}_2.fastq.gz") == True:
+                    cmd = f"gunzip -c "
+                    cmd += f"{location}/{Run}_1.fastq.gz "
+                    cmd += " > "
+                    cmd += f"{options.raw_data_downloaded_from_NCBI}/{Run}_1.fastq"
+                    with logging_mutex:
+                        logger_proxy.info("Fastq data is expanded")
+                    os.system(cmd)
+                    
+                    cmd = f"gunzip -c "
+                    cmd += f"{location}/{Run}_2.fastq.gz "
+                    cmd += " > "
+                    cmd += f"{options.raw_data_downloaded_from_NCBI}/{Run}_2.fastq"
+                    with logging_mutex:
+                        logger_proxy.info("Fastq data is expanded")
+                    os.system(cmd)
+                    options.mrna_md[condition][Run]["location_directory"] = options.raw_data_downloaded_from_NCBI
+                    options.mrna_md[condition][Run]["downloaded_from_NCBI"] = 1
+                elif os.path.exists(f"{location}/{Run}_1.fq.gz") == True and os.path.exists(f"{location}/{Run}_2.fq.gz") == True:
+                    cmd = f"gunzip -c "
+                    cmd += f"{location}/{Run}_1.fq.gz "
+                    cmd += " > "
+                    cmd += f"{options.raw_data_downloaded_from_NCBI}/{Run}_1.fastq"
+                    with logging_mutex:
+                        logger_proxy.info("Fastq data is expanded")
+                    os.system(cmd)
+                    
+                    cmd = f"gunzip -c "
+                    cmd += f"{location}/{Run}_2.fq.gz "
+                    cmd += " > "
+                    cmd += f"{options.raw_data_downloaded_from_NCBI}/{Run}_2.fastq"
+                    with logging_mutex:
+                        logger_proxy.info("Fastq data is expanded")
+                    os.system(cmd)
+                    options.mrna_md[condition][Run]["location_directory"] = options.raw_data_downloaded_from_NCBI
+                    options.mrna_md[condition][Run]["downloaded_from_NCBI"] = 1
                     
     
 

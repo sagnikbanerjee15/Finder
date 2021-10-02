@@ -151,7 +151,7 @@ def alignReadsWithSTARRound0(options,Run,ended,condition,logger_proxy,logging_mu
 
 def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mutex):
     
-    if (os.path.exists(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
+    if (os.path.exists(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round1_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
     cmd="STAR "
     cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
@@ -162,14 +162,14 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     """
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 2  " # For round 2 TWO mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 2  " # For round 1 TWO mismatches are allowed 
     cmd+=" --alignIntronMin 20  "
     cmd+=" --alignIntronMax 10000 "
     cmd+=" --limitBAMsortRAM 107374182400 "
     cmd+=" --alignEndsType Local " # ALLOWS soft clipping 
     cmd+=" --outSAMprimaryFlag AllBestScore "
-    cmd+=" --outFilterScoreMinOverLread 0.95 "
-    cmd+=" --outFilterMatchNminOverLread 0.95 "
+    cmd+=" --outFilterScoreMinOverLread 0.90 "
+    cmd+=" --outFilterMatchNminOverLread 0.90 "
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
@@ -177,8 +177,8 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     """if Run_num==0:
         cmd+=" --sjdbInsertSave All "
         cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round1_SJ.out.tab "
-    """
     cmd+=" --sjdbFileChrStartEnd "+options.output_star+"/"+condition+"_round1_SJ.out.tab "
+    """
     
     """if Run_num!=0:
         if options.star_shared_mem == True:
@@ -219,7 +219,8 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     
 def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mutex):
     
-    if (os.path.exists(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
+    if (os.path.exists(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round2_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
+    
     cmd="STAR "
     cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
@@ -230,14 +231,14 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     """
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 3  " # For round 3 THREE mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 3  " # For round 2 THREE mismatches are allowed 
     cmd+=" --alignIntronMin 20  "
     cmd+=" --alignIntronMax 10000 "
     cmd+=" --limitBAMsortRAM 107374182400"
     cmd+=" --alignEndsType Local " # ALLOWS soft clipping 
     cmd+=" --outSAMprimaryFlag AllBestScore "
-    cmd+=" --outFilterScoreMinOverLread 0.95 "
-    cmd+=" --outFilterMatchNminOverLread 0.95 "
+    cmd+=" --outFilterScoreMinOverLread 0.90 "
+    cmd+=" --outFilterMatchNminOverLread 0.90 "
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "
@@ -286,20 +287,21 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
         logger_proxy.info("STAR Round2 run for "+Run+" completed")
 
 def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mutex): 
-    if (os.path.exists(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam",options)==0):return
+    if (os.path.exists(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam")==True and samtoolsQuickCheck(options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam",options)==0) or os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:return
+    
     cmd="STAR "
     cmd+=" --runThreadN "+str(options.cpu)
     cmd+=" --genomeDir "+options.genome_dir_star
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 2  " # For round 4 TWO mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 2  " # For round 3 TWO mismatches are allowed 
     cmd+=" --alignIntronMin 10000  "
     cmd+=" --alignIntronMax 100000000 "
     cmd+=" --limitBAMsortRAM 107374182400"
     cmd+=" --alignEndsType Local " # ALLOWS soft clipping 
     cmd+=" --outSAMprimaryFlag AllBestScore "
-    cmd+=" --outFilterScoreMinOverLread 0.95 "
-    cmd+=" --outFilterMatchNminOverLread 0.95 "
+    cmd+=" --outFilterScoreMinOverLread 0.90 "
+    cmd+=" --outFilterMatchNminOverLread 0.90 "
     cmd+=" --outSJfilterOverhangMin 8 8 8 8 "
     cmd+=" --outSAMattributes NH HI AS nM NM MD jM jI XS "
     cmd+=" --outReadsUnmapped Fastx "

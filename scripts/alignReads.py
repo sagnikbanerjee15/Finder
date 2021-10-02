@@ -308,7 +308,7 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --outSAMattrRGline ID:3 "
     if options.star_shared_mem == True:
         cmd+=" --genomeLoad LoadAndKeep "
-    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round4_"
+    cmd+=" --outFileNamePrefix "+options.output_star+"/"+Run+"_round3_"
     cmd+=" --outSJfilterCountUniqueMin 3 3 3 3 " # Stricter bounds than round1
     cmd+=" --outSJfilterCountTotalMin 5 5 5 5 " # Stricter bounds than round1
     cmd+=" --alignSJoverhangMin 8 " # For round 4 same high overhang is used as in round 1

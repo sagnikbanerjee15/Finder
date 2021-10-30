@@ -197,8 +197,10 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
         cmd+=" "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_2.fastq "
     cmd+=" > "+options.output_star+"/"+Run+"_round1.output"
     cmd+=" 2> "+options.output_star+"/"+Run+"_round1.error"
-    print(cmd)
-    sys.stdout.flush()
+    #print(cmd)
+    #sys.stdout.flush()
+    with logging_mutex:
+        logger_proxy.info("Running command "+cmd)
     os.system(cmd)
     
     if options.star_shared_mem == True:
@@ -267,7 +269,9 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" > "+options.output_star+"/"+Run+"_round2.output"
     cmd+=" 2> "+options.output_star+"/"+Run+"_round2.error"
     #print(cmd)
-    sys.stdout.flush()
+    #sys.stdout.flush()
+    with logging_mutex:
+        logger_proxy.info("Running command "+cmd)
     os.system(cmd)
     
     if options.star_shared_mem == True:
@@ -321,6 +325,8 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
         cmd+=" "+options.output_star+"/"+Run+"_round2_Unmapped.out.mate2"
     cmd+=" > "+options.output_star+"/"+Run+"_round3.output"
     cmd+=" 2> "+options.output_star+"/"+Run+"_round3.error"
+    with logging_mutex:
+        logger_proxy.info("Running command "+cmd)
     os.system(cmd)
     
     if options.star_shared_mem == True:
@@ -350,7 +356,7 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
     cmd+=" --max-multi 500 "
     cmd+=options.genome_dir_olego
     if ended=="SE":
-        cmd+=" "+options.output_star+"/"+Run+"_round4_Unmapped.out.mate1"
+        cmd+=" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate1"
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sam"
         cmd+=" 2> "+options.output_star+"/"+Run+"_round5.error"
         if os.path.exists(options.output_star+"/"+Run+"_olego_round5.sam")==False:
@@ -379,14 +385,14 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sorted.bam"
         os.system(cmd)
     else:
-        cmd_f=cmd+" "+options.output_star+"/"+Run+"_round4_Unmapped.out.mate1"
+        cmd_f=cmd+" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate1"
         cmd_f+=" > "+options.output_star+"/"+Run+"_olego_round5_f.sam"
         cmd_f+=" 2> "+options.output_star+"/"+Run+"_round5_f.error"
         #print(cmd_f)
         if os.path.exists(options.output_star+"/"+Run+"_olego_round5_f.sam")==False:   
             os.system(cmd_f)
         
-        cmd_r=cmd+" "+options.output_star+"/"+Run+"_round4_Unmapped.out.mate2"
+        cmd_r=cmd+" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate2"
         cmd_r+=" > "+options.output_star+"/"+Run+"_olego_round5_r.sam"
         cmd_r+=" 2> "+options.output_star+"/"+Run+"_round5_r.error"
         #print(cmd_r)

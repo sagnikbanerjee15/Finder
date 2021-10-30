@@ -416,14 +416,14 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
         flag=1
         for Run_num,Run in enumerate(options.mrna_md[condition]):
             if Run in default_align_these_runs:continue
-            fhr=open(options.output_star+"/"+Run+"_round4_Log.final.out","r")
+            fhr=open(options.output_star+"/"+Run+"_round3_Log.final.out","r")
             for line in fhr:
                 if "Number of reads unmapped: too short" in line:
                     num_unmapped_reads=int(line.strip().split()[-1])
             fhr.close()
             if num_unmapped_reads>5000000:
                 # Create dummy olego file to assist in merge operation
-                os.system("samtools view -Hb "+options.output_star+"/"+Run+"_round4_Aligned.sortedByCoord.out.bam "+" >  "+options.output_star+"/"+Run+"_olego_round5.sorted.bam")
+                os.system("samtools view -Hb "+options.output_star+"/"+Run+"_round3_Aligned.sortedByCoord.out.bam "+" >  "+options.output_star+"/"+Run+"_olego_round5.sorted.bam")
                 with logging_mutex:
                     logger_proxy.info("Mapping with OLego for micro-exon detection skipped for "+Run+" due to huge number of reads")
             else:

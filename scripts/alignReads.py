@@ -197,8 +197,8 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
         cmd+=" "+options.mrna_md[condition][Run]["location_directory"]+"/"+Run+"_2.fastq "
     cmd+=" > "+options.output_star+"/"+Run+"_round1.output"
     cmd+=" 2> "+options.output_star+"/"+Run+"_round1.error"
-    #print(cmd)
-    #sys.stdout.flush()
+    print(cmd)
+    sys.stdout.flush()
     os.system(cmd)
     
     if options.star_shared_mem == True:

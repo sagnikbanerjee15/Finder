@@ -98,7 +98,7 @@ def parseCommandLineArguments():
     4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
     5. Annotate coding regions
     6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
-    """,default = 1,type =int)
+    """,default = 0,type =int)
     optional_named.add_argument("--perform_post_completion_data_cleanup","-pc_clean",help="Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ",action="store_true")
     optional_named.add_argument("--run_tests","-rt",help="Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations",action="store_true")
     optional_named.add_argument("--addUTR","--addUTR",help="Turn on this option if you wish BRAKER to add UTR sequences",action="store_true")

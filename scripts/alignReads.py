@@ -162,7 +162,7 @@ def alignReadsWithSTARRound1(options,Run,ended,condition,logger_proxy,logging_mu
     """
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 2  " # For round 1 TWO mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 5  " # For round 1 FIVE mismatches are allowed 
     cmd+=" --alignIntronMin 20  "
     cmd+=" --alignIntronMax 10000 "
     cmd+=" --limitBAMsortRAM 107374182400 "
@@ -233,7 +233,7 @@ def alignReadsWithSTARRound2(options,Run,ended,condition,logger_proxy,logging_mu
     """
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 3  " # For round 2 THREE mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 5  " # For round 2 FIVE mismatches are allowed 
     cmd+=" --alignIntronMin 20  "
     cmd+=" --alignIntronMax 10000 "
     cmd+=" --limitBAMsortRAM 107374182400"
@@ -298,7 +298,7 @@ def alignReadsWithSTARRound3(options,Run,ended,condition,logger_proxy,logging_mu
     cmd+=" --genomeDir "+options.genome_dir_star
     cmd+=" --outSAMtype BAM SortedByCoordinate "
     cmd+=" --outFilterMultimapNmax 500 " 
-    cmd+=" --outFilterMismatchNmax 2  " # For round 3 TWO mismatches are allowed 
+    cmd+=" --outFilterMismatchNmax 5  " # For round 3 FIVE mismatches are allowed 
     cmd+=" --alignIntronMin 10000  "
     cmd+=" --alignIntronMax 100000000 "
     cmd+=" --limitBAMsortRAM 107374182400"

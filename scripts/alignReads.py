@@ -383,6 +383,7 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
         cmd+="samtools "+" sort "
         cmd+=" -@ "+str(options.cpu)
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sorted.bam"
+        cmd+="2> /dev/null"
         os.system(cmd)
     else:
         cmd_f=cmd+" "+options.output_star+"/"+Run+"_round3_Unmapped.out.mate1"
@@ -428,6 +429,7 @@ def alignReadsWithOLegoRound5(options,Run,ended,condition,logger_proxy,logging_m
         cmd+="samtools "+" sort "
         cmd+=" -@ "+str(options.cpu)
         cmd+=" > "+options.output_star+"/"+Run+"_olego_round5.sorted.bam"
+        cmd+="2> /dev/null"
         os.system(cmd)
     
     # Remove intermediate sam file

@@ -126,7 +126,7 @@ def checkMappingRateToDiscardPoorRuns(options,condition,Run,logging_mutex,logger
     total_reads1,umr1,mmr1=pullOutMappingInformation(options.output_star+"/"+Run+"_round1_Log.final.out")
     total_reads2,umr2,mmr2=pullOutMappingInformation(options.output_star+"/"+Run+"_round2_Log.final.out")
     if total_reads1 + total_reads2 >0:
-        total_mapped_reads_percentage=(umr2 + mmr2 + umr2+mmr2)/(total_reads1 + total_reads2)
+        total_mapped_reads_percentage=(umr1 + mmr1 + umr2 + mmr2)/(total_reads1 + total_reads2)
     else:
         total_mapped_reads_percentage=0
     with logging_mutex:
@@ -363,8 +363,9 @@ def alignReadsAndMergeOutput(options,logger_proxy,logging_mutex):
             if checkMappingRateToDiscardPoorRuns(options,condition,Run,logging_mutex,logger_proxy)==0:
                 default_align_these_runs.append(Run)
         
-        with logging_mutex:
-            logger_proxy.info("Resorting to alignment with relaxed parameters for these runs due to poor mapping "+",".join(default_align_these_runs))
+        if len(default_align_these_runs)>0:
+            with logging_mutex:
+                logger_proxy.info("Resorting to alignment with relaxed parameters for these runs due to poor mapping "+",".join(default_align_these_runs))
         
         for Run in default_align_these_runs:
             if os.path.exists(options.output_star+"/"+Run+"_final.sortedByCoord.out.bam")==True:continue

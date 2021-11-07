@@ -3168,10 +3168,13 @@ int TranscriptDecider::Solve( struct _subexon *subexons, int seCnt, std::vector<
 		{
 			attr.f1[i].seVector.Nullify() ;
 			attr.f1[i].seVector.Init( seCnt ) ;
-			for ( j = i ; j < seCnt ; ++j )
+			if ( attr.f2 )
 			{
-				attr.f2[i][j].seVector.Nullify() ;
-				attr.f2[i][j].seVector.Init( seCnt ) ;
+				for ( j = i ; j < seCnt ; ++j )
+				{
+					attr.f2[i][j].seVector.Nullify() ;
+					attr.f2[i][j].seVector.Init( seCnt ) ;
+				}
 			}
 		}
 		for ( i = 0 ; i < hashMax ; ++i )
@@ -3254,7 +3257,8 @@ int TranscriptDecider::Solve( struct _subexon *subexons, int seCnt, std::vector<
 		delete[] attr.f1 ;
 		for ( i = 0 ; i < seCnt && attr.f2 ; ++i )
 			delete[] attr.f2[i] ;
-		delete[] attr.f2 ;
+		if ( attr.f2 )
+			delete[] attr.f2 ;
 		if (hashMax != HASH_MAX)
 			delete[] attr.hash ;
 

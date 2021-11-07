@@ -43,6 +43,7 @@ PsiCLASS depends on [pthreads](http://en.wikipedia.org/wiki/POSIX_Threads) and s
 			--vd FLOAT : the minimum average coverage depth of a transcript to be reported in voting (defaults: 1.0)
 			--maxDpConstraintSize: the number of subexons a constraint can cover in DP. (default: 7. -1 for inf)
 			--primaryParalog: use primary alignment to retain paralog genes (default: use unique alignments)
+			--tssTesQuantile FLOAT: the quantile for transcription start/end sites in subexon graph (default: 0.5; 1.0 for longest exon margin)
 			--version: print version and exit
 			--stage INT:  (default: 0)
                      		0-start from the beginning - building the splice site file for each sample

@@ -517,7 +517,10 @@ public:
 
 		// Get the read length info and fragment length info
 		qsort( lens, lensCnt, sizeof( int ), CompInt ) ;
-		readLen = lens[ lensCnt - 1 ] ;
+		if (lensCnt > 0)
+			readLen = lens[ lensCnt - 1 ] ;
+		else
+			readLen = 150 ;
 		
 		if ( mateDiffCnt > 0 )
 		{

@@ -8,7 +8,8 @@
 #include <algorithm>
 
 char usage[] = "Usage: ./add-genename annotation.gtf gtflist [OPTIONS]\n"
-		"\t-o: the directory for output gtf files (default: ./)\n" ;
+		"\t-o STRING: the directory for output gtf files (default: ./)\n"
+		"\t-f STRING: the field in the annotation.gtf to add in the gtf file (default: gene_name)"	;
 
 struct _interval
 {
@@ -20,6 +21,7 @@ struct _interval
 
 char line[10000] ;
 char buffer[10000], buffer2[10000], buffer3[10000] ;
+char annotationField[1023] = "gene_name" ;
 
 int CompInterval( const struct _interval &a, const struct _interval &b )
 {
@@ -167,6 +169,11 @@ int main( int argc, char *argv[] )
 			strcpy( outputPath, argv[i + 1 ] ) ;	
 			++i ;
 		}
+		else if ( !strcmp( argv[i], "-f" ) )
+		{
+			strcpy( annotationField, argv[ i + 1 ]) ;
+			++i ;
+		}
 		else
 		{
 			fprintf( stderr, "Unknown argument: %s\n", argv[i] ) ;
@@ -189,7 +196,7 @@ int main( int argc, char *argv[] )
 		sscanf( line, "%s %s %s %d %d", chrom, buffer, type, &start, &end ) ;
 		if ( strcmp( type, "exon" ) )
 			continue ;
-		if ( GetGTFField( gname, line, "gene_name" ) )
+		if ( GetGTFField( gname, line, annotationField ) )
 		{
 			struct _interval ne ;
 			strcpy( ne.chrom, chrom ) ;
@@ -200,7 +207,7 @@ int main( int argc, char *argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "%s has no field of gene_name.\n", line ) ;
+			fprintf( stderr, "%s has no field of %s.\n", line, annotationField ) ;
 			exit( 1 ) ;
 		}
 
@@ -412,6 +419,12 @@ int main( int argc, char *argv[] )
 		}
 		sprintf( buffer, "%s/%s", outputPath, p ) ;
 		fpOut = fopen( buffer, "w" ) ;
+		if (fpOut == NULL)
+		{
+			fprintf(stderr, "Could not create file %s. Please check whether the directory %s exists.\n", buffer, outputPath) ;
+			fclose( fpList ) ;
+			exit( 1 ) ;
+		}
 
 		// Process the input file
 		fp = fopen( line, "r" ) ;

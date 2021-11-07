@@ -15,7 +15,10 @@ char usage[] = "combineSubexons [options]\n"
 	       "Required options:\n"
 	       "\t-s STRING: the path to the predicted subexon information. Can use multiple -s to specify multiple subexon prediction files\n" 
 	       "\t\tor\n"
-	       "\t--ls STRING: the path to file of the list of the predicted subexon information.\n" ;
+	       "\t--ls STRING: the path to file of the list of the predicted subexon information.\n" 
+	       "Optional options:\n"
+	       "\t-q FLOAT: the quantile of samples to determine the extension of subexon soft boundaries. (default: 0.5)"
+	       ;
 
 struct _overhang
 {
@@ -526,6 +529,8 @@ int main( int argc, char *argv[] )
 	Blocks regions ;
 	Alignments alignments ;
 
+	double exonSoftBoundaryMergeQuantile = 0.5 ;
+
 	if ( argc == 1 )
 	{
 		printf( "%s", usage ) ;
@@ -556,6 +561,11 @@ int main( int argc, char *argv[] )
 				char *fileName = strdup( buffer ) ;
 				files.push_back( fileName ) ;
 			}
+		}
+		else if ( !strcmp( argv[i], "-q" ) )
+		{
+			sscanf( argv[i + 1], "%lf", &exonSoftBoundaryMergeQuantile ) ;
+			++i ;
 		}
 	}
 	int fileCnt = files.size() ;
@@ -963,8 +973,11 @@ int main( int argc, char *argv[] )
 			{
 				if ( j - i >= 3 )
 				{
-					rawSubexons[i].end = rawSubexons[ (i + j - 1) / 2 ].start ;
-					rawSubexons[j - 1].start = rawSubexons[ (i + j - 1) / 2].end ;
+					double adjustQuantile = exonSoftBoundaryMergeQuantile ;
+					if ( adjustQuantile > 0.5 ) 
+						adjustQuantile = 0.5 ;
+					rawSubexons[i].end = rawSubexons[ i + ( j - 1 - i ) * adjustQuantile ].start ;
+					rawSubexons[j - 1].start = rawSubexons[ i + ( j - 1 - i ) * (1 - adjustQuantile) ].end ;
 				}
 
 				if ( rawSubexons[i].end + 1 == rawSubexons[j - 1].start )
@@ -985,11 +998,11 @@ int main( int argc, char *argv[] )
 			
 			if ( rawSubexons[i].leftType == 0 && rawSubexons[i].rightType != 0 )
 			{
-				rawSubexons[i].start = rawSubexons[ i ].start ;
+				rawSubexons[i].start = rawSubexons[ i + ( j - 1 - i ) * ( 1 - exonSoftBoundaryMergeQuantile ) ].start ;
 			}
 			else if ( rawSubexons[i].rightType == 0 && rawSubexons[i].leftType != 0 )
 			{
-				rawSubexons[i].end = rawSubexons[ j - 1 ].end ;
+				rawSubexons[i].end = rawSubexons[ i + ( j - 1 - i ) * exonSoftBoundaryMergeQuantile ].end ;
 			}
 
 			subexons.push_back( rawSubexons[i] ) ;		

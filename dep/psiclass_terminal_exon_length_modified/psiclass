@@ -24,6 +24,7 @@ die "Usage: ./psiclass [OPTIONS]\n".
     "\t--maxDpConstraintSize: the number of subexons a constraint can cover in DP. (default: 7. -1 for inf)\n".
     "\t--bamGroup STRING: path to the file listing the group id of BAMs in the --lb file (default: not used)\n".
     "\t--primaryParalog: use primary alignment to retain paralog genes (default: use unique alignments)\n".
+    "\t--tssTesQuantile FLOAT: the quantile for transcription start/end sites in subexon graph (default: 0.5)\n".
     #"\t--mateIdx INT: the read id has suffix such as .1, .2 for a mate pair. (default: auto)\n".
     "\t--version: print version and exit\n".
     "\t--stage INT:  (default: 0)\n".
@@ -55,6 +56,7 @@ my $stage = 0 ;
 my $classesOpt = "" ;
 my $juncOpt = "" ;
 my $trustSpliceOpt = "" ;
+my $combineSubexonsOpt = "" ;
 my $voteOpt = "" ;
 my $outdir = "." ;
 my $mateIdx = -1 ;
@@ -160,6 +162,12 @@ for ( $i = 0 ; $i < @ARGV ; ++$i )
 	elsif ( $ARGV[$i] eq "--maxDpConstraintSize" )
 	{
 		$classesOpt .= " --maxDpConstraintSize ".$ARGV[$i + 1] ;
+		++$i ;
+	}
+	elsif ( $ARGV[$i] eq "--tssTesQuantile" )
+	{
+		# The larger the value, the longer the exon is.
+		$combineSubexonsOpt .= "-q ".$ARGV[$i + 1] ;
 		++$i ;
 	}
 	elsif ( $ARGV[$i] eq "--version" )
@@ -372,7 +380,7 @@ if ( $stage <= 1 )
 # combine the subexons.
 if ( $stage <= 2 )
 {
-	$cmd = "$WD/combine-subexons --ls $outdir/subexon/${prefix}subexon.list > $outdir/subexon/${prefix}subexon_combined.out" ;
+	$cmd = "$WD/combine-subexons --ls $outdir/subexon/${prefix}subexon.list $combineSubexonsOpt > $outdir/subexon/${prefix}subexon_combined.out" ;
 	system_call( "$cmd" ) ;
 }
 

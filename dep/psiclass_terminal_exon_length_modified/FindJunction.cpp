@@ -871,7 +871,8 @@ int main( int argc, char *argv[] )
 			if ( b->core.tid >= 0 )
 				strcpy( col[2], fpsam->header->target_name[b->core.tid] ) ;
 			else
-				strcpy( col[2], "-1" ) ;
+				continue ;
+				//strcpy( col[2], "-1" ) ;
 			cigar2string( &(b->core), bam1_cigar( b ), col[5] ) ;
 			strcpy( col[0], bam1_qname( b ) ) ;	
 			flag = b->core.flag ;	

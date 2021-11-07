@@ -135,6 +135,7 @@ def runPsiCLASSMaxTerminalExonLength(options,logging_mutex,logger_proxy):
     cmd+=" --mateIdx 0 "
     cmd+=" --bamGroup "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/bamgroup"
     cmd+=" --primaryParalog " # Outputs transcript assemblies with multi mapped reads
+    cmd+=" --tssTesQuantile 1"
     cmd+=" > "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined.output "
     cmd+=" 2> "+options.output_assemblies_psiclass_terminal_exon_length_modified+"/combined.error "
     os.system(cmd)

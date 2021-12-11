@@ -74,9 +74,11 @@ import pandas as pd
 
 def parseCommandLineArguments():
     parser = argparse.ArgumentParser(prog="finder",description="Generates gene annotation from RNA-Seq data",formatter_class=RawTextHelpFormatter)
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0.0')
+    
     required_named = parser.add_argument_group('Required arguments')
     optional_named = parser.add_argument_group('Optional arguments')
-    
+
     # Mandatory arguments
     required_named.add_argument("--metadatafile","-mf",help="Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ",required=True)
     required_named.add_argument("--output_directory","-out_dir",help="Enter the name of the directory where all other operations will be performed",required=True)

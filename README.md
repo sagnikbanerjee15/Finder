@@ -1,6 +1,8 @@
 # Welcome to `finder_v1.0.0`
 
-`finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. If you use `finder` for your research please cite 
+`finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. For this version, no docker images could be provided due to distribution restrictions of underlying software.
+
+If you use `finder` for your research please cite 
 
 Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise, and Carson M Andorf.  [FINDER: an automated software package to annotate eukaryotic genes from RNA-Seq data and associated protein sequences](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04120-9) BMC Bioinformatics
 
@@ -68,6 +70,18 @@ cd ..
 echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the bashrc file
 export PATH=$PATH:$(pwd)
 ```
+
+
+
+## Understanding Finder versions
+
+Each version of `finder` will be released with `3` numeric segments, each separated with a period - `x.y.z`
+
+`x` represents major changes including addition of several important updates to the software. `x` will be changed when new functionality is adopted
+
+`y` represents any change within the same version pertaining to how the data is made available. For e.g., a new `y` version will be created if a docker image is updated with new information. 
+
+`z` represents any bug fixes
 
 ## Executing FINDER with Sample data
 

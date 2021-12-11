@@ -1,4 +1,4 @@
-# Welcome to `finder`
+# Welcome to `finder_v1.0.0`
 
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. If you use `finder` for your research please cite 
 

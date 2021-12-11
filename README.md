@@ -20,7 +20,7 @@ bash Anaconda3-2020.11-Linux-x86_64.sh # do not install VS. You may replace it w
 ## Downloading `finder` and creating a conda environment
 
 ```bash
-git clone https://github.com/sagnikbanerjee15/finder.git
+git clone -b finder_v1.0.0 https://github.com/sagnikbanerjee15/finder.git
 cd Finder
 conda env create -f environment.yml # This will create an environment named finder_conda_env
 conda activate finder_conda_env

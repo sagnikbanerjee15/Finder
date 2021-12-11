@@ -27,18 +27,6 @@ conda activate finder_conda_env
 cd dep
 ```
 
-If you want to avoid using `git clone`and decide to download the zip package then please follow the following steps
-
-```bash
-wget https://github.com/sagnikbanerjee15/Finder/archive/master.zip
-unzip master.zip
-mv Finder-master Finder
-cd Finder
-conda env create -f environment.yml # This will create an environment named finder_conda_env
-conda activate finder_conda_env
-cd dep
-```
-
 While running `conda env create -f environment.yml` you might get an error about conflicts. Follow the following steps to get rid of that error.
 
 ```bash

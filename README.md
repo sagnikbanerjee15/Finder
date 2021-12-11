@@ -71,8 +71,6 @@ echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the
 export PATH=$PATH:$(pwd)
 ```
 
-
-
 ## Understanding Finder versions
 
 Each version of `finder` will be released with `3` numeric segments, each separated with a period - `x.y.z`
@@ -141,19 +139,21 @@ Help menu for FINDER can be launched by the following command:
 ```bash
 finder -h
 
-usage: finder [-h] --metadatafile METADATAFILE --output_directory
+usage: finder [-h] [--version] --metadatafile METADATAFILE --output_directory
               OUTPUT_DIRECTORY --genome GENOME [--cpu CPU]
               [--genome_dir_star GENOME_DIR_STAR]
               [--genome_dir_olego GENOME_DIR_OLEGO] [--verbose VERBOSE]
               [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data]
               [--checkpoint CHECKPOINT]
               [--perform_post_completion_data_cleanup] [--run_tests]
-              [--addUTR] [--skip_cpd]
+              [--addUTR] [--skip_cpd] [--exonerate_gff3 EXONERATE_GFF3]
+              [--star_shared_mem]
 
 Generates gene annotation from RNA-Seq data
 
 optional arguments:
   -h, --help            show this help message and exit
+  --version             show program's version number and exit
 
 Required arguments:
   --metadatafile METADATAFILE, -mf METADATAFILE
@@ -178,7 +178,8 @@ Optional arguments:
   --preserve_raw_input_data, -preserve
                         Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. 
   --checkpoint CHECKPOINT, -c CHECKPOINT
-                        Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous checkpoint. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+                        Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous 
+                        . For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
                             1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
                             2. Assemble with PsiCLASS (Will remove all assemblies) 
                             3. Find genes with FINDER (entails changepoint detection) 
@@ -194,6 +195,8 @@ Optional arguments:
                         Turn on this option to skip changepoint detection. Could be effective for grasses
   --exonerate_gff3 EXONERATE_GFF3, -egff3 EXONERATE_GFF3
                         Enter the exonerate output in gff3 format
+  --star_shared_mem, --star_shared_mem
+                        Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.
 ```
 
 `finder` can be launched using the following command:

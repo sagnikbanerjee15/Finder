@@ -310,7 +310,7 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     
     os.system("rm -rf "+options.output_braker)
     os.system("mkdir -p "+options.output_braker)
-    
+    """
     ################################################################################
     # Copy Augustus file to output directory
     ################################################################################
@@ -319,6 +319,7 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     os.system(cmd)    
     with logging_mutex:
         logger_proxy.info(f"Running command - {cmd}")
+    """
     
     with logging_mutex:
         logger_proxy.info("BRAKER run started")
@@ -328,9 +329,6 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     cores_for_braker='40' if int(options.cpu)>40 else str(options.cpu) # BRAKER cannot run with more than 40 CPUs
     cmd=options.softwares["braker"]
     cmd+=" --GENEMARK_PATH="+options.softwares["GENEMARK_PATH"]
-    cmd+=" --AUGUSTUS_CONFIG_PATH="+options.softwares["AUGUSTUS_CONFIG_PATH"]
-    cmd+=" --AUGUSTUS_BIN_PATH="+options.softwares["AUGUSTUS_BIN_PATH"]
-    cmd+=" --AUGUSTUS_SCRIPTS_PATH="+options.softwares["AUGUSTUS_SCRIPTS_PATH"]
     cmd+=" --GUSHR_PATH="+options.softwares["GUSHR_PATH"]
     cmd+=" --softmasking "
     #cmd+=" --hints="+options.output_assemblies_psiclass_terminal_exon_length_modified+"/hints.gff "

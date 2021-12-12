@@ -179,10 +179,10 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     #os.system("mkdir -p "+options.output_rcorrector)
     #os.system("mkdir -p "+options.ncrna_dir)
 
-    options.softwares["psiclass"]="/psiclass"
-    options.softwares["junc"]="/junc"
-    options.softwares["subexon-info"]="/subexon-info"
-    options.softwares["addXS"]="/addXS"
+    options.softwares["psiclass"]="psiclass"
+    options.softwares["junc"]="junc"
+    options.softwares["subexon-info"]="subexon-info"
+    options.softwares["addXS"]="addXS"
     #options.softwares["fastq-sample"]="/fastq-tools-0.8/scripts/fastq-sample"
     options.softwares["download_and_dump_fastq_from_SRA"]=+"downloadAndDumpFastqFromSRA.py"
     options.softwares["transferGenomicNucleotideCountsToTranscriptome"]="transferGenomicNucleotideCountsToTranscriptome.py"
@@ -199,18 +199,13 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     ################################################################################
     # Set paths for BRAKER run
     ################################################################################
-    options.softwares["augustus_main_dir"]=dep_path+"/Augustus"
     options.softwares["braker"]="braker.pl"
     options.softwares["GENEMARK_PATH"]=options.genemark_path
     options.softwares["AUGUSTUS_CONFIG_PATH"]=options.output_braker+"/Augustus/config"
     options.softwares["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"
     options.softwares["AUGUSTUS_SCRIPTS_PATH"]=options.output_braker+"/Augustus/scripts"
-    options.softwares["GUSHR_PATH"]=dep_path+"/GUSHR"
+    options.softwares["GUSHR_PATH"]="/softwares/GUSHR/GUSHR"
     
-    os.environ["PATH"] = os.environ["PATH"]+":/"+dep_path
-    os.environ["AUGUSTUS_CONFIG_PATH"] = options.output_braker+"/Augustus/config"
-    os.environ["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"
-    os.environ["AUGUSTUS_SCRIPTS_PATH"]=options.output_braker+"/Augustus/scripts"
     with logging_mutex:
         logger_proxy.info("Software paths have been set")
     

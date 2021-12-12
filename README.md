@@ -1,4 +1,4 @@
-# Welcome to `finder_v1.0.0`
+# Welcome to `finder_v1.1.0`
 
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. For this version, no docker images could be provided due to distribution restrictions of underlying software.
 
@@ -10,40 +10,10 @@ Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise
 
 `finder` requires a number of softwares which needs to be installed. This might cause version conflicts with softwares that are already installed in your system. Hence, the developers have decided to enforce the use of `finder` within a conda environment. 
 
-### Downloading and installing Anaconda (skip if you already have Anaconda installed)
+## Installing `finder` using `docker`
 
-Execute the following commands to download and install Anaconda
-
-```bash
-wget https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
-bash Anaconda3-2020.11-Linux-x86_64.sh # do not install VS. You may replace it with the latest version of Anaconda from https://www.anaconda.com/distribution/. Also, conda will default to the home directory, but make sure you choose a directory that has sufficient disk space to install all the software packages. 
 ```
-
-## Downloading `finder` and creating a conda environment
-
-```bash
-git clone -b finder_v1.0.0 https://github.com/sagnikbanerjee15/finder.git
-cd Finder
-conda env create -f environment.yml # This will create an environment named finder_conda_env
-conda activate finder_conda_env
-cd dep
-```
-
-While running `conda env create -f environment.yml` you might get an error about conflicts. Follow the following steps to get rid of that error.
-
-```bash
-cat /dev/null > ~/.condarc
-vim ~/.condarc
-# Copy paste the following part
-channels:
- - defaults
- - conda-forge
-channel_priority: true
-
-conda update --all
-conda env create -f environment.yml # This will create an environment named finder_conda_env
-conda activate finder_conda_env
-cd dep
+docker pull sagnikbanerjee15/finder:1.1.0
 ```
 
 `finder` runs `BRAKER2` which depends on `GeneMark-ES`. `finder` also needs `GeneMarkS/T` to predict coding regions of genes. Both `GeneMark-ES` and `GeneMarkS/T` are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the `dep` sub-directory. Please follow the instructions below to download the softwares and the key:

@@ -162,8 +162,7 @@ ENV PATH="${PATH}:/softwares/GFFREAD/gffread"
 
 ARG BEDOPS_VERSION=2.4.40
 RUN mkdir -p /softwares/bedops
-RUN wget https://github.com/bedops/bedops/releases/download/v2.4.40/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2
-RUN tar jxvf bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2
+RUN cd /softwares/bedops && wget https://github.com/bedops/bedops/releases/download/v2.4.40/bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2 && tar jxvf bedops_linux_x86_64-v${BEDOPS_VERSION}.tar.bz2
 
 ENV PATH="${PATH}:/softwares/bedops/bin" 
 ###################################################################################################################################################################################################

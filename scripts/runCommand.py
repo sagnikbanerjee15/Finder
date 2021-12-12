@@ -2,14 +2,13 @@
 # Running commands in parallel
 ############################################################################################################################################################
 
-
 import os
 import subprocess
 
 
-def runCommand(eachinput):
-    Run,cmd=eachinput
+def runCommand( eachinput ):
+    Run, cmd = eachinput
     if "<" not in cmd:
-        os.system(cmd)
+        os.system( cmd )
     else:
-        subprocess.check_call(['bash', '-c', cmd])
+        subprocess.check_call( ['bash', '-c', cmd] )

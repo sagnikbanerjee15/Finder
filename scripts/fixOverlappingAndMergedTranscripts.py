@@ -527,7 +527,7 @@ def fixOverlappingAndMergedTranscripts( options, logger_proxy, logging_mutex ):
         allinputs = []
         for file_num, chunk in enumerate( chunked_file ):
             outputfilename_portion = outputfile_for_CPD + "_" + str( file_num )
-            cmd = "Rscript " + options.softwares["find_exonic_troughs"]
+            cmd = "Rscript $(which " + options.softwares["find_exonic_troughs"] + ")"
             cmd += " " + inputfile_for_CPD + "_" + str( file_num )
             cmd += " " + outputfilename_portion
             cmd += " 2 "

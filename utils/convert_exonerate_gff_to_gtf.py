@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 The default genewise output contains GFF2 regions as long as you pass the --showquerygff or
@@ -27,7 +27,7 @@ Example input (only GFF regions are show, the others are ignored):
 #
 jcf7180000085759        exonerate:est2genome    gene    829164  1013996 178     -       .       gene_id 0 ; sequence comp1000_c0_seq1 ;
  gene_orientation +
-jcf7180000085759        exonerate:est2genome    utr5    1013927 1013996 .       -       .       
+jcf7180000085759        exonerate:est2genome    utr5    1013927 1013996 .       -       .
 jcf7180000085759        exonerate:est2genome    exon    1013927 1013996 .       -       .       insertions 7 ; deletions 5
 jcf7180000085759        exonerate:est2genome    splice5 1013925 1013926 .       -       .       intron_id 1 ; splice_site "AT"
 jcf7180000085759        exonerate:est2genome    intron  829487  1013926 .       -       .       intron_id 1
@@ -36,7 +36,7 @@ jcf7180000085759        exonerate:est2genome    exon    829164  829486  .       
 jcf7180000085759        exonerate:est2genome    similarity      829164  1013996 178     -       .       alignment_id 0 ; Query comp1000
 _c0_seq1 ; Align 1013997 114 8 ; Align 1013988 122 11 ; Align 1013977 138 16 ; Align 1013960 154 3 ; Align 1013955 157 1 ; Align 101395
 3 158 15 ; Align 1013936 173 9 ; Align 829487 182 29 ; Align 829457 211 39 ; Align 829418 255 23 ; Align 829395 279 1 ; Align 829394 28
-2 9 ; Align 829385 292 9 ; Align 829375 301 11 ; Align 829364 313 4 ; Align 829360 318 1 ; Align 829359 320 14 ; Align 829345 335 32 ; 
+2 9 ; Align 829385 292 9 ; Align 829375 301 11 ; Align 829364 313 4 ; Align 829360 318 1 ; Align 829359 320 14 ; Align 829345 335 32 ;
 Align 829313 374 2 ; Align 829311 378 5 ; Align 829306 384 2 ; Align 829304 387 14 ; Align 829290 405 14 ; Align 829275 419 2 ; Align 8
 29272 421 5 ; Align 829266 426 6 ; Align 829260 433 4 ; Align 829253 437 13 ; Align 829238 450 8 ; Align 829229 458 3 ; Align 829225 46
 1 12 ; Align 829212 473 16 ; Align 829196 491 3 ; Align 829193 495 7 ; Align 829186 503 7 ; Align 829175 510 11
@@ -62,55 +62,55 @@ import re
 
 
 def main():
-    parser = argparse.ArgumentParser( description='Converts exonerate GFF output to GFF3')
+    parser = argparse.ArgumentParser( description = 'Converts exonerate GFF output to GFF3' )
 
     # output file to be written
-    parser.add_argument('-i', '--input_file', type=str, required=True, help='Path to an input file to parse' )
-    parser.add_argument('-o', '--output_file', type=str, required=True, help='Path to an output file to be created' )
-    
+    parser.add_argument( '-i', '--input_file', type = str, required = True, help = 'Path to an input file to parse' )
+    parser.add_argument( '-o', '--output_file', type = str, required = True, help = 'Path to an output file to be created' )
+
     args = parser.parse_args()
 
-    fout = open(args.output_file, 'w')
-    #fout.write("##gff-version 3\n")
+    fout = open( args.output_file, 'w' )
+    # fout.write("##gff-version 3\n")
 
     next_id_num = 1
     in_gff3_region = False
     current_sequence = None
 
-    for line in open(args.input_file, 'r'):
-        if line.startswith('# --- START OF GFF DUMP ---'):
+    for line in open( args.input_file, 'r' ):
+        if line.startswith( '# --- START OF GFF DUMP ---' ):
             in_gff3_region = True
-    
-        elif line.startswith('# --- END OF GFF DUMP ---'):
+
+        elif line.startswith( '# --- END OF GFF DUMP ---' ):
             in_gff3_region = False
             current_sequence = None
-        
-        if line.startswith('#'):
-            continue
-        
-        cols = line.split("\t")
 
-        if len(cols) != 9 or in_gff3_region == False:
+        if line.startswith( '#' ):
+            continue
+
+        cols = line.split( "\t" )
+
+        if len( cols ) != 9 or in_gff3_region == False:
             continue
 
         if cols[2] == 'gene':
-            provided_id=cols[8].split("sequence")[-1].split(";")[0].strip().split("|")[1]
-            identity=cols[8].split("identity")[-1].split(";")[0].strip()
-            similarity=cols[8].split("similarity")[-1].split(";")[0].strip()
+            provided_id = cols[8].split( "sequence" )[-1].split( ";" )[0].strip().split( "|" )[1]
+            identity = cols[8].split( "identity" )[-1].split( ";" )[0].strip()
+            similarity = cols[8].split( "similarity" )[-1].split( ";" )[0].strip()
         elif cols[2] == 'exon':
-            id = "exonerate_protgene_{0}".format(next_id_num)
+            id = "exonerate_protgene_{0}".format( next_id_num )
             next_id_num += 1
 
             cols[2] = 'exon'
-            cols[8] = "gene_id \"{0}\"; transcript_id \"{1}\"; identity \"{2}\"; similarity \"{3}\"".format(provided_id+"_protgene", provided_id+"_protgene",identity,similarity)
+            cols[8] = "gene_id \"{0}\"; transcript_id \"{1}\"; identity \"{2}\"; similarity \"{3}\"".format( provided_id + "_protgene", provided_id + "_protgene", identity, similarity )
 
-            fout.write("\t".join(cols) + "\n")
-        elif cols[2]=="cds":
-            cols[2]="CDS"
-            cols[8] = "gene_id \"{0}\"; transcript_id \"{1}\"; identity \"{2}\"; similarity \"{3}\"".format(provided_id+"_protgene", provided_id+"_protgene",identity,similarity)
-            fout.write("\t".join(cols) + "\n")
+            fout.write( "\t".join( cols ) + "\n" )
+        elif cols[2] == "cds":
+            cols[2] = "CDS"
+            cols[8] = "gene_id \"{0}\"; transcript_id \"{1}\"; identity \"{2}\"; similarity \"{3}\"".format( provided_id + "_protgene", provided_id + "_protgene", identity, similarity )
+            fout.write( "\t".join( cols ) + "\n" )
+
 
 if __name__ == '__main__':
     main()
-
 

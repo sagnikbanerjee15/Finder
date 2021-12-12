@@ -178,51 +178,35 @@ def validateCommandLineArguments(options,logger_proxy,logging_mutex):
     #os.system("mkdir -p "+options.output_logs)
     #os.system("mkdir -p "+options.output_rcorrector)
     #os.system("mkdir -p "+options.ncrna_dir)
-    
-    ########################################################################################################
-    # Setting up links to the softwares
-    ########################################################################################################
-    cmd="whereis finder > "+options.temp_dir+"/finding_finder"
-    os.system(cmd)
-    finder_directory=open(options.temp_dir+"/finding_finder","r").read().split(":")[-1].split()[-1].strip()
-    
-    if finder_directory!="":
-        # PATH NOT set to downloaded directory
-        dep_path="/".join(finder_directory.split("/")[:-1])+"/dep"
-    else:
-        # PATH IS set to downloaded directory
-        if "/" in sys.argv[0]:
-            dep_path="/".join(sys.argv[0].split("/")[:-1])+"/dep"
-        else:
-            dep_path="dep"
 
-    options.softwares["psiclass"]=dep_path+"/psiclass_terminal_exon_length_modified/psiclass"
-    options.softwares["junc"]=dep_path+"/psiclass_terminal_exon_length_modified//junc"
-    options.softwares["subexon-info"]=dep_path+"/psiclass_terminal_exon_length_modified//subexon-info"
-    options.softwares["addXS"]=dep_path+"/psiclass_terminal_exon_length_modified//addXS"
-    options.softwares["fastq-sample"]=dep_path+"/fastq-tools-0.8/scripts/fastq-sample"
-    options.softwares["download_and_dump_fastq_from_SRA"]=dep_path+"/../utils/downloadAndDumpFastqFromSRA.py"
-    options.softwares["transferGenomicNucleotideCountsToTranscriptome"]=dep_path+"/../scripts/transferGenomicNucleotideCountsToTranscriptome.py"
-    options.softwares["find_exonic_troughs"]=dep_path+"/../scripts/find_exonic_troughs.R"
-    options.softwares["olego"]=dep_path+"/olego/olego"
-    options.softwares["olegoindex"]=dep_path+"/olego/olegoindex"
-    options.softwares["mergePEsam.pl"]=dep_path+"/olego/mergePEsam.pl"
-    options.softwares["xa2multi"]=dep_path+"/olego/xa2multi.pl"
-    options.softwares["gmst"]=dep_path+"/gmst.pl"
-    options.softwares["prodigal"]=dep_path+"/Prodigal/prodigal"
-    options.softwares["canon-gff3"]=dep_path+"/canon-gff3"
-    options.softwares["convert_exonerate_gff_to_gtf"] = dep_path+"/../utils/convert_exonerate_gff_to_gtf.py"
+    options.softwares["psiclass"]="/psiclass"
+    options.softwares["junc"]="/junc"
+    options.softwares["subexon-info"]="/subexon-info"
+    options.softwares["addXS"]="/addXS"
+    #options.softwares["fastq-sample"]="/fastq-tools-0.8/scripts/fastq-sample"
+    options.softwares["download_and_dump_fastq_from_SRA"]=+"downloadAndDumpFastqFromSRA.py"
+    options.softwares["transferGenomicNucleotideCountsToTranscriptome"]="transferGenomicNucleotideCountsToTranscriptome.py"
+    options.softwares["find_exonic_troughs"]="find_exonic_troughs.R"
+    options.softwares["olego"]="olego"
+    options.softwares["olegoindex"]=+"olegoindex"
+    options.softwares["mergePEsam.pl"]="mergePEsam.pl"
+    options.softwares["xa2multi"]="xa2multi.pl"
+    #options.softwares["gmst"]=+"/gmst.pl"
+    #options.softwares["prodigal"]=dep_path+"/Prodigal/prodigal"
+    options.softwares["canon-gff3"]="canon-gff3"
+    options.softwares["convert_exonerate_gff_to_gtf"] = "convert_exonerate_gff_to_gtf.py"
     
     ################################################################################
     # Set paths for BRAKER run
     ################################################################################
     options.softwares["augustus_main_dir"]=dep_path+"/Augustus"
-    options.softwares["braker"]=dep_path+"/BRAKER/scripts/braker.pl"
-    options.softwares["GENEMARK_PATH"]=dep_path+"/gmes_linux_64"
+    options.softwares["braker"]="braker.pl"
+    options.softwares["GENEMARK_PATH"]=options.genemark_path
     options.softwares["AUGUSTUS_CONFIG_PATH"]=options.output_braker+"/Augustus/config"
     options.softwares["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"
     options.softwares["AUGUSTUS_SCRIPTS_PATH"]=options.output_braker+"/Augustus/scripts"
     options.softwares["GUSHR_PATH"]=dep_path+"/GUSHR"
+    
     os.environ["PATH"] = os.environ["PATH"]+":/"+dep_path
     os.environ["AUGUSTUS_CONFIG_PATH"] = options.output_braker+"/Augustus/config"
     os.environ["AUGUSTUS_BIN_PATH"]=options.output_braker+"/Augustus/bin"

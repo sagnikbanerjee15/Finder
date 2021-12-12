@@ -345,10 +345,8 @@ def configureAndRunBRAKER(options,logger_proxy,logging_mutex):
     cmd+=" --gff3 "
     if options.addUTR==True:
         cmd+=" --addUTR=on "
-    #cmd+=" --UTR=on "
     cmd+=" > "+options.output_braker+".output"
     cmd+=" 2> "+options.output_braker+".error"
-    #print(cmd)
     with logging_mutex:
         logger_proxy.info(f"Running BRAKER2 - {cmd}")
     os.system(cmd)

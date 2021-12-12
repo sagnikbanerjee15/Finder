@@ -537,6 +537,7 @@ def fixOverlappingAndMergedTranscripts( options, logger_proxy, logging_mutex ):
                 allinputs.append( ["dummy", cmd] )
                 with logging_mutex:
                     logger_proxy.info( "Performing calculation for " + outputfile_for_CPD + "_" + str( file_num ) )
+                    logger_proxy.info( f"Running cmd - {cmd}" )
 
         pool.map( runCommand, allinputs )
         time.sleep( 5 )

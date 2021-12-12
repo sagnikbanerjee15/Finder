@@ -1,8 +1,61 @@
 #! /usr/bin/env python3
 
+from argparse import RawTextHelpFormatter
+
+import argparse
+import sys
+
+
+def parseCommandLineArguments():
+    parser = argparse.ArgumentParser( prog = "finder", description = "Generates gene annotation from RNA-Seq data", formatter_class = RawTextHelpFormatter )
+    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v1.0.0' )
+
+    required_named = parser.add_argument_group( 'Required arguments' )
+    optional_named = parser.add_argument_group( 'Optional arguments' )
+
+    # Mandatory arguments
+    required_named.add_argument( "--metadatafile", "-mf", help = "Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ", required = True )
+    required_named.add_argument( "--output_directory", "-out_dir", help = "Enter the name of the directory where all other operations will be performed", required = True )
+    required_named.add_argument( "--genome", "-g", help = "Enter the SOFT-MASKED genome file of the organism", required = True )
+    required_named.add_argument( "--organism_model", "-om", help = "Enter the type of organism", choices = ["VERT", "INV", "PLANTS", "FUNGI"] , required = True )
+
+    # Optional arguments
+    optional_named.add_argument( "--cpu", "-n", help = "Enter the number of CPUs to be used.", default = 1 )
+    optional_named.add_argument( "--genome_dir_star", "-gdir_star", help = "Please enter the location of the genome index directory of STAR" )
+    optional_named.add_argument( "--genome_dir_olego", "-gdir_olego", help = "Please enter the location of the genome index directory of OLego" )
+    optional_named.add_argument( "--verbose", "-verb", default = 1, help = "Enter a verbosity level" )
+    optional_named.add_argument( "--protein", "-p", help = "Enter the protein fasta" )
+    optional_named.add_argument( "--no_cleanup", "-no_cleanup", help = "Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space", action = "store_true" )
+    optional_named.add_argument( "--preserve_raw_input_data", "-preserve", help = "Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. ", action = "store_true" )
+    optional_named.add_argument( "--checkpoint", "-c", help = """Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous
+. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+    1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
+    2. Assemble with PsiCLASS (Will remove all assemblies)
+    3. Find genes with FINDER (entails changepoint detection)
+    4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
+    5. Annotate coding regions
+    6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
+    """, default = 0, type = int )
+    optional_named.add_argument( "--perform_post_completion_data_cleanup", "-pc_clean", help = "Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ", action = "store_true" )
+    optional_named.add_argument( "--run_tests", "-rt", help = "Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations", action = "store_true" )
+    optional_named.add_argument( "--addUTR", "--addUTR", help = "Turn on this option if you wish BRAKER to add UTR sequences", action = "store_true" )
+    optional_named.add_argument( "--skip_cpd", "--skip_cpd", help = "Turn on this option to skip changepoint detection. Could be effective for grasses", action = "store_true" )
+    optional_named.add_argument( "--exonerate_gff3", "-egff3", help = "Enter the exonerate output in gff3 format" )
+    optional_named.add_argument( "--star_shared_mem", "--star_shared_mem", help = "Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.", action = "store_true" )
+    optional_named.add_argument( "--genemark_path", "-gm", help = "Enter the path to genemark" )
+    optional_named.add_argument( "--genemark_license", "-gml", help = "Enter the licence file. Please make sure your license file is less than 365 days old" )
+    # optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
+    # optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
+    # optional_named.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")
+
+    return parser.parse_args()
+
 
 def main():
-    pass
+    commandLineArg = sys.argv
+    if len( commandLineArg ) == 1:
+        print( "Please use the --help option to get usage information" )
+    options = parseCommandLineArguments()
 
 
 if __name__ == "__main__":

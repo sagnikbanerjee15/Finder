@@ -149,10 +149,11 @@ ENV PATH="${PATH}:/softwares/GUSHR/GUSHR"
 # FINDER
 ###################################################################################################################################################################################################
 
-RUN mkdir /softwares/FINDER
+RUN mkdir -p /softwares/FINDER
+RUN cd /softwares/FINDER
 RUN cd /softwares/FINDER && git clone -b finder_v1.1.0 https://github.com/sagnikbanerjee15/Finder.git
 
-ENV PATH="${PATH}:/softwares/FINDER/Finder"
+ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/softwares/FINDER/Finder/utils:/softwares/FINDER/Finder/dep"
 ###################################################################################################################################################################################################
 
 # Remove downloaded files

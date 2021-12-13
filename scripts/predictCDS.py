@@ -51,7 +51,7 @@ def findCDS( options , logger_proxy, logging_mutex ):
 
     cmd = f" codan.py "
     cmd += f" -t {gtf_filename[:-3]}fasta "
-    cmd += f" -m /softwares/CODAN/CodAn-1.2/models/${options.organism_model}_full "
+    cmd += f" -m /softwares/CODAN/CodAn-1.2/models/{options.organism_model}_full "
     cmd += f" -c {options.cpu} "
     cmd += f" -o {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict "
     cmd += f" 1> {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict.output "

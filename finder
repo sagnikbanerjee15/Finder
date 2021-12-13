@@ -122,7 +122,7 @@ def main():
     cmd += f" --star_shared_mem {options.star_shared_mem} "
     if options.genemark_path is not None:
         cmd += f" --genemark_path {options.genemark_path} "
-        volumes_list.append( f"{'/'.join(options.genemark_path.split('/')[:-1])}:{'/'.join(options.genemark_path.split('/')[:-1])}" )
+        volumes_list.append( f"{options.genemark_path}:{options.genemark_path}" )
     if options.genemark_license is not None:
         cmd += f" --genemark_license {options.genemark_license}"
         volumes_list.append( f"{'/'.join(options.genemark_license.split('/')[:-1])}:{'/'.join(options.genemark_license.split('/')[:-1])}" )

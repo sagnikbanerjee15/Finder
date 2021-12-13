@@ -216,6 +216,7 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
             cmd_cp = f"cp -r {options.genemark_path}/* /softwares/GeneMark/"
             os.system( cmd_cp )
             options.genemark_path = "/softwares/GeneMark"
+            os.chdir( options.genemark_path )
             cmd = f"perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\""
             logger_proxy.info( f"Running command - {cmd}" )
         os.system( cmd )

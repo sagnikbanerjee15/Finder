@@ -216,6 +216,7 @@ ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/sof
 ###################################################################################################################################################################################################
 
 # Set up the folder for GeneMark in case it is provided by the user
+RUN mkdir -p /softwares/GeneMark
 ENV PATH="${PATH}:/softwares/GeneMark/"
 
 # Remove downloaded files

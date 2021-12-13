@@ -49,69 +49,27 @@ def findCDS( options ):
     cmd += " " + gtf_filename
     os.system( cmd )
 
-    cmd = options.softwares["gmst"]
-    cmd += " --output " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_ultra_long_introns_redundancy_removed_genemarkST_output.gff3 "
-    cmd += " --format GFF "
-    cmd += " -faa "
-    cmd += " -fnn "
-    cmd += " --strand direct "
-    cmd += gtf_filename[:-3] + "fasta "
-    os.system( cmd )
-
-    # Select all uni-exon transcripts
-    cmd = "cat " + gtf_filename
-    cmd += "|awk '$7==\".\"' "
-    cmd += " > " + gtf_filename[:-4] + "_uniexon.gtf"
-    os.system( cmd )
-
-    cmd = "gffread "
-    cmd += " -w " + gtf_filename[:-4] + "_uniexon.fasta "
-    cmd += " -g " + options.genome
-    cmd += " " + gtf_filename[:-4] + "_uniexon.gtf"
-    os.system( cmd )
-
-    cmd = options.softwares["gmst"]
-    cmd += " --output " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_ultra_long_introns_redundancy_removed_uniexon_genemarkST_output.gff3 "
-    cmd += " --format GFF "
-    cmd += " -faa "
-    cmd += " -fnn "
-    # cmd+=" --strand direct "
-    cmd += gtf_filename[:-4] + "_uniexon.fasta"
-    os.system( cmd )
-
-    uniexon_cds_prediction_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_ultra_long_introns_redundancy_removed_uniexon_genemarkST_output.gff3"
-    fhr = open( uniexon_cds_prediction_filename, "r" )
-    uni_exon_transcript_to_CDS_start_end = {}
-    for line in fhr:
-        if line[0] == "#" or "gene_id" not in line:continue
-        transcript_id = line.strip().split( "\t" )[0].split()[0]
-        start, end = int( line.strip().split( "\t" )[3] ), int( line.strip().split( "\t" )[4] )
-        score = float( line.strip().split( "rbs_score=" )[-1].split( "," )[0] )
-        direction = line.strip().split( "\t" )[6]
-        if transcript_id not in uni_exon_transcript_to_CDS_start_end:
-            uni_exon_transcript_to_CDS_start_end[transcript_id] = [start, end, score, direction]
-        else:
-            if score > uni_exon_transcript_to_CDS_start_end[transcript_id][2]:
-                uni_exon_transcript_to_CDS_start_end[transcript_id] = [start, end, score, direction]
-    fhr.close()
+    cmd = f" codan.py "
+    cmd += f" -t {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_ultra_long_introns_redundancy_removed_genemarkST_output.gff3 "
+    cmd += f" -m /softwares/CODAN/CodAn-1.2/models/${options.organism_model}_full "
+    cmd += f" -c {options.cpu} "
+    cmd += f" -o {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict "
+    cmd += f" 1> {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict.output "
+    cmd += f" 2> {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict.error "
+    if os.path.exists( f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict/annotation.gtf" ) == False:
+        os.system( cmd )
 
     transcript_info = readAllTranscriptsFromGTFFileInParallel( [gtf_filename, "dummy", "dummy"] )[0]
     transcript_to_CDS_start_end = {}
-    fhr = open( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_ultra_long_introns_redundancy_removed_genemarkST_output.gff3", "r" )
+    fhr = open( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/cds_predict/annotation.gtf", "r" )
     for line in fhr:
-        if line[0] == "#" or "gene_id" not in line:continue
+        if line.strip().split( "\t" )[2] != "CDS":continue
         # print(line.strip().split("\t"))
-        transcript_id = line.strip().split( "\t" )[0].split()[0]
+        transcript_id = line.strip().split( "\t" )[0]
         start, end = int( line.strip().split( "\t" )[3] ), int( line.strip().split( "\t" )[4] )
         transcript_to_CDS_start_end[transcript_id] = [start, end]
     fhr.close()
 
-    for transcript_id in uni_exon_transcript_to_CDS_start_end:
-        transcript_to_CDS_start_end[transcript_id] = uni_exon_transcript_to_CDS_start_end[transcript_id][:2]
-        chromosome = transcript_id.split( "." )[0]
-        transcript_info[transcript_id]["direction"] = uni_exon_transcript_to_CDS_start_end[transcript_id][-1]
-
-    # print("3.15366.0" in transcript_to_CDS_start_end,transcript_to_CDS_start_end["3.15366.0"])
     output_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf"
     fhw = open( output_filename, "w" )
 

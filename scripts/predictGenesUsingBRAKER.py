@@ -357,6 +357,8 @@ def configureAndRunBRAKER( options, logger_proxy, logging_mutex ):
     cmd = "gffread "
     cmd += " -E " + options.output_braker + "/braker.gff3"
     cmd += " -T -o " + options.output_braker + "/braker.gtf"
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
     with logging_mutex:
         logger_proxy.info( f"Running command - {cmd}" )

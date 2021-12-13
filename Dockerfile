@@ -200,6 +200,8 @@ ARG CODAN_VERSION=1.2
 RUN apt-get install -y --no-install-recommends bioperl libmce-perl
 RUN mkdir -p /softwares/CODAN && cd /softwares/CODAN && wget https://github.com/pedronachtigall/CodAn/archive/refs/tags/v${CODAN_VERSION}.zip && unzip v${CODAN_VERSION}.zip
 RUN chmod 777 /softwares/CODAN/CodAn-${CODAN_VERSION}/bin/*
+RUN cd /softwares/CODAN/CodAn-${CODAN_VERSION}/models/ && unzip FUNGI_full.zip && unzip FUNGI_partial.zip && unzip INV_full.zip && unzip INV_partial.zip && \
+	unzip PLANTS_full.zip && unzip PLANTS_partial.zip && unzip VERT_full.zip && unzip VERT_partial.zip
 
 ENV PATH="${PATH}:/softwares/CODAN/CodAn-${CODAN_VERSION}/bin" 
 ###################################################################################################################################################################################################

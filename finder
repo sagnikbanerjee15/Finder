@@ -4,11 +4,13 @@ from argparse import RawTextHelpFormatter
 
 import argparse
 import sys
+import docker
+import os
 
 
 def parseCommandLineArguments():
     parser = argparse.ArgumentParser( prog = "finder", description = "Generates gene annotation from RNA-Seq data", formatter_class = RawTextHelpFormatter )
-    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v1.0.0' )
+    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v1.1.0' )
 
     required_named = parser.add_argument_group( 'Required arguments' )
     optional_named = parser.add_argument_group( 'Optional arguments' )
@@ -51,11 +53,87 @@ def parseCommandLineArguments():
     return parser.parse_args()
 
 
+def runDockerCommand( name, version, image_location, container_name, volumes, command , cpus = 1, memory = '1g' ):
+    """
+    Runs the command in a docker container
+    """
+    client = docker.from_env()
+    try:
+        container = client.containers.get( container_name )
+    except docker.errors.NotFound as exc:
+        pass
+    else:
+        container_state = container.attrs["State"]
+        if container_state["Status"] == 'running' or container_state["Status"] == 'exited': return
+
+    # Runs the main command
+    docker_cmd = f" docker run "
+    docker_cmd += f" --rm "
+    docker_cmd += f" --cpus={cpus}"
+    docker_cmd += f" --memory='{memory}'"
+    docker_cmd += f" --name {container_name}"
+    for mapping in volumes:
+        docker_cmd += f" -v {mapping}"
+    docker_cmd += f" {image_location}:{version} "
+    docker_cmd += f" bash -c {command}"
+    os.system( docker_cmd )
+
+
 def main():
     commandLineArg = sys.argv
     if len( commandLineArg ) == 1:
         print( "Please use the --help option to get usage information" )
     options = parseCommandLineArguments()
+
+    volumes_list = [f"{options.output_directory}",
+                    f"{'/'.join(options.genome.split('/')[:-1])}:{'/'.join(options.genome.split('/')[:-1])}",
+                    f"{options.output_directory}:{options.output_directory}"]
+
+    cmd = f" run_finder "
+    cmd += f" --metadatafile {options.metadatafile} "
+    cmd += f" --output_directory {options.output_directory} "
+    cmd += f" --genome {options.genome} "
+    cmd += f" --organism_model {options.organism_model} "
+    cmd += f" --cpu {options.cpu} "
+    if options.genome_dir_star is not None:
+        cmd += f" --genome_dir_star {options.genome_dir_star} "
+        volumes_list.append( f"{options.genome_dir_star}:{options.genome_dir_star}" )
+    if options.genome_dir_olego is not None:
+        cmd += f" --genome_dir_olego {options.genome_dir_olego} "
+        volumes_list.append( f"{options.genome_dir_olego}:{options.genome_dir_olego}" )
+    cmd += f" --verbose {options.verbose} "
+    if options.protein is not None:
+        cmd += f" --protein {options.protein} "
+        volumes_list.append( f"{'/'.join(options.protein.split('/')[:-1])}:{'/'.join(options.protein.split('/')[:-1])}" )
+    if options.no_cleanup == True:
+        cmd += f" --no_cleanup "
+    if options.preserve_raw_input_data == True:
+        cmd += f" --preserve_raw_input_data"
+    cmd += f" --checkpoint {options.checkpoint} "
+    if options.perform_post_completion_data_cleanup == True:
+        cmd += f" --perform_post_completion_data_cleanup "
+    if options.run_tests == True:
+        cmd += f" --run_tests "
+    if options.skip_cpd == True:
+        cmd += f" --skip_cpd "
+    if options.exonerate_gff3 is not None:
+        cmd += f" --exonerate_gff3 {options.exonerate_gff3} "
+        volumes_list.append( f"{'/'.join(options.exonerate_gff3.split('/')[:-1])}:{'/'.join(options.exonerate_gff3.split('/')[:-1])}" )
+    cmd += f" --star_shared_mem {options.star_shared_mem} "
+    if options.genemark_path is not None:
+        cmd += f" --genemark_path {options.genemark_path} "
+        volumes_list.append( f"{'/'.join(options.genemark_path.split('/')[:-1])}:{'/'.join(options.genemark_path.split('/')[:-1])}" )
+    if options.genemark_license is not None:
+        cmd += f" --genemark_license {options.genemark_license}"
+        volumes_list.append( f"{'/'.join(options.genemark_license.split('/')[:-1])}:{'/'.join(options.genemark_license.split('/')[:-1])}" )
+
+    runDockerCommand( name = "finder",
+                            version = "1.1.0",
+                            image_location = "sagnikbanerjee15/finder",
+                            container_name = f"{options.output_directory}",
+                            volumes = volumes_list,
+                            command = cmd
+            )
 
 
 if __name__ == "__main__":

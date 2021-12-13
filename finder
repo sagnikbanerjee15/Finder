@@ -76,8 +76,9 @@ def runDockerCommand( name, version, image_location, container_name, volumes, co
         docker_cmd += f" -v {mapping}"
     docker_cmd += f" {image_location}:{version} "
     docker_cmd += f" bash -c {command}"
-    # os.system( docker_cmd )
     print( f"Docker command - {docker_cmd}" )
+    sys.stdout.flush()
+    os.system( docker_cmd )
 
 
 def main():

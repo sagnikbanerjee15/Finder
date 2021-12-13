@@ -215,6 +215,9 @@ RUN cd /softwares/FINDER && git clone -b finder_v1.1.0 https://github.com/sagnik
 ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/softwares/FINDER/Finder/utils:/softwares/FINDER/Finder/dep"
 ###################################################################################################################################################################################################
 
+# Set up the folder for GeneMark in case it is provided by the user
+ENV PATH="${PATH}:/softwares/GeneMark/"
+
 # Remove downloaded files
 RUN cd /softwares && \
 	rm -rf /softwares/Augustus/v${AUGUSTUS_VERSION}.zip && \

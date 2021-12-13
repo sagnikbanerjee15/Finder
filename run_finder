@@ -201,7 +201,7 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
     # Set paths for BRAKER run
     ################################################################################
     options.softwares["braker"] = "braker.pl"
-    options.softwares["GENEMARK_PATH"] = options.genemark_path
+    options.softwares["GENEMARK_PATH"] = "/softwares/GeneMark"
     options.softwares["AUGUSTUS_CONFIG_PATH"] = options.output_braker + "/Augustus/config"
     options.softwares["AUGUSTUS_BIN_PATH"] = options.output_braker + "/Augustus/bin"
     options.softwares["AUGUSTUS_SCRIPTS_PATH"] = options.output_braker + "/Augustus/scripts"

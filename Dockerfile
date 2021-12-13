@@ -171,7 +171,7 @@ ENV PATH="${PATH}:/softwares/bedops/bin"
 # Regtools
 ###################################################################################################################################################################################################
 
-RUN mkdir /softwares/REGTOOLS && git clone https://github.com/griffithlab/regtools && \
+RUN mkdir /softwares/REGTOOLS && cd /softwares/REGTOOLS && git clone https://github.com/griffithlab/regtools && \
 	cd regtools && \
     mkdir build && \
     cd build/ && \

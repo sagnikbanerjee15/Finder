@@ -135,6 +135,8 @@ def main():
                             command = cmd
             )
 
+    print( f"Running command - {cmd}" )
+
 
 if __name__ == "__main__":
     main()

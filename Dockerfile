@@ -221,7 +221,7 @@ ENV PATH="${PATH}:/softwares/GeneMark/"
 
 # Move those up to BRAKER later
 
-apt-get install -y libmath-utils-perl
+RUN apt-get install -y libmath-utils-perl
 
 # Remove downloaded files
 RUN cd /softwares && \

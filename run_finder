@@ -207,6 +207,13 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
     options.softwares["AUGUSTUS_SCRIPTS_PATH"] = options.output_braker + "/Augustus/scripts"
     options.softwares["GUSHR_PATH"] = "/softwares/GUSHR/GUSHR"
 
+    if options.genemark_license is not None:
+        new_filename = f"~/.gm_key"
+        os.system( f"mv {options.genemark_license} {new_filename}" )
+
+    if options.genemark_path is not None:
+        os.system( f"perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\" " )
+
     with logging_mutex:
         logger_proxy.info( "Software paths have been set" )
 

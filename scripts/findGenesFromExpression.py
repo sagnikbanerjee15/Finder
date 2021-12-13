@@ -297,11 +297,11 @@ def alignReadsAndMergeOutput( options, logger_proxy, logging_mutex ):
             cmd += " -n " + str( options.cpu )
             cmd += " > " + options.temp_dir + "/download_these_runs.output "
             cmd += " 2> " + options.temp_dir + "/download_these_runs.error "
-            sys.exit()
 
             with logging_mutex:
                 logger_proxy.info( "Running command - " + cmd )
             os.system( cmd )
+            sys.exit()
         with logging_mutex:
             logger_proxy.info( "Downloading missing data from NCBI finished for " + condition )
 

@@ -219,6 +219,10 @@ ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/sof
 RUN mkdir -p /softwares/GeneMark
 ENV PATH="${PATH}:/softwares/GeneMark/"
 
+# Move those up to BRAKER later
+
+apt-get install -y libmath-utils-perl
+
 # Remove downloaded files
 RUN cd /softwares && \
 	rm -rf /softwares/Augustus/v${AUGUSTUS_VERSION}.zip && \

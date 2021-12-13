@@ -94,8 +94,8 @@ def main():
     new_SRAs = [s for s in SRAs if s != ""]
     SRAs = new_SRAs
     default_path_to_download = ""
-    while verifyOutput( options.output, SRAs ) == 1:
-        downloadSRAFilesAndConvertToFastq( SRAs, default_path_to_download, int( options.cpu ), options.output )
+    # while verifyOutput( options.output, SRAs ) == 1:
+    downloadSRAFilesAndConvertToFastq( SRAs, default_path_to_download, int( options.cpu ), options.output )
 
 
 if __name__ == "__main__":

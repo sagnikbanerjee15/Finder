@@ -86,7 +86,7 @@ def main():
         print( "Please use the --help option to get usage information" )
     options = parseCommandLineArguments()
 
-    volumes_list = [f"{options.output_directory}",
+    volumes_list = [f"{options.output_directory}:{options.output_directory}",
                     f"{'/'.join(options.genome.split('/')[:-1])}:{'/'.join(options.genome.split('/')[:-1])}",
                     f"{options.output_directory}:{options.output_directory}"]
 

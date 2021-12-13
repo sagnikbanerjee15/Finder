@@ -657,7 +657,7 @@ def main():
     with logging_mutex:
         logger_proxy.info( "BRAKER run completed" )
 
-    findCDS( options )
+    findCDS( options, logger_proxy, logging_mutex )
     with logging_mutex:
         logger_proxy.info( "Finding CDS completed" )
 

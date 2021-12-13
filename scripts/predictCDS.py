@@ -28,7 +28,7 @@ def convertToGenomicCoordinate( transcriptomic_coordinate, exon_list_genomic, tr
     print("="*100)"""
 
 
-def findCDS( options ):
+def findCDS( options , logger_proxy, logging_mutex ):
     """
     """
     gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf"
@@ -69,6 +69,9 @@ def findCDS( options ):
         start, end = int( line.strip().split( "\t" )[3] ), int( line.strip().split( "\t" )[4] )
         transcript_to_CDS_start_end[transcript_id] = [start, end]
     fhr.close()
+
+    with logging_mutex:
+        logger_proxy.info( f"{len(transcript_to_CDS_start_end)} transcripts with CDS predicted" )
 
     output_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf"
     fhw = open( output_filename, "w" )

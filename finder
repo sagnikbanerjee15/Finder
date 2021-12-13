@@ -136,7 +136,9 @@ def main():
                             image_location = "sagnikbanerjee15/finder",
                             container_name = f"{options.output_directory.split('/')[-1]}",
                             volumes = volumes_list,
-                            command = cmd
+                            command = cmd,
+                            cpus = options.cpu,
+                            memory = '200g'
             )
 
     print( f"Running command - {cmd}" )

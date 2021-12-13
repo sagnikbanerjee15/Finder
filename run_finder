@@ -213,6 +213,7 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
 
     if options.genemark_path is not None:
         with logging_mutex:
+            os.environ['PATH'] = f"{os.environ['PATH']}:{options.genemark_path}"
             cmd = f"perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\""
             logger_proxy.info( f"Running command - {cmd}" )
         os.system( cmd )

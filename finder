@@ -121,7 +121,8 @@ def main():
     if options.exonerate_gff3 is not None:
         cmd += f" --exonerate_gff3 {options.exonerate_gff3} "
         volumes_list.append( f"{'/'.join(options.exonerate_gff3.split('/')[:-1])}:{'/'.join(options.exonerate_gff3.split('/')[:-1])}" )
-    cmd += f" --star_shared_mem {options.star_shared_mem} "
+    if options.star_shared_mem == True:
+        cmd += f" --star_shared_mem "
     if options.genemark_path is not None:
         cmd += f" --genemark_path {options.genemark_path} "
         volumes_list.append( f"{options.genemark_path}:{options.genemark_path}" )

@@ -208,6 +208,7 @@ ENV PATH="${PATH}:/softwares/CODAN/CodAn-${CODAN_VERSION}/bin"
 # FINDER
 ###################################################################################################################################################################################################
 
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 RUN mkdir -p /softwares/FINDER
 RUN cd /softwares/FINDER && git clone -b finder_v1.1.0 https://github.com/sagnikbanerjee15/Finder.git
 

@@ -50,7 +50,7 @@ def findCDS( options ):
     os.system( cmd )
 
     cmd = f" codan.py "
-    cmd += f" -t {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/combined_ultra_long_introns_redundancy_removed_genemarkST_output.gff3 "
+    cmd += f" -t {gtf_filename[:-3]}fasta "
     cmd += f" -m /softwares/CODAN/CodAn-1.2/models/${options.organism_model}_full "
     cmd += f" -c {options.cpu} "
     cmd += f" -o {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict "

@@ -57,6 +57,8 @@ def findCDS( options , logger_proxy, logging_mutex ):
     cmd += f" 1> {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict.output "
     cmd += f" 2> {options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict.error "
     if os.path.exists( f"{options.output_assemblies_psiclass_terminal_exon_length_modified}/combined/cds_predict/annotation.gtf" ) == False:
+        with logging_mutex:
+            logger_proxy.info( f"Running command - {cmd}" )
         os.system( cmd )
 
     transcript_info = readAllTranscriptsFromGTFFileInParallel( [gtf_filename, "dummy", "dummy"] )[0]

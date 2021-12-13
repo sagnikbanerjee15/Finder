@@ -76,7 +76,7 @@ def runDockerCommand( name, version, image_location, container_name, volumes, co
         docker_cmd += f" -v {mapping}"
     docker_cmd += f" {image_location}:{version} "
     docker_cmd += f" bash -c {command}"
-    os.system( docker_cmd )
+    # os.system( docker_cmd )
     print( f"Docker command - {docker_cmd}" )
 
 
@@ -138,7 +138,7 @@ def main():
                             volumes = volumes_list,
                             command = cmd,
                             cpus = options.cpu,
-                            memory = '200g'
+                            memory = '300g'
             )
 
     print( f"Running command - {cmd}" )

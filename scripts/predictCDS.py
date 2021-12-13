@@ -34,7 +34,7 @@ def findCDS( options , logger_proxy, logging_mutex ):
     gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf"
     combined_ultra_long_introns_redundancy_removed = readAllTranscriptsFromGTFFileInParallel( [gtf_filename, "dummy", "dummy"] )[0]
     output_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf"
-    if os.path.exists( output_gtf_filename ) == True:return
+    # if os.path.exists( output_gtf_filename ) == True:return
     for transcript_id in combined_ultra_long_introns_redundancy_removed:
         if len( combined_ultra_long_introns_redundancy_removed[transcript_id]["exons"] ) == 1:
             combined_ultra_long_introns_redundancy_removed[transcript_id]["direction"] = "."

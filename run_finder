@@ -213,7 +213,7 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
 
     if options.genemark_path is not None:
         with logging_mutex:
-            cmd = "perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\""
+            cmd = f"perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\""
             logger_proxy.info( f"Running command - {cmd}" )
         os.system( cmd )
 
@@ -228,37 +228,41 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
         with logging_mutex:
             logger_proxy.info( "Generating STAR index" )
         options.genome_dir_star = options.indices + "/star_index_without_transcriptome"
-        os.system( "mkdir -p " + options.genome_dir_star )
-        number_of_reference_sequences = 0
-        genome_length = 0
-        fhr = open( options.genome, "r" )
-        for line in fhr:
-            if line[0] == '>':
-                number_of_reference_sequences += 1
-            else:
-                genome_length += len( line.strip() )
-        fhr.close()
-        genomeChrBinNbits_value = min( 18, math.log2( genome_length / number_of_reference_sequences ) )
-        genomeSAindexNbases_value = min( 14, math.log2( genome_length ) / 2 - 1 )
+        if os.path.exists( f"{options.genome_dir_star}/genomeParameters.txt" ) == False:
+            os.system( "mkdir -p " + options.genome_dir_star )
+            number_of_reference_sequences = 0
+            genome_length = 0
+            fhr = open( options.genome, "r" )
+            for line in fhr:
+                if line[0] == '>':
+                    number_of_reference_sequences += 1
+                else:
+                    genome_length += len( line.strip() )
+            fhr.close()
+            genomeChrBinNbits_value = min( 18, math.log2( genome_length / number_of_reference_sequences ) )
+            genomeSAindexNbases_value = min( 14, math.log2( genome_length ) / 2 - 1 )
 
-        cmd = f"STAR "
-        cmd += f" --runThreadN {options.cpu}"
-        cmd += f" --runMode genomeGenerate "
-        if options.star_shared_mem == True:
-            cmd += f" --genomeLoad LoadAndKeep"
-        cmd += f" --genomeDir {options.genome_dir_star}"
-        cmd += f" --genomeFastaFiles {options.genome}"
-        cmd += f" --genomeChrBinNbits {genomeChrBinNbits_value}"
-        cmd += f" --genomeSAindexNbases {genomeSAindexNbases_value}"
-        cmd += f" --outFileNamePrefix {options.output_star}/indexGenome"
-        cmd += " > " + options.genome_dir_star + ".output "
-        cmd += " 2> " + options.genome_dir_star + ".error "
-        if os.path.exists( f"{options.genome_dir_star}/SAindex" ) == False:
+            cmd = f"STAR "
+            cmd += f" --runThreadN {options.cpu}"
+            cmd += f" --runMode genomeGenerate "
+            if options.star_shared_mem == True:
+                cmd += f" --genomeLoad LoadAndKeep"
+            cmd += f" --genomeDir {options.genome_dir_star}"
+            cmd += f" --genomeFastaFiles {options.genome}"
+            cmd += f" --genomeChrBinNbits {genomeChrBinNbits_value}"
+            cmd += f" --genomeSAindexNbases {genomeSAindexNbases_value}"
+            cmd += f" --outFileNamePrefix {options.output_star}/indexGenome"
+            cmd += " > " + options.genome_dir_star + ".output "
+            cmd += " 2> " + options.genome_dir_star + ".error "
+            if os.path.exists( f"{options.genome_dir_star}/SAindex" ) == False:
+                with logging_mutex:
+                    logger_proxy.info( f"Running cmd - {cmd}" )
+                os.system( cmd )
+                with logging_mutex:
+                    logger_proxy.info( "STAR index generation complete" )
+        else:
             with logging_mutex:
-                logger_proxy.info( f"Running cmd - {cmd}" )
-            os.system( cmd )
-            with logging_mutex:
-                logger_proxy.info( "STAR index generation complete" )
+                logger_proxy.info( "STAR indices present skipping regeneration" )
 
     if options.star_shared_mem == True:
         # Remove a pre-loaded genome
@@ -270,26 +274,26 @@ def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
         os.system( cmd )
 
     if options.genome_dir_olego is None:
-        with logging_mutex:
-            logger_proxy.info( "Generating OLego index" )
-        cmd = options.softwares["olegoindex"]
-        cmd += " -p " + options.indices + "/olego_index "
-        cmd += options.genome
-        cmd += " > " + options.indices + "_olego_index.output "
-        cmd += " 2> " + options.indices + "_olego_index.error "
-        if os.path.exists( f"{options.indices}/olego_index.rsa" ) == False:
-            with logging_mutex:
-                logger_proxy.info( f"Running cmd - {cmd}" )
-            os.system( cmd )
-            with logging_mutex:
-                logger_proxy.info( "OLego index built" )
         options.genome_dir_olego = options.indices + "/olego_index"
+        olego_files = glob.glob( f"{options.genome_dir_olego}/*" )
+        if len( olego_files ) != 8:
+            with logging_mutex:
+                logger_proxy.info( "Generating OLego index" )
+            cmd = options.softwares["olegoindex"]
+            cmd += " -p " + options.indices + "/olego_index "
+            cmd += options.genome
+            cmd += " > " + options.indices + "_olego_index.output "
+            cmd += " 2> " + options.indices + "_olego_index.error "
+            if os.path.exists( f"{options.indices}/olego_index.rsa" ) == False:
+                with logging_mutex:
+                    logger_proxy.info( f"Running cmd - {cmd}" )
+                os.system( cmd )
+                with logging_mutex:
+                    logger_proxy.info( "OLego index built" )
+        else:
+            with logging_mutex:
+                logger_proxy.info( "OLego indices present skipping regeneration" )
 
-    """if os.path.exists(options.indices+"/bowtie_index.rev.1.ebwt")==False:
-        cmd="bowtie-build "
-        cmd+=" "+options.genome
-        cmd+=" "+options.indices+"/bowtie_index "
-        os.system(cmd)"""
     if options.protein is None:
         cmd = f"touch {options.temp_dir}/dummy_protein.fasta"
         options.protein = f"{options.temp_dir}/dummy_protein.fasta"

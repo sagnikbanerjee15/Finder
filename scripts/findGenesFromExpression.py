@@ -301,7 +301,6 @@ def alignReadsAndMergeOutput( options, logger_proxy, logging_mutex ):
             with logging_mutex:
                 logger_proxy.info( "Running command - " + cmd )
             os.system( cmd )
-            sys.exit()
         with logging_mutex:
             logger_proxy.info( "Downloading missing data from NCBI finished for " + condition )
 

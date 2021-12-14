@@ -228,6 +228,18 @@ RUN cd /softwares/FINDER && git clone -b finder_v1.1.0 https://github.com/sagnik
 ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/softwares/FINDER/Finder/utils:/softwares/FINDER/Finder/dep"
 ###################################################################################################################################################################################################
 
+###################################################################################################################################################################################################
+# FINDER
+###################################################################################################################################################################################################
+
+ARG GFFCOMPARE_VERSION=0.12.6 
+RUN mkdir /softwares/GFFCOMPARE && cd /softwares/GFFCOMPARE &&\
+	wget https://github.com/gpertea/gffcompare/releases/download/v0.12.6/gffcompare-${GFFCOMPARE_VERSION}.Linux_x86_64.tar.gz &&\
+	tar -zvxf gffcompare-${GFFCOMPARE_VERSION}.Linux_x86_64.tar.gz 
+
+ENV PATH="${PATH}:/softwares/GFFCOMPARE/gffcompare-${GFFCOMPARE_VERSION}.Linux_x86_64" 
+
+###################################################################################################################################################################################################
 # Remove downloaded files
 RUN cd /softwares && \
 	rm -rf /softwares/Augustus/v${AUGUSTUS_VERSION}.zip && \

@@ -546,7 +546,7 @@ def aggregateOutputFiles( options, logger_proxy, logging_mutex ):
                           ]
 
     for file in files_to_be_copied:
-        os.system( f"cp {file} {options.final_GTF_files}" )
+        os.system( f"cp {file} {options.final_GTF_files} > /dev/null 2> /dev/null" )
 
 
 def cleanUpAfterPipelineCompletion( options, logger_proxy, logging_mutex ):

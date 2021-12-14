@@ -133,6 +133,8 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " -num_threads " + ( "32" if int( options.cpu ) >= 32 else options.cpu )
     cmd += " -out " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/finder_to_protein.out "
     cmd += " -query " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_prot.fasta "
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     braker_fasta = readFastaFile( options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.fa" )
@@ -160,6 +162,8 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " -num_threads " + ( "32" if int( options.cpu ) >= 32 else options.cpu )
     cmd += " -out " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker_to_protein.out "
     cmd += " -query " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker_prot.fa "
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     cmd = "cat " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker_to_protein.out "

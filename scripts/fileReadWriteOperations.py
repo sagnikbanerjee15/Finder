@@ -6,6 +6,7 @@
 
 import os
 import time
+import glob
 
 
 def divide_chunks( l, n ):
@@ -122,6 +123,13 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
             # print(line)
             small_rna_samples[condition] = {}
         if rna_seq == "1":
+            files = glob.glob( f"{options.local_data_directory}/{Run}*" )
+            if ended == "SE" and len( files ) != 1:
+                location = options.raw_data_downloaded_from_NCBI
+            elif ended == "PE" and len( files ) != 2:
+                location = options.raw_data_downloaded_from_NCBI
+            else:
+                location = options.local_data_directory
             all_samples[condition][Run] = {"bioproject":BioProject,
                                      "condition":condition,
                                      "Date":Date,
@@ -129,7 +137,7 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
                                      "desc":desc,
                                      "read_length":read_length,
                                      "error_corrected":0,
-                                     "location_directory":options.raw_data_downloaded_from_NCBI if isValidLocation( location ) == 0 else location,
+                                     "location_directory":location,
                                      "downloaded_from_NCBI":1 if isValidLocation( location ) == 0 else 0
                                      }
         else:

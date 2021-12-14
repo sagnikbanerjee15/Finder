@@ -22,6 +22,7 @@ def parseCommandLineArguments():
 
     # Optional arguments
     optional_named.add_argument( "--cpu", "-n", help = "Enter the number of CPUs to be used.", default = 1 )
+    optional_named.add_argument( "--local_data_directory", "-ldd", help = "Enter the name of the directory where all the local RNA-Seq data is present" )
     optional_named.add_argument( "--genome_dir_star", "-gdir_star", help = "Please enter the location of the genome index directory of STAR" )
     optional_named.add_argument( "--genome_dir_olego", "-gdir_olego", help = "Please enter the location of the genome index directory of OLego" )
     optional_named.add_argument( "--verbose", "-verb", default = 1, help = "Enter a verbosity level" )

@@ -109,8 +109,19 @@ RUN cd /softwares/BRAKER && wget https://github.com/Gaius-Augustus/BRAKER/archiv
 RUN cpanm File::Spec::Functions Hash::Merge List::Util Logger::Simple \
       Module::Load::Conditional Parallel::ForkManager POSIX Scalar::Util::Numeric YAML
 RUN perl -MCPAN -e 'install "File::HomeDir"'
+RUN apt-get install -y libmath-utils-perl
  
 ENV PATH="${PATH}:/softwares/BRAKER/BRAKER-${BRAKER_VERSION}/scripts"
+
+###################################################################################################################################################################################################
+
+###################################################################################################################################################################################################
+# GeneMark
+###################################################################################################################################################################################################
+
+# Set up the folder for GeneMark in case it is provided by the user
+RUN mkdir -p /softwares/GeneMark
+ENV PATH="${PATH}:/softwares/GeneMark/"
 
 ###################################################################################################################################################################################################
 
@@ -216,14 +227,6 @@ RUN cd /softwares/FINDER && git clone -b finder_v1.1.0 https://github.com/sagnik
 
 ENV PATH="${PATH}:/softwares/FINDER/Finder:/softwares/FINDER/Finder/scripts:/softwares/FINDER/Finder/utils:/softwares/FINDER/Finder/dep"
 ###################################################################################################################################################################################################
-
-# Set up the folder for GeneMark in case it is provided by the user
-RUN mkdir -p /softwares/GeneMark
-ENV PATH="${PATH}:/softwares/GeneMark/"
-
-# Move those up to BRAKER later
-
-RUN apt-get install -y libmath-utils-perl
 
 # Remove downloaded files
 RUN cd /softwares && \

@@ -202,7 +202,7 @@ RUN mkdir -p /softwares/NCBIBLAST && \
 	wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_VERSION}+-x64-linux.tar.gz && \
 	tar -xvzf /softwares/NCBIBLAST/ncbi-blast-${NCBI_VERSION}+-x64-linux.tar.gz
 
-ENV PATH="${PATH}:/softwares/NCBIBLAST/ncbi-blast-${NCBI_VERSION}+-x64-linux/bin" 
+ENV PATH="${PATH}:/softwares/NCBIBLAST/ncbi-blast-${NCBI_VERSION}+/bin" 
 ###################################################################################################################################################################################################
 
 ###################################################################################################################################################################################################

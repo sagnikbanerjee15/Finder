@@ -126,10 +126,13 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
             files = glob.glob( f"{options.local_data_directory}/{Run}*" )
             if ended == "SE" and len( files ) != 1:
                 location = options.raw_data_downloaded_from_NCBI
+                downloaded_from_NCBI = 1
             elif ended == "PE" and len( files ) != 2:
                 location = options.raw_data_downloaded_from_NCBI
+                downloaded_from_NCBI = 1
             else:
                 location = options.local_data_directory
+                downloaded_from_NCBI = 0
             all_samples[condition][Run] = {"bioproject":BioProject,
                                      "condition":condition,
                                      "Date":Date,
@@ -138,7 +141,7 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
                                      "read_length":read_length,
                                      "error_corrected":0,
                                      "location_directory":location,
-                                     "downloaded_from_NCBI":1 if isValidLocation( location ) == 0 else 0
+                                     "downloaded_from_NCBI":downloaded_from_NCBI
                                      }
         else:
             small_rna_samples[condition][Run] = {"bioproject":BioProject,

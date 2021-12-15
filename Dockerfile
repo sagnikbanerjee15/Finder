@@ -248,7 +248,7 @@ RUN cd /softwares && \
 	rm -rf /softwares/STAR/${STAR_VERSION}.zip && \
 	rm -rf /softwares/BRAKER/v${BRAKER_VERSION}.zip
 	
-RUN chmod -R a+x /softwares/BRAKER
-RUN chmod -R a+x /softwares/Augustus
+RUN chmod -R a+w /softwares/BRAKER
+RUN chmod -R a+w /softwares/Augustus
 	
 	

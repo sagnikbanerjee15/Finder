@@ -101,8 +101,8 @@ def runSingularityCommand( name, version, image_location, container_name, volume
     # Runs the main command
     docker_cmd = f" singularity exec "
     # docker_cmd += f" --rm "
-    docker_cmd += f" --cpus={cpus}"
-    docker_cmd += f" --memory='{memory}'"
+    # docker_cmd += f" --cpus={cpus}"
+    # docker_cmd += f" --memory='{memory}'"
     docker_cmd += f" --name {container_name}"
     for mapping in volumes:
         docker_cmd += f" -B {mapping}"

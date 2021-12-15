@@ -315,16 +315,19 @@ def configureAndRunBRAKER( options, logger_proxy, logging_mutex ):
 
     os.system( "rm -rf " + options.output_braker )
     os.system( "mkdir -p " + options.output_braker )
-    """
+
     ################################################################################
     # Copy Augustus file to output directory
     ################################################################################
-    cmd="cp -r "+options.softwares["augustus_main_dir"]+" "
-    cmd+=options.output_braker+"/"
-    os.system(cmd)
+    cmd = "cp -r /softwares/Augustus/Augustus-3.4.0 "
+    cmd += options.output_braker + "/"
+    os.system( cmd )
     with logging_mutex:
-        logger_proxy.info(f"Running command - {cmd}")
-    """
+        logger_proxy.info( f"Running command - {cmd}" )
+
+    options.softwares["AUGUSTUS_CONFIG_PATH"] = options.output_braker + "/Augustus-3.4.0/config"
+    options.softwares["AUGUSTUS_BIN_PATH"] = options.output_braker + "/Augustus-3.4.0/bin"
+    options.softwares["AUGUSTUS_SCRIPTS_PATH"] = options.output_braker + "/Augustus-3.4.0/scripts"
 
     with logging_mutex:
         logger_proxy.info( "BRAKER run started" )

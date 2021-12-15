@@ -338,6 +338,9 @@ def configureAndRunBRAKER( options, logger_proxy, logging_mutex ):
     cmd = options.softwares["braker"]
     cmd += " --GENEMARK_PATH=" + options.softwares["GENEMARK_PATH"]
     cmd += " --GUSHR_PATH=" + options.softwares["GUSHR_PATH"]
+    cmd += " --AUGUSTUS_CONFIG_PATH=" + options.softwares["AUGUSTUS_CONFIG_PATH"]
+    cmd += " --AUGUSTUS_BIN_PATH=" + options.softwares["AUGUSTUS_BIN_PATH"]
+    cmd += " --AUGUSTUS_SCRIPTS_PATH=" + options.softwares["AUGUSTUS_SCRIPTS_PATH"]
     cmd += " --softmasking "
     # cmd+=" --hints="+options.output_assemblies_psiclass_terminal_exon_length_modified+"/hints.gff "
     cmd += " --bam="

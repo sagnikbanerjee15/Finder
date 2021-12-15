@@ -95,9 +95,9 @@ RUN cd /softwares/Augustus/Augustus-${AUGUSTUS_VERSION} && make && make install
 RUN cd /softwares/Augustus/Augustus-${AUGUSTUS_VERSION} && make unit_test
 
 ENV PATH="${PATH}:/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/bin:/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/scripts"
-ENV AUGUSTUS_CONFIG_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/config"
-ENV AUGUSTUS_BIN_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/bin"
-ENV AUGUSTUS_SCRIPTS_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/scripts"
+#ENV AUGUSTUS_CONFIG_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/config"
+#ENV AUGUSTUS_BIN_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/bin"
+#ENV AUGUSTUS_SCRIPTS_PATH "/softwares/Augustus/Augustus-${AUGUSTUS_VERSION}/scripts"
 
 ###################################################################################################################################################################################################
 # BRAKER

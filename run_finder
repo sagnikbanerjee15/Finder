@@ -176,6 +176,7 @@ def main():
                             memory = '300g'
             )
     """
+    volumes_list = list( set( volumes_list ) )
 
     runSingularityCommand( name = "finder",
                             version = "1.1.0",

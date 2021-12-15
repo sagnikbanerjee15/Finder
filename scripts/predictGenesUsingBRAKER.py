@@ -328,6 +328,7 @@ def configureAndRunBRAKER( options, logger_proxy, logging_mutex ):
     options.softwares["AUGUSTUS_CONFIG_PATH"] = options.output_braker + "/Augustus-3.4.0/config"
     options.softwares["AUGUSTUS_BIN_PATH"] = options.output_braker + "/Augustus-3.4.0/bin"
     options.softwares["AUGUSTUS_SCRIPTS_PATH"] = options.output_braker + "/Augustus-3.4.0/scripts"
+    options.softwares["GENEMARK_PATH"] = options.genemark_path
 
     with logging_mutex:
         logger_proxy.info( "BRAKER run started" )

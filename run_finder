@@ -123,7 +123,7 @@ def main():
                     f"{'/'.join(options.genome.split('/')[:-1])}:{'/'.join(options.genome.split('/')[:-1])}",
                     f"{options.output_directory}:{options.output_directory}"]
 
-    cmd = f" \" "
+    cmd = f" \" sudo "
     cmd += f" finder "
     cmd += f" --metadatafile {options.metadatafile} "
     cmd += f" --output_directory {options.output_directory} "

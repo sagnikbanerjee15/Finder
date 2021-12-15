@@ -248,6 +248,6 @@ RUN cd /softwares && \
 	rm -rf /softwares/STAR/${STAR_VERSION}.zip && \
 	rm -rf /softwares/BRAKER/v${BRAKER_VERSION}.zip
 	
-RUN chmod -R 777 /softwares
+#RUN chmod -R 777 /softwares
 	
 	

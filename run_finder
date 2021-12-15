@@ -99,7 +99,7 @@ def runSingularityCommand( name, version, image_location, container_name, volume
     """
 
     # Runs the main command
-    docker_cmd = f" singularity exec "
+    docker_cmd = f" singularity exec   --disable-cache  "
     # docker_cmd += f" --rm "
     # docker_cmd += f" --cpus={cpus}"
     # docker_cmd += f" --memory='{memory}'"

@@ -1,6 +1,6 @@
 # Welcome to `finder_v1.1.0`
 
-`finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generatess gene annotations in GTF format. `finder` accepts inputs through command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. For this version, no docker images could be provided due to distribution restrictions of underlying software.
+`finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generates gene annotations in GTF format. `finder` accepts inputs through the command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. `finder` is released as a docker image. Users need to have python3 installed in their system to be able to run `finder`. The header script will create either a `docker` container or a `singularity` container depending on what is installed on the system with preference given to `docker`.
 
 If you use `finder` for your research please cite 
 
@@ -10,13 +10,20 @@ Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise
 
 `finder` requires a number of softwares which needs to be installed. This might cause version conflicts with softwares that are already installed in your system. Hence, the developers have decided to enforce the use of `finder` within a conda environment. 
 
-## Installing `finder` using `docker`
+## Installing `finder` from `GitHub`
 
-```
-docker pull sagnikbanerjee15/finder:1.1.0
+```bash
+git pull -b finder_v1.1.0 https://github.com/sagnikbanerjee15/Finder.git
 ```
 
-`finder` runs `BRAKER2` which depends on `GeneMark-ES`. `finder` also needs `GeneMarkS/T` to predict coding regions of genes. Both `GeneMark-ES` and `GeneMarkS/T` are hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download these 2 softwares and place them under the `dep` sub-directory. Please follow the instructions below to download the softwares and the key:
+## Downloading `finder` from release (Latest stable version)
+
+```bash
+wget https://github.com/sagnikbanerjee15/Finder/archive/refs/tags/finder_v1.1.0.tar.gz
+tar -xvzf finder_v1.1.0.tar.gz
+```
+
+`finder` runs `BRAKER2` which depends on `GeneMark-ET`. `GeneMark-ET` is hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download the software and provide the path as input to the software. Please follow the instructions below to download the softwares and the key:
 
 1. Open a browser of your choice
 2. Go to [this](http://topaz.gatech.edu/GeneMark/license_download.cgi) website
@@ -24,32 +31,16 @@ docker pull sagnikbanerjee15/finder:1.1.0
 4. Enter your name, institution, country and email-id and click on the button that says ***I agree to the terms of this license agreement***
 5. Right click on the link that says *Please download program **here*** and select **Copy Link Address**
 6. Then type in `wget ` and paste the path you just copied
-7. This command will download the file **gmes_linux_64.tar.gz** in the `dep` sub-directory
-8. Go to step 2
-9. Select the option **GeneMarkS-T** (last option) and **LINUX 64**
-10. Repeat steps 4-6
-11. This command will download the file **gmst_linux_64.tar.gz** in the `dep` sub-directory
+7. This command will download the file **gmes_linux_64.tar.gz** in the current directory
 12. Now, right click on the link that says **64_bit** and select **Copy Link Address**
 13. Then type in `wget` and paste the path you just copied
-14. This command will download the file **gm_key_64.tar.gz** in the `dep` sub-directory. This license key will serve for both the programs. Please note that this key will expire after one year from the date of download.
+14. This command will download the file **gm_key_64.tar.gz** in the current directory. Please note that this key will expire after one year from the date of download.
 15. Execute the following commands:
 
 ```bash
-cd ..
-./install.py
-echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc # Add this path permanently to the bashrc file
-export PATH=$PATH:$(pwd)
+tar -xvzf gm_key_64.tar.gz
+tar -xvzf gmes_linux_64.tar.gz
 ```
-
-## Understanding Finder versions
-
-Each version of `finder` will be released with `3` numeric segments, each separated with a period - `x.y.z`
-
-`x` represents major changes including addition of several important updates to the software. `x` will be changed when new functionality is adopted
-
-`y` represents any change within the same version pertaining to how the data is made available. For e.g., a new `y` version will be created if a docker image is updated with new information. 
-
-`z` represents any bug fixes
 
 ## Executing FINDER with Sample data
 
@@ -69,38 +60,6 @@ Please follow the following the instructions to generate gene annotations using 
 | Location         | Enter the location of the directory. For samples to be downloaded from NCBI, this field should be left empty. If the location of a directory is provided here then `finder` will assume that the sample is present in it. `finder` will generate an error if the sample is not found in this directory. It is *not* necessary to have all the samples in the same directory. | **YES**   |
 
 To optimize disk space usage `finder` will process read samples from each bioproject at a time. Once the data is downloaded and reads are mapped, FINDER will remove all those data (if `-no-cleanup` is not specificied) to save disk space. But samples that were locally present will not be removed.
-
-### Preparing the genome index
-
-`finder` uses `STAR` and `OLego` for aligning and `PsiCLASS` for assembling. Users have the choice of generating the genome index and providing it to `finder` or allowing `finder` to generate the index. For some organisms with large genomes, `STAR` might require more memory. Hence users might be forced to transfer the STAR genome index generation to a computer that permits the usage of a large enough memory.  Download the *Arabidopsis thaliana* genome using the following command:
-
-```bash
-cd example
-wget ftp://ftp.ensemblgenomes.org/pub/plants/release-49/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa.gz
-```
-
-Unzip the genome using this command
-
-```bash
-gunzip Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa.gz
-```
-
-This command will generate the file `Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa` which contains the entire genome of *Arabidopsis thaliana*
-
-STAR genome index can be created by the following command
-
-```bash
-CPU=30 #Enter the number of CPUs that you are permitted to use
-mkdir star_index_without_transcriptome
-
-STAR --runMode genomeGenerate --runThreadN $CPU --genomeDir star_index_without_transcriptome --genomeSAindexNbases 12 --genomeFastaFiles Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa
-```
-
-Similarly olego index can be generated by the following command
-
-```bash
-../dep/olego/olegoindex -p olego_index Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa
-```
 
 ### Running FINDER
 

@@ -63,6 +63,8 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " -r " + braker_gtf_file
     cmd += " -o " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/braker_psiclass_gffcompare"
     cmd += " " + psiclass_gtf_file
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     # remove_these=[]
@@ -81,18 +83,23 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " -dbtype prot "
     cmd += " -in " + options.protein
     cmd += " -out " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/protein_db"
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     cmd = "gffread "
     cmd += " " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.gtf "
     cmd += " -g " + options.genome
     cmd += " -w " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.fa "
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     cmd = "perl -pe '/^>/ ? print \"\\n\" : chomp' "
     cmd += options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.fa "
     cmd += "| tail -n +2 "
     cmd += " > " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.fa.temp "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     cmd = "mv " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/braker.fa.temp "
@@ -103,6 +110,8 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " " + psiclass_gtf_file
     cmd += " -g " + options.genome
     cmd += " -w " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.fasta"
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     cmd = "perl -pe '/^>/ ? print \"\\n\" : chomp' "
@@ -270,6 +279,8 @@ def addBRAKERPredictions( options, logger_proxy, logging_mutex ):
     cmd += " -r " + outputfilename
     cmd += " -o " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/proteins_comparison_gffcompare "
     cmd += " " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/proteins_for_alignment.gtf "
+    cmd += " 1> /dev/null "
+    cmd += " 2> /dev/null "
     os.system( cmd )
 
     proteins_to_be_discarded = []

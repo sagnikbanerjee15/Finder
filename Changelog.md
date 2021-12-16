@@ -60,4 +60,5 @@ Here we write upgrading notes for `finder`. It's an effort to make them as strai
 ## [1.0.0] - 2021-02-06
 
 * First release of `finder`
+* Please download it from https://github.com/sagnikbanerjee15/Finder/releases/tag/finder_v1.0.0
 

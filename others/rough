@@ -1,6 +1,6 @@
 CPU=96
 
-nohup /home/ubuntu/Finder/finder -no_cleanup \
+nohup /home/ubuntu/Finder/run_finder -no_cleanup \
 	-mf /home/ubuntu/Finder/example/Arabidopsis_thaliana_metadata.csv \
 	-n $CPU \
 	-out_dir /data/FINDER_test_ARATH_docker \
@@ -15,7 +15,7 @@ nohup /home/ubuntu/Finder/finder -no_cleanup \
 	2> /data/FINDER_test_ARATH_docker.error  &
 	
 	
-nohup /home/ubuntu/Finder/finder -no_cleanup \
+nohup /home/ubuntu/Finder/run_finder -no_cleanup \
 	-mf /home/ubuntu/Finder/example/Arabidopsis_thaliana_metadata.csv \
 	-n $CPU \
 	-out_dir /data/FINDER_test_ARATH_singularity \

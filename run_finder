@@ -46,6 +46,7 @@ def parseCommandLineArguments():
     optional_named.add_argument( "--skip_cpd", "--skip_cpd", help = "Turn on this option to skip changepoint detection. Could be effective for grasses", action = "store_true" )
     optional_named.add_argument( "--exonerate_gff3", "-egff3", help = "Enter the exonerate output in gff3 format" )
     optional_named.add_argument( "--star_shared_mem", "--star_shared_mem", help = "Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.", action = "store_true" )
+    optional_named.add_argument( "--framework", "-fm", help = "Enter your choice of framework", choices = ["docker", "singularity"], default = "docker" )
 
     # optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
     # optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
@@ -140,7 +141,32 @@ def main():
 
     volumes_list = list( set( volumes_list ) )
 
-    runDockerCommand( name = "finder",
+    os.system( f"mkdir -p {options.output_directory}" )
+    os.system( f"which docker > {options.output_directory}/find_docker" )
+    os.system( f"which singularity > {options.output_directory}/find_singularity" )
+
+    docker_installed = 1 if "Command not found" not in open( f"{options.output_directory}/find_docker", "r" ).read() else 0
+    singularity_installed = 1 if "Command not found" not in open( f"{options.output_directory}/find_singularity", "r" ).read() else 0
+
+    if docker_installed == 0 and singularity_installed == 0:
+        print( "You need to have either docker or singularity installed" )
+        sys.exit()
+
+    framework_of_choice = ""
+    if options.framework == "docker":
+        if docker_installed == 1:
+            framework_of_choice = "docker"
+        else:
+            framework_of_choice = "singularity"
+
+    if options.framework == "singularity":
+        if singularity_installed == "singularity":
+            framework_of_choice = "singularity"
+        else:
+            framework_of_choice = "docker"
+
+    if framework_of_choice == "docker":
+        runDockerCommand( name = "finder",
                             version = "1.1.0",
                             image_location = "sagnikbanerjee15/finder",
                             container_name = f"{options.output_directory.split('/')[-1]}",
@@ -150,7 +176,8 @@ def main():
                             memory = '300g'
             )
 
-    runSingularityCommand( name = "finder",
+    elif framework_of_choice == "singularity":
+        runSingularityCommand( name = "finder",
                             version = "1.1.0",
                             image_location = "sagnikbanerjee15/finder",
                             container_name = f"{options.output_directory.split('/')[-1]}",

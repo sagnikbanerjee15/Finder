@@ -68,15 +68,9 @@ Help menu for FINDER can be launched by the following command:
 ```bash
 finder -h
 
-usage: finder [-h] [--version] --metadatafile METADATAFILE --output_directory
-              OUTPUT_DIRECTORY --genome GENOME [--cpu CPU]
-              [--genome_dir_star GENOME_DIR_STAR]
-              [--genome_dir_olego GENOME_DIR_OLEGO] [--verbose VERBOSE]
-              [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data]
-              [--checkpoint CHECKPOINT]
-              [--perform_post_completion_data_cleanup] [--run_tests]
-              [--addUTR] [--skip_cpd] [--exonerate_gff3 EXONERATE_GFF3]
-              [--star_shared_mem]
+usage: finder [-h] [--version] --metadatafile METADATAFILE --output_directory OUTPUT_DIRECTORY --genome GENOME --organism_model {VERT,INV,PLANTS,FUNGI} [--cpu CPU] [--local_data_directory LOCAL_DATA_DIRECTORY] [--genome_dir_star GENOME_DIR_STAR] [--genome_dir_olego GENOME_DIR_OLEGO]
+              [--verbose VERBOSE] [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data] [--checkpoint CHECKPOINT] [--perform_post_completion_data_cleanup] [--run_tests] [--addUTR] [--skip_cpd] [--exonerate_gff3 EXONERATE_GFF3] [--star_shared_mem] [--genemark_path GENEMARK_PATH]
+              [--genemark_license GENEMARK_LICENSE]
 
 Generates gene annotation from RNA-Seq data
 
@@ -91,9 +85,13 @@ Required arguments:
                         Enter the name of the directory where all other operations will be performed
   --genome GENOME, -g GENOME
                         Enter the SOFT-MASKED genome file of the organism
+  --organism_model {VERT,INV,PLANTS,FUNGI}, -om {VERT,INV,PLANTS,FUNGI}
+                        Enter the type of organism
 
 Optional arguments:
   --cpu CPU, -n CPU     Enter the number of CPUs to be used.
+  --local_data_directory LOCAL_DATA_DIRECTORY, -ldd LOCAL_DATA_DIRECTORY
+                        Enter the name of the directory where all the local RNA-Seq data is present
   --genome_dir_star GENOME_DIR_STAR, -gdir_star GENOME_DIR_STAR
                         Please enter the location of the genome index directory of STAR
   --genome_dir_olego GENOME_DIR_OLEGO, -gdir_olego GENOME_DIR_OLEGO
@@ -107,11 +105,11 @@ Optional arguments:
   --preserve_raw_input_data, -preserve
                         Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. 
   --checkpoint CHECKPOINT, -c CHECKPOINT
-                        Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous 
+                        Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous
                         . For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
                             1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
-                            2. Assemble with PsiCLASS (Will remove all assemblies) 
-                            3. Find genes with FINDER (entails changepoint detection) 
+                            2. Assemble with PsiCLASS (Will remove all assemblies)
+                            3. Find genes with FINDER (entails changepoint detection)
                             4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
                             5. Annotate coding regions
                             6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
@@ -126,6 +124,10 @@ Optional arguments:
                         Enter the exonerate output in gff3 format
   --star_shared_mem, --star_shared_mem
                         Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.
+  --genemark_path GENEMARK_PATH, -gm GENEMARK_PATH
+                        Enter the path to genemark
+  --genemark_license GENEMARK_LICENSE, -gml GENEMARK_LICENSE
+                        Enter the licence file. Please make sure your license file is less than 365 days old
 ```
 
 `finder` can be launched using the following command:

@@ -12,9 +12,6 @@ Here we write upgrading notes for `finder`. It's an effort to make them as strai
 
 - Option to provide alignments by `exonerate` to `finder`
 - `finder` will now be able to process gzipped `fastq` files. But this option will work only if the files are available locally
-- `finder` performs enhanced memory checks to ensure 
-- Utility program added to convert `gtf` files to `gff3` including options to generate UTR annotation. `README.md` file has been updated accordingly
-- Included an option to use local RNA-Seq files in the testing data
 
 ### Changed
 

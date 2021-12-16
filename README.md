@@ -1,3 +1,15 @@
+# To dos
+
+Copy genome to output folder and process from there - needed for singularity
+
+Change back the way to handle locally available data - have run_finder program find all the locations and then mount those
+
+Code to decide whether to use docker or singularity
+
+Rerun on the docker image to check everything is running perfectly
+
+
+
 # Welcome to `finder_v1.1.0`
 
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generates gene annotations in GTF format. `finder` accepts inputs through the command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. `finder` is released as a docker image. Users need to have python3 installed in their system to be able to run `finder`. The header script will create either a `docker` container or a `singularity` container depending on what is installed on the system with preference given to `docker`.

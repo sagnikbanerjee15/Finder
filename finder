@@ -86,6 +86,8 @@ def parseCommandLineArguments():
     required_named.add_argument( "--output_directory", "-out_dir", help = "Enter the name of the directory where all other operations will be performed", required = True )
     required_named.add_argument( "--genome", "-g", help = "Enter the SOFT-MASKED genome file of the organism", required = True )
     required_named.add_argument( "--organism_model", "-om", help = "Enter the type of organism", choices = ["VERT", "INV", "PLANTS", "FUNGI"] , required = True )
+    required_named.add_argument( "--genemark_path", "-gm", help = "Enter the path to genemark" , required = True )
+    required_named.add_argument( "--genemark_license", "-gml", help = "Enter the licence file. Please make sure your license file is less than 365 days old"  , required = True )
 
     # Optional arguments
     optional_named.add_argument( "--cpu", "-n", help = "Enter the number of CPUs to be used.", default = 1 )
@@ -111,8 +113,6 @@ def parseCommandLineArguments():
     optional_named.add_argument( "--skip_cpd", "--skip_cpd", help = "Turn on this option to skip changepoint detection. Could be effective for grasses", action = "store_true" )
     optional_named.add_argument( "--exonerate_gff3", "-egff3", help = "Enter the exonerate output in gff3 format" )
     optional_named.add_argument( "--star_shared_mem", "--star_shared_mem", help = "Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.", action = "store_true" )
-    optional_named.add_argument( "--genemark_path", "-gm", help = "Enter the path to genemark" )
-    optional_named.add_argument( "--genemark_license", "-gml", help = "Enter the licence file. Please make sure your license file is less than 365 days old" )
     # optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
     # optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
     # optional_named.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")

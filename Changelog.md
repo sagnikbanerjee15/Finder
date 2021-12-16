@@ -23,6 +23,7 @@ Here we write upgrading notes for `finder`. It's an effort to make them as strai
 * Removed `setup.py` file. 
 * Total time for downloading, aligning and assembling all samples provided in `progress.log` file
 * Coding sequence prediction software has been changed from `GeneMarkS/T` to `CodAn`
+* `metadata.csv` file needs to have `-1` for the location of the samples which needs to be downloaded from NCBI SRA
 
 ### Fixed
 

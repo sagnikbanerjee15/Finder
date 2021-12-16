@@ -166,7 +166,7 @@ def main():
 
     if framework_of_choice == "docker":
         # os.system( "docker rmi sagnikbanerjee15/finder:1.1.0" )
-        # os.system( "docker pull sagnikbanerjee15/finder:1.1.0" )
+        os.system( "docker pull sagnikbanerjee15/finder:1.1.0" )
         runDockerCommand( name = "finder",
                             version = "1.1.0",
                             image_location = "sagnikbanerjee15/finder",

@@ -8,7 +8,7 @@ import os
 
 
 def parseCommandLineArguments():
-    parser = argparse.ArgumentParser( prog = "finder", description = "Generates gene annotation from RNA-Seq data", formatter_class = RawTextHelpFormatter )
+    parser = argparse.ArgumentParser( prog = "run_finder", description = "Generates gene annotation from RNA-Seq data", formatter_class = RawTextHelpFormatter )
     parser.add_argument( '--version', action = 'version', version = '%(prog)s-v1.1.0' )
 
     required_named = parser.add_argument_group( 'Required arguments' )

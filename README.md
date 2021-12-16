@@ -78,11 +78,11 @@ To optimize disk space usage `finder` will process read samples from each biopro
 Help menu for FINDER can be launched by the following command:
 
 ```bash
-finder -h
+run_finder -h
 
-usage: finder [-h] [--version] --metadatafile METADATAFILE --output_directory OUTPUT_DIRECTORY --genome GENOME --organism_model {VERT,INV,PLANTS,FUNGI} [--cpu CPU] [--local_data_directory LOCAL_DATA_DIRECTORY] [--genome_dir_star GENOME_DIR_STAR] [--genome_dir_olego GENOME_DIR_OLEGO]
-              [--verbose VERBOSE] [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data] [--checkpoint CHECKPOINT] [--perform_post_completion_data_cleanup] [--run_tests] [--addUTR] [--skip_cpd] [--exonerate_gff3 EXONERATE_GFF3] [--star_shared_mem] [--genemark_path GENEMARK_PATH]
-              [--genemark_license GENEMARK_LICENSE]
+usage: run_finder [-h] [--version] --metadatafile METADATAFILE --output_directory OUTPUT_DIRECTORY --genome GENOME --organism_model {VERT,INV,PLANTS,FUNGI} --genemark_path GENEMARK_PATH --genemark_license GENEMARK_LICENSE [--cpu CPU] [--genome_dir_star GENOME_DIR_STAR]
+              [--genome_dir_olego GENOME_DIR_OLEGO] [--verbose VERBOSE] [--protein PROTEIN] [--no_cleanup] [--preserve_raw_input_data] [--checkpoint CHECKPOINT] [--perform_post_completion_data_cleanup] [--run_tests] [--addUTR] [--skip_cpd] [--exonerate_gff3 EXONERATE_GFF3]
+              [--star_shared_mem] [--framework {docker,singularity}]
 
 Generates gene annotation from RNA-Seq data
 
@@ -99,11 +99,13 @@ Required arguments:
                         Enter the SOFT-MASKED genome file of the organism
   --organism_model {VERT,INV,PLANTS,FUNGI}, -om {VERT,INV,PLANTS,FUNGI}
                         Enter the type of organism
+  --genemark_path GENEMARK_PATH, -gm GENEMARK_PATH
+                        Enter the path to genemark
+  --genemark_license GENEMARK_LICENSE, -gml GENEMARK_LICENSE
+                        Enter the licence file. Please make sure your license file is less than 365 days old
 
 Optional arguments:
   --cpu CPU, -n CPU     Enter the number of CPUs to be used.
-  --local_data_directory LOCAL_DATA_DIRECTORY, -ldd LOCAL_DATA_DIRECTORY
-                        Enter the name of the directory where all the local RNA-Seq data is present
   --genome_dir_star GENOME_DIR_STAR, -gdir_star GENOME_DIR_STAR
                         Please enter the location of the genome index directory of STAR
   --genome_dir_olego GENOME_DIR_OLEGO, -gdir_olego GENOME_DIR_OLEGO
@@ -136,10 +138,8 @@ Optional arguments:
                         Enter the exonerate output in gff3 format
   --star_shared_mem, --star_shared_mem
                         Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.
-  --genemark_path GENEMARK_PATH, -gm GENEMARK_PATH
-                        Enter the path to genemark
-  --genemark_license GENEMARK_LICENSE, -gml GENEMARK_LICENSE
-                        Enter the licence file. Please make sure your license file is less than 365 days old
+  --framework {docker,singularity}, -fm {docker,singularity}
+                        Enter your choice of framework
 ```
 
 `finder` can be launched using the following command:

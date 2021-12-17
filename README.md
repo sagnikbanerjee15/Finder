@@ -33,6 +33,9 @@ git pull -b finder_v1.1.0 https://github.com/sagnikbanerjee15/Finder.git
 ```bash
 wget https://github.com/sagnikbanerjee15/Finder/archive/refs/tags/finder_v1.1.0.tar.gz
 tar -xvzf finder_v1.1.0.tar.gz
+cd finder_v1.1.0
+echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
+source ~/.bashrc
 ```
 
 `finder` runs `BRAKER2` which depends on `GeneMark-ET`. `GeneMark-ET` is hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download the software and provide the path as input to the software. Please follow the instructions below to download the softwares and the key:
@@ -145,7 +148,7 @@ Optional arguments:
 `finder` can be launched using the following command:
 
 ```bash
-finder -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -gdir_star $PWD/star_index_without_transcriptome -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -gdir_olego olego_index -preserve 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error 
+run_finder -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -preserve 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error 
 ```
 
 This program will download and run the entire process of annotation. The duration of execution will depend on your internet speed and the number of cores you assigned to FINDER. Also, FINDER is designed in a way to handle a large number of RNA-Seq samples. So the speedup might not be noticeable with just a few samples.
@@ -153,7 +156,7 @@ This program will download and run the entire process of annotation. The duratio
 Run the following command to remove all intermediate files. We recommend that while you run `finder`, you preserve all intermediate files and then run the following command to remove all the intermediate files.
 
 ```bash
-finder -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -gdir_star $PWD/star_index_without_transcriptome -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -gdir_olego olego_index -preserve -pc_clean 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error
+run_finder -no_cleanup -mf Arabidopsis_thaliana_metadata.csv -n $CPU -out_dir $PWD/FINDER_test_ARATH -g $PWD/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa -p $PWD/uniprot_ARATH.fasta -preserve -pc_clean 1> $PWD/FINDER_test_ARATH.output 2> $PWD/FINDER_test_ARATH.error
 ```
 
 ### Enforcing running of `finder` from preset checkpoints

@@ -642,10 +642,11 @@ def main():
     with logging_mutex:
         logger_proxy.info( "expandGzippedFiles execution successful" )
 
-    return
     determineOptimalStartingPoint( options, logger_proxy, logging_mutex )
     with logging_mutex:
         logger_proxy.info( f" Program params - {options}" )
+
+    return
 
     orchestrateGeneModelPrediction( options, logger_proxy, logging_mutex )
     with logging_mutex:

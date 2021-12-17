@@ -61,7 +61,7 @@ def runDockerCommand( name, version, image_location, container_name, volumes, co
 
     # Runs the main command
     docker_cmd = f" docker run "
-    docker_cmd += f" -ti "
+    # docker_cmd += f" -ti "
     docker_cmd += f" --rm "
     docker_cmd += f" --cpus={cpus}"
     docker_cmd += f" --memory='{memory}'"

@@ -49,7 +49,6 @@ def expandGzippedFiles( options, logger_proxy, logging_mutex ):
         for Run in options.mrna_md[condition]:
             if options.mrna_md[condition][Run]["downloaded_from_NCBI"] == 0:
                 location = options.mrna_md[condition][Run]["location_directory"]
-                print( f"{location}/{Run}.fastq.gz" )
                 if os.path.exists( f"{location}/{Run}.fastq.gz" ) == True:
                     cmd = f"gunzip -c "
                     cmd += f"{location}/{Run}.fastq.gz "
@@ -133,7 +132,7 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
                                      "read_length":read_length,
                                      "error_corrected":0,
                                      "location_directory":location if location != "-1" else options.raw_data_downloaded_from_NCBI,
-                                     "downloaded_from_NCBI":1 if location != -1 else 0
+                                     "downloaded_from_NCBI":1 if location != "-1" else 0
                                      }
         else:
             small_rna_samples[condition][Run] = {"bioproject":BioProject,
@@ -144,7 +143,7 @@ def readMetaDataFile( options, logger_proxy, logging_mutex ):
                                      "read_length":read_length,
                                      "error_corrected":0,
                                      "location_directory":location if location != "-1" else options.raw_data_downloaded_from_NCBI,
-                                     "downloaded_from_NCBI":1 if location != -1 else 0
+                                     "downloaded_from_NCBI":1 if location != "-1" else 0
                                      }
     fhr.close()
     options.mrna_md = all_samples

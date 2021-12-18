@@ -160,7 +160,7 @@ def main():
             framework_of_choice = "singularity"
 
     if options.framework == "singularity":
-        if singularity_installed == "singularity":
+        if singularity_installed == 1:
             framework_of_choice = "singularity"
         else:
             framework_of_choice = "docker"

@@ -1,0 +1,30 @@
+CPU=8
+
+nohup /home/ubuntu/Finder/run_finder -no_cleanup \
+	-mf /home/ubuntu/Finder/example/Arabidopsis_thaliana_metadata.csv \
+	-n $CPU \
+	-out_dir /data/FINDER_test_ARATH_docker \
+	-g /home/ubuntu/Finder/example/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa \
+	-p /home/ubuntu/Finder/example/uniprot_ARATH.fasta \
+	-preserve \
+	--organism_model PLANTS \
+	--genemark_path /home/ubuntu/Finder/gmes_linux_64 \
+	--genemark_license /home/ubuntu/Finder/gm_key_64 \
+	--framework docker \
+	1> /data/FINDER_test_ARATH_docker.output \
+	2> /data/FINDER_test_ARATH_docker.error  &
+	
+	
+nohup /home/ubuntu/Finder/run_finder -no_cleanup \
+	-mf /home/ubuntu/Finder/example/Arabidopsis_thaliana_metadata.csv \
+	-n $CPU \
+	-out_dir /data/FINDER_test_ARATH_singularity \
+	-g /home/ubuntu/Finder/example/Arabidopsis_thaliana.TAIR10.dna_sm.toplevel.fa \
+	-p /home/ubuntu/Finder/example/uniprot_ARATH.fasta \
+	-preserve \
+	--organism_model PLANTS \
+	--genemark_path /home/ubuntu/Finder/gmes_linux_64 \
+	--genemark_license /home/ubuntu/Finder/gm_key_64 \
+	--framework singularity \
+	1> /data/FINDER_test_ARATH_singularity.output \
+	2> /data/FINDER_test_ARATH_singularity.error  &

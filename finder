@@ -1,0 +1,688 @@
+#! /usr/bin/env python3
+######################################################################################################################################################################################
+#  Version 1.6
+#  Developed by Sagnik Banerjee
+
+# Highlights of version 5
+####################################################################################
+# Functionalities included from previous analysis
+# Read error correction using Rcorrector [Omitted was taking a very long time to finish]
+# Multiple rounds of mapping to ensure most optimized alignment
+# PsiCLASS executed on each project separately
+# Functions to check if low coverage splices are being retained by PsiCLASS
+# GTF files from each project merged with StringTie-merge
+####################################################################################
+#
+# # Highlights of version 6
+####################################################################################
+# Metadata datastructure changed to bioproject->Run from Run->bioproject
+# STAR alignments modified (--outSAMattrRGline added)
+# Latest version of PsiCLASS used
+# rpy2 used instead of writing to disk for CPD
+# Data structures modified for CPD detection
+# Logging introduced for easier error detection
+# Software dependencies coded into options.mrna_md
+####################################################################################
+######################################################################################################################################################################################
+
+from argparse import RawTextHelpFormatter
+from builtins import enumerate, list
+from collections import OrderedDict
+from copy import deepcopy
+from itertools import groupby
+from operator import itemgetter
+from pathlib import Path
+
+import argparse
+import collections
+import copy
+import glob
+import importlib
+import itertools
+import math
+import multiprocessing
+import os
+import pickle
+import pprint
+import random
+import re
+import statistics
+import subprocess
+import sys
+import time
+import numpy as np
+import pandas as pd
+
+from ruffus.proxy_logger import *
+from scripts.alignReads import *
+from scripts.determineOptimalStartingPoint import *
+from scripts.fileReadWriteOperations import *
+from scripts.findGenesFromExpression import *
+from scripts.findTranscriptsInEachSampleNotReportedInCombinedAnnotations import *
+from scripts.fixOverlappingAndMergedTranscripts import *
+from scripts.fixTranscriptsConnectingTwoTranscripts import *
+from scripts.generateGenomicAndTranscriptomicCounts import *
+from scripts.mergeCloselySpacedTranscripts import *
+from scripts.performAssembly import *
+from scripts.predictCDS import *
+from scripts.predictGenesUsingBRAKER import *
+from scripts.removeRedundantTranscripts import *
+from scripts.removeSpuriousTranscriptsBasedOnCDS import *
+from scripts.runCommand import *
+from scripts.splitTranscriptsWithQuestionableSpliceJunctions import *
+from scripts.transcriptToConditions import *
+from scripts.verifyInstallations import *
+
+
+def parseCommandLineArguments():
+    parser = argparse.ArgumentParser( prog = "finder", description = "Generates gene annotation from RNA-Seq data", formatter_class = RawTextHelpFormatter )
+    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v1.1.0' )
+
+    required_named = parser.add_argument_group( 'Required arguments' )
+    optional_named = parser.add_argument_group( 'Optional arguments' )
+
+    # Mandatory arguments
+    required_named.add_argument( "--metadatafile", "-mf", help = "Please enter the name of the metadata file. Enter 0 in the last column of those samples which you wish to skip processing. The columns should represent the following in order --> BioProject, SRA Accession, Tissues, Description, Date, Read Length, Ended (PE or SE), RNA-Seq, process, Location. If the sample is skipped it will not be downloaded. Leave the directory path blank if you are downloading the samples. In the end of the run the program will output a csv file with the directory path filled out. Please check the provided csv file for more information on how to configure the metadata file. ", required = True )
+    required_named.add_argument( "--output_directory", "-out_dir", help = "Enter the name of the directory where all other operations will be performed", required = True )
+    required_named.add_argument( "--genome", "-g", help = "Enter the SOFT-MASKED genome file of the organism", required = True )
+    required_named.add_argument( "--organism_model", "-om", help = "Enter the type of organism", choices = ["VERT", "INV", "PLANTS", "FUNGI"] , required = True )
+    required_named.add_argument( "--genemark_path", "-gm", help = "Enter the path to genemark" , required = True )
+    required_named.add_argument( "--genemark_license", "-gml", help = "Enter the licence file. Please make sure your license file is less than 365 days old"  , required = True )
+
+    # Optional arguments
+    optional_named.add_argument( "--cpu", "-n", help = "Enter the number of CPUs to be used.", default = 1 )
+    optional_named.add_argument( "--genome_dir_star", "-gdir_star", help = "Please enter the location of the genome index directory of STAR" )
+    optional_named.add_argument( "--genome_dir_olego", "-gdir_olego", help = "Please enter the location of the genome index directory of OLego" )
+    optional_named.add_argument( "--verbose", "-verb", default = 1, help = "Enter a verbosity level" )
+    optional_named.add_argument( "--protein", "-p", help = "Enter the protein fasta" )
+    optional_named.add_argument( "--no_cleanup", "-no_cleanup", help = "Provide this option if you do not wish to remove any intermediate files. Please note that this will NOT remove any files and might take up a large amount of space", action = "store_true" )
+    optional_named.add_argument( "--preserve_raw_input_data", "-preserve", help = "Set this argument if you want to preserve the raw fastq files. All other temporary files will be removed. These fastq files can be later used. ", action = "store_true" )
+    optional_named.add_argument( "--checkpoint", "-c", help = """Enter a value if you wish to restart operations from a certain check point. Please note if you have new RNA-Seq samples, then FINDER will override this argument and computation will take place from read alignment. If there are missing data in any step then also FINDER will enforce restart of operations from a previous
+. For example, if you wish to run assembly on samples for which alignments are not available then FINDER will readjust this value and set it to 1.
+    1. Align reads to reference genome (Will trigger removal of all alignments and start from beginning)
+    2. Assemble with PsiCLASS (Will remove all assemblies)
+    3. Find genes with FINDER (entails changepoint detection)
+    4. Predict genes using BRAKER2 (Will remove previous results of gene predictions with BRAKER2)
+    5. Annotate coding regions
+    6. Merge FINDER annotations with BRAKER2 predictions and protein sequences
+    """, default = 0, type = int )
+    optional_named.add_argument( "--perform_post_completion_data_cleanup", "-pc_clean", help = "Set this field if you wish to clean up all the intermediate files after the completion of the execution. If this operation is requested prior to generation of all the important files then it will be ignored and finder will proceed to annotate the genome. ", action = "store_true" )
+    optional_named.add_argument( "--run_tests", "-rt", help = "Modify behaviour of finder to accelerate tests. This will reduce the downloaded fastq files to a bare minimum and also check the other installations", action = "store_true" )
+    optional_named.add_argument( "--addUTR", "--addUTR", help = "Turn on this option if you wish BRAKER to add UTR sequences", action = "store_true" )
+    optional_named.add_argument( "--skip_cpd", "--skip_cpd", help = "Turn on this option to skip changepoint detection. Could be effective for grasses", action = "store_true" )
+    optional_named.add_argument( "--exonerate_gff3", "-egff3", help = "Enter the exonerate output in gff3 format" )
+    optional_named.add_argument( "--star_shared_mem", "--star_shared_mem", help = "Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.", action = "store_true" )
+    # optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
+    # optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")
+    # optional_named.add_argument("--error_correct_reads","-ecr",help="Set this argument if you wish to perform error corrections using Rcorrector. Please note that setting this option does not guarantee correction. Short read error correction is a time consuming task. Hence, only those samples will be error corrected which have a low mapping rate. Please refer to page no. <> of the manual for more details. ",action="store_true")
+
+    # Suppressed arguments
+    parser.add_argument( "--md", "-md", help = argparse.SUPPRESS )  # Metadata to store all the requested processing
+    parser.add_argument( "--output_star", "-ostar", help = argparse.SUPPRESS )  # Output of STAR alignments
+    parser.add_argument( "--raw_data_downloaded_from_NCBI", "-raw_data_downloaded_from_NCBI", help = argparse.SUPPRESS )  # New directory is created if no fastq file is provided as input
+    parser.add_argument( "--output_assemblies_psiclass_terminal_exon_length_modified", "-output_assemblies_psiclass_terminal_exon_length_modified", help = argparse.SUPPRESS )
+    # parser.add_argument("--output_logs","-ologs",help=argparse.SUPPRESS)# Directory for logs
+    # parser.add_argument("--sample_wide_merge","-sample_wide_merge",help=argparse.SUPPRESS)# Directory to hold gtf files merged from each bioproject
+    parser.add_argument( "--record_time", help = argparse.SUPPRESS )  # Holds duration of execution for each step of execution
+    parser.add_argument( "--output_fasta_N_removed", help = argparse.SUPPRESS )  # Directory to contain fastq files after each sequence is cleaned of flanking Ns
+    parser.add_argument( "--output_sample_fastq", help = argparse.SUPPRESS )  # Directory to hold fastq files generated by sampling original fastq to decide whether or not to error correct
+    parser.add_argument( "--error_corrected_raw_data", help = argparse.SUPPRESS )  # Directory to hold Rcorrector error corrected fastq
+    parser.add_argument( "--softwares", help = argparse.SUPPRESS )  # Sets up the full path to the dependent softwares like STAR, Spring, etc
+    parser.add_argument( "--temp_dir", help = argparse.SUPPRESS )  # Directory to store temporary information
+    parser.add_argument( "--compressed_data_files", help = argparse.SUPPRESS )  # Directory to store compressed read files using SPRING
+    parser.add_argument( "--indices", help = argparse.SUPPRESS )  # Directory to store the indices for STAR and bowtie2
+    parser.add_argument( "--output_braker", help = argparse.SUPPRESS )  # Directory to store the BRAKER output
+    parser.add_argument( "--total_space", help = argparse.SUPPRESS )  # Records the total space occupied by files
+    parser.add_argument( "--space_saved", help = argparse.SUPPRESS )  # Records the amount of space saved after moving intermediate files
+    parser.add_argument( "--single_end_adapterfile", help = argparse.SUPPRESS )
+    parser.add_argument( "--paired_end_adapterfile", help = argparse.SUPPRESS )
+    parser.add_argument( "--files_for_ncrna", help = argparse.SUPPRESS )
+
+    return parser.parse_args()
+
+
+def validateCommandLineArguments( options, logger_proxy, logging_mutex ):
+    options.output_directory = os.path.abspath( options.output_directory )
+    # options.output_trimmomatic=options.output_directory+"/trimmomatic_output"
+    options.output_star = options.output_directory + "/alignments"
+    options.output_assemblies_psiclass_terminal_exon_length_modified = options.output_directory + "/assemblies_psiclass_modified"
+    # soptions.output_logs=options.output_directory+"/logs"
+    # options.output_rcorrector=options.output_directory+"/error_corrected"
+    options.output_fasta_N_removed = options.output_directory + "/raw_fasta_N_removed"
+    # options.output_sample_fastq=options.output_directory+"/sample_fastq"
+    options.error_corrected_raw_data = options.output_directory + "/raw_data_error_corrected"
+    options.temp_dir = options.output_directory + "/temp"
+    options.raw_data_downloaded_from_NCBI = options.output_directory + "/raw_data_downloaded_from_NCBI"
+    # options.compressed_data_files=options.output_directory+"/compressed_data_files"
+    options.indices = options.output_directory + "/indices"
+    options.output_braker = options.output_directory + "/braker"
+    options.final_GTF_files = options.output_directory + "/final_GTF_files"
+    options.verbose = int( options.verbose ) if int( options.verbose ) <= 3 else 3
+    options.softwares = {}
+    options.files_for_ncrna = {}
+    # options.ncrna_dir=options.output_directory+"/ncrna"
+
+    os.system( "mkdir -p " + options.output_directory )
+    os.system( "mkdir -p " + options.output_star )
+    os.system( "mkdir -p " + options.output_assemblies_psiclass_terminal_exon_length_modified )
+    os.system( "mkdir -p " + options.temp_dir )
+    os.system( "mkdir -p " + options.raw_data_downloaded_from_NCBI )
+    os.system( "mkdir -p " + options.indices )
+    os.system( "mkdir -p " + options.final_GTF_files )
+    # os.system("mkdir -p "+options.output_fasta_N_removed)
+    # os.system("rm -rf "+options.output_sample_fastq)
+    # os.system("mkdir -p "+options.output_sample_fastq)
+    # os.system("rm -rf "+options.error_corrected_raw_data)
+    # os.system("mkdir -p "+options.error_corrected_raw_data)
+    # os.system("mkdir -p "+options.compressed_data_files)
+    # os.system("mkdir -p "+options.output_trimmomatic)
+    # os.system("mkdir -p "+options.output_logs)
+    # os.system("mkdir -p "+options.output_rcorrector)
+    # os.system("mkdir -p "+options.ncrna_dir)
+
+    options.softwares["psiclass"] = "psiclass"
+    options.softwares["junc"] = "junc"
+    options.softwares["subexon-info"] = "subexon-info"
+    options.softwares["addXS"] = "addXS"
+    # options.softwares["fastq-sample"]="/fastq-tools-0.8/scripts/fastq-sample"
+    options.softwares["download_and_dump_fastq_from_SRA"] = "downloadAndDumpFastqFromSRA.py"
+    options.softwares["transferGenomicNucleotideCountsToTranscriptome"] = "transferGenomicNucleotideCountsToTranscriptome.py"
+    options.softwares["find_exonic_troughs"] = "find_exonic_troughs.R"
+    options.softwares["olego"] = "olego"
+    options.softwares["olegoindex"] = "olegoindex"
+    options.softwares["mergePEsam.pl"] = "mergePEsam.pl"
+    options.softwares["xa2multi"] = "xa2multi.pl"
+    # options.softwares["gmst"]=+"/gmst.pl"
+    # options.softwares["prodigal"]=dep_path+"/Prodigal/prodigal"
+    options.softwares["canon-gff3"] = "canon-gff3"
+    options.softwares["convert_exonerate_gff_to_gtf"] = "convert_exonerate_gff_to_gtf.py"
+
+    ################################################################################
+    # Set paths for BRAKER run
+    ################################################################################
+    options.softwares["braker"] = "braker.pl"
+    options.softwares["GENEMARK_PATH"] = "/softwares/GeneMark"
+    options.softwares["AUGUSTUS_CONFIG_PATH"] = options.output_braker + "/Augustus/config"
+    options.softwares["AUGUSTUS_BIN_PATH"] = options.output_braker + "/Augustus/bin"
+    options.softwares["AUGUSTUS_SCRIPTS_PATH"] = options.output_braker + "/Augustus/scripts"
+    options.softwares["GUSHR_PATH"] = "/softwares/GUSHR/GUSHR"
+
+    if options.genemark_license is not None:
+        new_filename = f"~/.gm_key"
+        os.system( f"cp {options.genemark_license} {new_filename}" )
+
+    if options.genemark_path is not None:
+        with logging_mutex:
+            # cmd_cp = f"cp -r {options.genemark_path}/* /softwares/GeneMark/"
+            # os.system( cmd_cp )
+            # options.genemark_path = "/softwares/GeneMark"
+            os.chdir( options.genemark_path )
+            cmd = f"perl {options.genemark_path}/change_path_in_perl_scripts.pl \"/usr/bin/env perl\""
+            logger_proxy.info( f"Running command - {cmd}" )
+        os.system( cmd )
+
+    with logging_mutex:
+        logger_proxy.info( "Software paths have been set" )
+
+    # Copy genome to output directory for singularity to work
+    cmd = f"cp {options.genome} {options.output_directory}"
+    os.system( cmd )
+    options.genome = f"{options.output_directory}/{options.genome.split('/')[-1]}"
+
+    options.record_time = {}
+    cmd = "samtools " + " faidx " + options.genome
+    os.system( cmd )
+
+    if options.genome_dir_star is None:
+        with logging_mutex:
+            logger_proxy.info( "Generating STAR index" )
+        options.genome_dir_star = options.indices + "/star_index_without_transcriptome"
+        if os.path.exists( f"{options.genome_dir_star}/genomeParameters.txt" ) == False:
+            os.system( "mkdir -p " + options.genome_dir_star )
+            number_of_reference_sequences = 0
+            genome_length = 0
+            fhr = open( options.genome, "r" )
+            for line in fhr:
+                if line[0] == '>':
+                    number_of_reference_sequences += 1
+                else:
+                    genome_length += len( line.strip() )
+            fhr.close()
+            genomeChrBinNbits_value = min( 18, math.log2( genome_length / number_of_reference_sequences ) )
+            genomeSAindexNbases_value = min( 14, math.log2( genome_length ) / 2 - 1 )
+
+            cmd = f"STAR "
+            cmd += f" --runThreadN {options.cpu}"
+            cmd += f" --runMode genomeGenerate "
+            if options.star_shared_mem == True:
+                cmd += f" --genomeLoad LoadAndKeep"
+            cmd += f" --genomeDir {options.genome_dir_star}"
+            cmd += f" --genomeFastaFiles {options.genome}"
+            cmd += f" --genomeChrBinNbits {genomeChrBinNbits_value}"
+            cmd += f" --genomeSAindexNbases {genomeSAindexNbases_value}"
+            cmd += f" --outFileNamePrefix {options.output_star}/indexGenome"
+            cmd += " > " + options.genome_dir_star + ".output "
+            cmd += " 2> " + options.genome_dir_star + ".error "
+            if os.path.exists( f"{options.genome_dir_star}/SAindex" ) == False:
+                with logging_mutex:
+                    logger_proxy.info( f"Running cmd - {cmd}" )
+                os.system( cmd )
+                with logging_mutex:
+                    logger_proxy.info( "STAR index generation complete" )
+        else:
+            with logging_mutex:
+                logger_proxy.info( "STAR indices present skipping regeneration" )
+
+    if options.star_shared_mem == True:
+        # Remove a pre-loaded genome
+        cmd = "STAR "
+        cmd += f" --runThreadN {options.cpu} "
+        cmd += f" --genomeLoad Remove "
+        cmd += f" --genomeDir {options.genome_dir_star} "
+        cmd += f" --outFileNamePrefix {options.output_star}/removeGenomeShmem_"
+        os.system( cmd )
+
+    if options.genome_dir_olego is None:
+        options.genome_dir_olego = options.indices + "/olego_index"
+        olego_files = glob.glob( f"{options.genome_dir_olego}/*" )
+        if len( olego_files ) != 8:
+            with logging_mutex:
+                logger_proxy.info( "Generating OLego index" )
+            cmd = options.softwares["olegoindex"]
+            cmd += " -p " + options.indices + "/olego_index "
+            cmd += options.genome
+            cmd += " > " + options.indices + "_olego_index.output "
+            cmd += " 2> " + options.indices + "_olego_index.error "
+            if os.path.exists( f"{options.indices}/olego_index.rsa" ) == False:
+                with logging_mutex:
+                    logger_proxy.info( f"Running cmd - {cmd}" )
+                os.system( cmd )
+                with logging_mutex:
+                    logger_proxy.info( "OLego index built" )
+        else:
+            with logging_mutex:
+                logger_proxy.info( "OLego indices present skipping regeneration" )
+
+    if options.protein is None:
+        cmd = f"touch {options.temp_dir}/dummy_protein.fasta"
+        options.protein = f"{options.temp_dir}/dummy_protein.fasta"
+        fhw = open( f"{options.temp_dir}/dummy_protein.fasta", "w" )
+        fhw.write( ">dummy\n" )
+        fhw.write( "M"*5000 + "\n" )
+        fhw.close()
+        with logging_mutex:
+            logger_proxy.info( "Adding dummy file since no protein evidence was provided" )
+
+    ################################################################################
+    # Set up main files for ncRNA computation
+    ################################################################################
+    # options.files_for_ncrna["mature_ATGC"]=dep_path+"/mature_ATGC.fa"
+
+
+def readValidSJDBInfo( valid_SJDB_filename ):
+    """
+    """
+    validSJDB = {}
+    fhr = open( valid_SJDB_filename, "r" )
+    for line in fhr:
+        chromosome, start, end = line.strip().split()[:3]
+        if chromosome not in validSJDB:
+            validSJDB[chromosome] = []
+        validSJDB[chromosome].append( start + "_" + end )
+    fhr.close()
+    for chromosome in validSJDB:
+        validSJDB[chromosome] = set( validSJDB[chromosome] )
+    return validSJDB
+
+
+def removeSpuriousMappingsInParallel( eachinput ):
+    """
+    """
+    samfilename, outputsamfilename, validSJDB, logging_mutex, logger_proxy, Run = eachinput
+    fhr = open( samfilename, "r" )
+    fhw = open( outputsamfilename, "w" )
+    for line in fhr:
+        if line[0] == "@":
+            fhw.write( line )
+        else:
+            if "N" not in line.strip().split()[5]:
+                fhw.write( line )
+            else:
+                chromosome = line.split()[2]
+                for ele in line.split():
+                    if "jI:B:i," in ele:
+                        coordinates = ele.split( "jI:B:i," )[-1]
+                        break
+                coordinates = coordinates.split( "," )
+                i = 0
+                skip = 0
+                while i < len( coordinates ):
+                    junction_start, junction_end = coordinates[i], coordinates[i + 1]
+                    if chromosome in validSJDB and junction_start + "_" + junction_end not in validSJDB[chromosome]:
+                        skip = 1
+                    i += 2
+                if skip == 0:
+                    fhw.write( line )
+    fhw.close()
+    fhr.close()
+    with logging_mutex:
+        logger_proxy.info( "Removal of spurious alignments completed for run --> " + Run )
+
+
+def removeSpuriousMappings( options, cpu_per_condition, logging_mutex, logger_proxy ):
+    pool = multiprocessing.Pool( processes = int( options.cpu ) )
+    allinputs = []
+    for condition in options.mrna_md:
+        for Run in options.mrna_md[condition]:
+            if os.path.exists( options.output_star + "/" + Run + "_final.sortedByCoord.out.sam" ) == True:continue
+            cmd = "samtools " + " view -@ " + str( cpu_per_condition )
+            cmd += " -h " + options.output_star + "/" + Run + "_final.sortedByCoord.out.bam > "
+            cmd += options.output_star + "/" + Run + "_final.sortedByCoord.out.sam"
+            allinputs.append( ["dummy", cmd] )
+    pool.map( runCommand, allinputs )
+
+    pool = multiprocessing.Pool( processes = int( options.cpu ) )
+    allinputs = []
+    for condition in options.mrna_md:
+        valid_SJDB_filename = options.output_star + "/" + condition + "_round1_and_round2_and_round3_and_round4_SJ.out.tab"
+        validSJDB = readValidSJDBInfo( valid_SJDB_filename )
+        for Run in options.mrna_md[condition]:
+            samfilename = options.output_star + "/" + Run + "_final.sortedByCoord.out.sam"
+            outputsamfilename = options.output_star + "/" + Run + "_final.sortedByCoord.out.sam.new"
+            allinputs.append( [samfilename, outputsamfilename, validSJDB, logging_mutex, logger_proxy, Run] )
+    pool.map( removeSpuriousMappingsInParallel, allinputs )
+
+    allinputs = []
+    for condition in options.mrna_md:
+        for Run in options.mrna_md[condition]:
+            cmd = "samtools " + " view -@ " + str( cpu_per_condition ) + "  "
+            cmd += "-Sbh " + options.output_star + "/" + Run + "_final.sortedByCoord.out.sam.new > "
+            cmd += options.output_star + "/" + Run + "_final.sortedByCoord.out.bam"
+            allinputs.append( [Run, cmd] )
+    pool.map( runCommand, allinputs )
+
+    allinputs = []
+    for condition in options.mrna_md:
+        for Run in options.mrna_md[condition]:
+            cmd = "rm " + options.output_star + "/" + Run + "_final.sortedByCoord.out.sam* "
+            allinputs.append( [Run, cmd] )
+    pool.map( runCommand, allinputs )
+
+
+def configureLogger( options ):
+    os.system( "mkdir -p " + options.output_directory )
+    os.system( "rm -f " + options.output_directory + "/progress.log" )
+
+    arguments = {}
+    arguments["file_name"] = options.output_directory + "/progress.log"
+    arguments["formatter"] = "%(asctime)s - %(name)s - %(levelname)6s - %(message)s"
+    arguments["level"] = logging.DEBUG
+    arguments["delay"] = False
+
+    ( logger_proxy, logging_mutex ) = make_shared_logger_and_proxy ( setup_std_shared_logger, "finder", arguments )
+
+    return logger_proxy, logging_mutex
+
+
+def orchestrateGeneModelPrediction( options, logger_proxy, logging_mutex ):
+
+    #########################################################################################################
+    # Use STAR and OLego to align short reads
+    #########################################################################################################
+    alignReadsAndMergeOutput( options, logger_proxy, logging_mutex )
+
+    #########################################################################################################
+    # Rearrange data for assembly
+    #########################################################################################################
+    reArrangeDataForAssembly( options, logger_proxy, logging_mutex )
+
+    #########################################################################################################
+    # Collect information about mapping
+    #########################################################################################################
+    collectStatsAboutMapping( options )
+    with logging_mutex:
+        logger_proxy.info( "Information collection about alignments completed " )
+
+    #########################################################################################################
+    # Generate one assembly with all samples
+    #########################################################################################################
+    all_runs = [os.path.exists( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/psiclass_output_sample_" + Run + ".gtf" ) for condition in options.mrna_md for Run in options.mrna_md[condition]]
+    if False in all_runs or os.path.exists( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined.gtf" ) == False:
+        runPsiCLASSMaxTerminalExonLength( options, logging_mutex, logger_proxy )
+        with logging_mutex:
+            logger_proxy.info( "Generation of assemblies with PsiCLASS completed " )
+    else:
+        with logging_mutex:
+            logger_proxy.info( "Skipping the regeneration of assemblies with PsiCLASS " )
+
+    #########################################################################################################
+    # Select transcripts expressed in tissue but not reported in combined.gtf file
+    #########################################################################################################
+    findTranscriptsInEachSampleNotReportedInCombinedAnnotations( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Missed tissue specific transcripts added to gene annotations " )
+
+    #########################################################################################################
+    # Remove redundant transcripts which are proper subsets of other transcripts
+    #########################################################################################################
+    input_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_missed_transcripts_added.gtf"
+    output_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_redundant_transcripts_removed.gtf"
+    removeRedundantTranscripts( input_gtf_filename, output_gtf_filename, options )
+    with logging_mutex:
+        logger_proxy.info( "Redundant transcripts removed from gene annotations " )
+
+    #########################################################################################################
+    # Find transcripts formed due to read alignments in incorrect direction
+    #########################################################################################################
+    fixTranscriptsConnectingTwoTranscripts( options, logging_mutex, logger_proxy )  # Currently a dummy implementation
+    with logging_mutex:
+        logger_proxy.info( "Transcripts connecting two other transcripts in opposite direction fixed " )
+
+    #########################################################################################################
+    # Generate counts for the generated transcriptome
+    #########################################################################################################
+    generateGenomicAndTranscriptomicCounts( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Generation of transcriptomic counts completed " )
+
+    #########################################################################################################
+    # Fix overlapping and merged transcripts
+    #########################################################################################################
+    fixOverlappingAndMergedTranscripts( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Fix overlapping and merged transcripts completed" )
+
+    #########################################################################################################
+    # Remove redundant transcripts which are proper subsets of other transcripts
+    #########################################################################################################
+    input_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_cov_opp_split.gtf"
+    output_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_cov_opp_split_redundancy_removed.gtf"
+    removeRedundantTranscripts( input_gtf_filename, output_gtf_filename, options )
+    with logging_mutex:
+        logger_proxy.info( "Redundant transcripts removed from gene annotations " )
+
+    #########################################################################################################
+    # Find closely placed almost overlapping transcripts transcripts
+    #########################################################################################################
+    mergeCloselySpacedTranscripts( options )
+    with logging_mutex:
+        logger_proxy.info( "Closely placed transcripts with very similar expression level merged" )
+
+    #########################################################################################################
+    # Split transcripts with splice junctions NOT present *.tab file
+    #########################################################################################################
+    splitTranscriptsWithQuestionableSpliceJunctions( options )
+    with logging_mutex:
+        logger_proxy.info( "Transcripts splited on intron information" )
+
+    #########################################################################################################
+    # Remove redundant transcripts which are proper subsets of other transcripts
+    #########################################################################################################
+    input_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_split_transcripts_with_bad_SJ.gtf"
+    output_gtf_filename = options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf"
+    removeRedundantTranscripts( input_gtf_filename, output_gtf_filename, options )
+    with logging_mutex:
+        logger_proxy.info( "Redundant transcripts removed from gene annotations " )
+
+    #########################################################################################################
+    # Append tissue/condition expressed in information to each transcript
+    #########################################################################################################
+    transcriptToConditions( options )
+    with logging_mutex:
+        logger_proxy.info( "Associating transcripts to conditions completed" )
+
+
+def aggregateOutputFiles( options, logger_proxy, logging_mutex ):
+    """
+    Aggregates all the output GTF files and puts them in one folder
+    """
+    options.final_GTF_files
+    files_to_be_copied = [options.output_braker + "/braker.gtf",  # BRAKER2 final GTF file
+                          options.output_braker + "/braker_utr.gtf",  # BRAKER2 final GTF file
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_redundant_transcripts_removed.gtf",  # GTF file from PsiCLASS output
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_split_transcripts_with_bad_SJ_redundancy_removed.gtf",  # FINDER output without CDS
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf",  # FINDER output with CDS
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_low_conf.gtf",  # Low confidence set
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_high_conf.gtf",  # High confidence set
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_high_and_low_confidence_merged.gtf",  # FINDER+BRAKER2+Protein
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_BRAKER_appended_high_conf.gtf",  # High confidence set
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/FINDER_BRAKER_PROT.gtf",  #
+                          options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/transcript_to_condition"
+                          ]
+
+    for file in files_to_be_copied:
+        os.system( f"cp {file} {options.final_GTF_files} > /dev/null 2> /dev/null" )
+
+
+def cleanUpAfterPipelineCompletion( options, logger_proxy, logging_mutex ):
+    """
+    """
+    # Remove all files downloaded from NCBI
+    cmd = f"rm -rf {options.raw_data_downloaded_from_NCBI}"
+    os.system( cmd )
+    with logging_mutex:
+        logger_proxy.info( f"Running command - {cmd}" )
+        logger_proxy.info( "Files downloaded from NCBI has been removed" )
+
+    cmd = "rm -rf "
+    cmd += options.output_star + "/*_round*_Aligned.sortedByCoord.out.bam"
+    os.system( cmd )
+
+    cmd = "rm -rf "
+    cmd += options.output_star + "/*_round*__STARgenome"
+    os.system( cmd )
+
+    cmd = "rm -rf "
+    cmd += options.output_star + "/*_round*_Unmapped.out.mate*"
+    os.system( cmd )
+
+    cmd = "rm -rf "
+    cmd += options.output_star + "/*_olego_round5.sorted.bam"
+    os.system( cmd )
+
+    cmd = "rm -rf "
+    cmd += options.output_star + "/*STARtmp"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*.bed"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*pkl"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*_exons"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*_intron*"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*tab"
+    os.system( cmd )
+
+    cmd = "rm "
+    cmd += options.output_star + "/*sam"
+    os.system( cmd )
+
+    cmd = "rm -rf " + options.temp_dir
+    os.system( cmd )
+
+    cmd = "rm -rf " + options.indices
+    os.system( cmd )
+
+    with logging_mutex:
+        logger_proxy.info( "Removing intermediate alignment files completed " )
+
+
+def main():
+    commandLineArg = sys.argv
+    if len( commandLineArg ) == 1:
+        print( "Please use the --help option to get usage information" )
+    options = parseCommandLineArguments()
+    logger_proxy, logging_mutex = configureLogger( options )
+
+    validateCommandLineArguments( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "validateCommandLineArguments execution successful" )
+
+    if options.run_tests == True:
+        verifyInstallations( options, logger_proxy, logging_mutex )
+        with logging_mutex:
+            logger_proxy.info( "verifyInstallations execution successful" )
+
+    readMetaDataFile( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "readMetaDataFile execution successful" )
+
+    expandGzippedFiles( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "expandGzippedFiles execution successful" )
+
+    determineOptimalStartingPoint( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( f" Program params - {options}" )
+
+    orchestrateGeneModelPrediction( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "orchestrateGeneModelPrediction execution successful" )
+
+    if options.preserve_raw_input_data == False:
+        # Remove all the files downloaded from NCBI
+        cmd = f"rm -rf {options.raw_data_downloaded_from_NCBI}"
+        os.system( cmd )
+        with logging_mutex:
+            logger_proxy.info( f"Running command - {cmd}" )
+            logger_proxy.info( "Files downloaded from NCBI has been removed" )
+
+    configureAndRunBRAKER( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "BRAKER run completed" )
+
+    findCDS( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Finding CDS completed" )
+
+    removeSpuriousTranscriptsBasedOnCDS( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Sibling spurious transcripts removed" )
+
+    addBRAKERPredictions( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Gene predictions and RNA-Seq evidence merged" )
+
+    aggregateOutputFiles( options, logger_proxy, logging_mutex )
+    with logging_mutex:
+        logger_proxy.info( "Aggregating GTF files completed" )
+
+    if options.perform_post_completion_data_cleanup == True:
+        cleanUpAfterPipelineCompletion( options, logger_proxy, logging_mutex )
+        with logging_mutex:
+            logger_proxy.info( "Removing all intermediate files after completion of execution" )
+
+
+if __name__ == "__main__":
+    main()

@@ -13,7 +13,7 @@ Sagnik Banerjee, Priyanka Bhandary, Margaret Woodhouse, Taner Z Sen,Roger P Wise
 ## Installing `finder` from `GitHub`
 
 ```bash
-git pull -b finder_v1.1.0 https://github.com/sagnikbanerjee15/Finder.git
+git pull https://github.com/sagnikbanerjee15/Finder.git
 ```
 
 ## Downloading `finder` from release (Latest stable version)

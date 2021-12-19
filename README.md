@@ -1,15 +1,3 @@
-# To dos
-
-Copy genome to output folder and process from there - needed for singularity
-
-Change back the way to handle locally available data - have run_finder program find all the locations and then mount those
-
-Code to decide whether to use docker or singularity
-
-Rerun on the docker image to check everything is running perfectly
-
-
-
 # Welcome to `finder_v1.1.0`
 
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generates gene annotations in GTF format. `finder` accepts inputs through the command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. `finder` is released as a docker image. Users need to have python3 installed in their system to be able to run `finder`. The header script will create either a `docker` container or a `singularity` container depending on what is installed on the system with preference given to `docker`.
@@ -37,6 +25,14 @@ cd finder_v1.1.0
 echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
 source ~/.bashrc
 ```
+
+You can choose to run `finder` using the command outlined in [this section](#Running Finder). When `run_finder` command is executed, it will pull the latest docker image from docker hub. Depending on what is installed, the program will create either a docker or a singularity container and execute the main program inside it. If you wish to create the docker image locally execute the following command:
+
+```bash
+docker build -t sagnikbanerjee15/finder:1.1.0 .
+```
+
+Please remember to add proxies if you are on a VPN.
 
 `finder` runs `BRAKER2` which depends on `GeneMark-ET`. `GeneMark-ET` is hosted at the University of Georgia website. The license prohibits the redistribution of their software, which is why it could not be included in this package. Hence, users have to manually download the software and provide the path as input to the software. Please follow the instructions below to download the softwares and the key:
 

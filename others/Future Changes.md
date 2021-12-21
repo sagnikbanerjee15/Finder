@@ -46,3 +46,4 @@
 - Merge contigs and split them to speed up processing
 - Parallelize over several nodes - useful for HPCs
 - Group transcripts into correct set of genes. 
+- Modify SAM files to contain only mappings - no sequence and no quality scores

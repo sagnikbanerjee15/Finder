@@ -1,6 +1,7 @@
 
 from scripts.fileReadWriteOperations import *
 import os
+import collections
 
 
 def convertToGenomicCoordinate( transcriptomic_coordinate, exon_list_genomic, transcript_id ):
@@ -41,6 +42,26 @@ def findCDS( options , logger_proxy, logging_mutex ):
 
     writeTranscriptsToFile( [combined_ultra_long_introns_redundancy_removed, gtf_filename, 0] )
 
+    fhr = open(f"{gtf_filename}","r")
+    sequence_ids = []
+    for line in fhr:
+        if line.strip().split("\t")[2]=="transcript":
+            sequence_ids.append(line.strip().split("\t")[-1].split("transcript_id")[-1].split()[0][1:-2])
+    fhr.close()
+    counter = collections.Counter(sequence_ids)
+    fhr = open(f"{gtf_filename}","r")
+    fhw = open(f"{gtf_filename}.temp","r")
+    for line in fhr:
+        transcript_id = line.strip().split("\t")[-1].split("transcript_id")[-1].split()[0][1:-2]
+        if counter[transcript_id]>1: continue
+        else:
+            fhw.write(line)
+    fhw.close()
+    fhr.close()
+    
+    cmd = f"mv {gtf_filename}.temp {gtf_filename}"
+    os.system(cmd)
+
     os.chdir( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined" )
     # Convert from gtf to fasta
     cmd = "gffread "
@@ -48,6 +69,19 @@ def findCDS( options , logger_proxy, logging_mutex ):
     cmd += " -g " + options.genome
     cmd += " " + gtf_filename
     os.system( cmd )
+    
+    # convert multiline fasta to single line fasta
+    cmd = f"perl '/^>/ ? print \"\\n\" : chomp' "
+    cmd += f" {gtf_filename[:-3]}fasta "
+    cmd += f" |tail -n +2 "
+    cmd += f" 2> {gtf_filename[:-3]}fasta.temp"
+    os.system(cmd)
+    
+    cmd = f"mv {gtf_filename[:-3]}fasta.temp {gtf_filename[:-3]}fasta"
+    os.system(cmd)
+    
+    
+    
 
     cmd = f" codan.py "
     cmd += f" -t {gtf_filename[:-3]}fasta "

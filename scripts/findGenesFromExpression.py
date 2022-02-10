@@ -270,6 +270,7 @@ def alignReadsAndMergeOutput( options, logger_proxy, logging_mutex ):
         fhw = open( options.temp_dir + "/download_these_runs", "w" )
         download_these = []
         print(options.mrna_md)
+        sys.stdout.flush()
         for Run in options.mrna_md[condition]:
             if os.path.exists( options.output_star + "/" + Run + "_final.sortedByCoord.out.bam" ) == True and os.path.exists( options.output_star + "/" + Run + "_round4_Aligned.sortedByCoord.out.bam" ) == True:continue
             if options.mrna_md[condition][Run]["downloaded_from_NCBI"] == 0:continue

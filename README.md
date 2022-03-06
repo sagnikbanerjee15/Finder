@@ -1,7 +1,5 @@
 # Welcome to `finder_v1.1.0`
 
-![GitHub All Releases](https://img.shields.io/github/downloads/lewdev/hw-gen/total)
-
 `finder` is a gene annotator pipeline which automates the process of downloading short reads, aligning them and using the assembled  transcripts to generate gene annotations. Additionally it uses protein sequences and reports gene predictions by `BRAKER2`. It is a fast, scalable, platform independent software that generates gene annotations in GTF format. `finder` accepts inputs through the command line interface. It finds several novel genes/transcripts and also reports the tissue/conditions they were found to be in. `finder` is released as a docker image. Users need to have python3 installed in their system to be able to run `finder`. The header script will create either a `docker` container or a `singularity` container depending on what is installed on the system with preference given to `docker`.
 
 If you use `finder` for your research please cite 

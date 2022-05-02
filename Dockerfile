@@ -199,7 +199,7 @@ ARG NCBI_VERSION=2.12.0
 
 RUN mkdir -p /softwares/NCBIBLAST && \
 	cd /softwares/NCBIBLAST &&  \
-	wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_VERSION}+-x64-linux.tar.gz && \
+	wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${NCBI_VERSION}/ncbi-blast-${NCBI_VERSION}+-x64-linux.tar.gz && \
 	tar -xvzf /softwares/NCBIBLAST/ncbi-blast-${NCBI_VERSION}+-x64-linux.tar.gz
 
 ENV PATH="${PATH}:/softwares/NCBIBLAST/ncbi-blast-${NCBI_VERSION}+/bin" 

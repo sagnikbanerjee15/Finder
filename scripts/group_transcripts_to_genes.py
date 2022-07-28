@@ -75,8 +75,23 @@ for chromosome in transcripts_grouped_into_genes:
             transcripts_grouped_into_genes[chromosome][gene][transcript] = transcript_number + 1
             final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript] = [gene, transcripts_grouped_into_genes[chromosome][gene][transcript]]
         
-        print(chromosome, gene, transcripts_grouped_into_genes[chromosome][gene])
+        #print(chromosome, gene, transcripts_grouped_into_genes[chromosome][gene])
         
 for chromosome in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids:
     for transcript in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome]:
-        print(chromosome, transcript, final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript])
+        pass
+        #print(chromosome, transcript, final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript])
+
+fhw = open(gene_annotation_gtf[:-4] + "_final" + ".gtf", "w")
+fhr = open(gene_annotation_gtf,"r")
+for line in fhr:
+    line = line.strip().split("\t")
+    old_transcript_id = line[-1].split("transcript_id")[-1].strip().split()[0].strip()[:-1].strip("\"")
+    old_gene_id = line[-1].split("gene_id")[-1].strip().split()[0].strip()[:-1].strip("\"")
+    chromosome = line[0]
+    new_gene_id, new_transcript_id = final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][old_transcript_id]
+    line[-1] = f"gene_id \"{chromosome}.{new_gene_id}\"; transcript_id \"{chromosome}.{new_gene_id}.{new_transcript_id}\"; "
+    fhw.write("\t".join(line) + "\n")
+
+fhr.close()
+fhw.close()

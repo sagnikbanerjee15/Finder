@@ -64,10 +64,15 @@ for chromosome in gene_info:
             transcripts_grouped_into_genes[chromosome][gene_number] = {}
             transcripts_grouped_into_genes[chromosome][gene_number][previous_transcript_id] = [start, end, strand]
             gene_number+=1
+
+final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids = {}
             
 for chromosome in transcripts_grouped_into_genes:
+    if chromosome not in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids:
+        final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome] = {}
     for gene in transcripts_grouped_into_genes[chromosome]:
         for transcript_number,transcript in enumerate(transcripts_grouped_into_genes[chromosome][gene]):
             transcripts_grouped_into_genes[chromosome][gene][transcript] = transcript_number + 1
+            final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript] = [gene, transcripts_grouped_into_genes[chromosome][gene][transcript]]
         
         print(chromosome, gene, transcripts_grouped_into_genes[chromosome][gene])

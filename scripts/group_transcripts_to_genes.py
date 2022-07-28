@@ -19,7 +19,7 @@ for line in fhr:
         chromosome = line[0]
         if chromosome not in gene_info:
             gene_info[chromosome] = []
-        previous_transcript_id = line[-1].split("transcript_id")[-1].strip().split()[0].strip("\"")
+        previous_transcript_id = line[-1].split("transcript_id")[-1].strip().split()[0:-1].strip("\"")
         start = int(line[3])
         end = int(line[4])
         strand = line[6]
@@ -79,4 +79,4 @@ for chromosome in transcripts_grouped_into_genes:
         
 for chromosome in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids:
     for transcript in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome]:
-        print(chromosome, transcript, final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids)
+        print(chromosome, transcript, final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript])

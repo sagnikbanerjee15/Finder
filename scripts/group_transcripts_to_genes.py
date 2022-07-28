@@ -61,10 +61,13 @@ for chromosome in gene_info:
                     transcript_incorporated = 1
                     break
         if transcript_incorporated == 0:
-            transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"] = {}
-            transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"][previous_transcript_id] = [start, end, strand]
+            transcripts_grouped_into_genes[chromosome][gene_number] = {}
+            transcripts_grouped_into_genes[chromosome][gene_number][previous_transcript_id] = [start, end, strand]
             gene_number+=1
             
 for chromosome in transcripts_grouped_into_genes:
     for gene in transcripts_grouped_into_genes[chromosome]:
+        for transcript_number,transcript in enumerate(transcripts_grouped_into_genes[chromosome][gene]):
+            transcripts_grouped_into_genes[chromosome][gene][transcript] = transcript_number + 1
+        
         print(chromosome, gene, transcripts_grouped_into_genes[chromosome][gene])

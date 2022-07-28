@@ -76,3 +76,7 @@ for chromosome in transcripts_grouped_into_genes:
             final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome][transcript] = [gene, transcripts_grouped_into_genes[chromosome][gene][transcript]]
         
         print(chromosome, gene, transcripts_grouped_into_genes[chromosome][gene])
+        
+for chromosome in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids:
+    for transcript in final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids[chromosome]:
+        print(chromosome, transcript, final_mapping_prev_transcript_to_new_gene_and_new_transcript_ids)

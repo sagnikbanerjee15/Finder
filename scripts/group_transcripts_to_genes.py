@@ -44,20 +44,21 @@ for chromosome in gene_info:
                 # Check if this transcript overlaps at least 80%
                 if start <= transcript_start <= end <= transcript_end:
                     if ( end - transcript_start )/(end - start if (end-start)<(transcript_end-transcript_start) else (transcript_end-transcript_start) ) > 0.8:
-                        transcripts_grouped_into_genes[chromosome][gene].append(previous_transcript_id)
+                        transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                         transcript_incorporated = 1
                 elif transcript_start <= start <= transcript_end <= end:
                     if ( transcript_end - start )/(end - start if (end-start)<(transcript_end-transcript_start) else (transcript_end-transcript_start) ) > 0.8:
-                        transcripts_grouped_into_genes[chromosome][gene].append(previous_transcript_id)
+                        transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                         transcript_incorporated = 1
                 elif start <= transcript_start <= transcript_end <= end:
-                    transcripts_grouped_into_genes[chromosome][gene].append(previous_transcript_id)
+                    transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                     transcript_incorporated = 1
                 elif transcript_start <= start <= end <= transcript_end:
-                    transcripts_grouped_into_genes[chromosome][gene].append(previous_transcript_id)
+                    transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                     transcript_incorporated = 1
         if transcript_incorporated == 0:
-            transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"] = [previous_transcript_id]
+            transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"] = {}
+            transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"][previous_transcript_id] = [start, end, strand]
             gene_number+=1
             
 for chromosome in transcripts_grouped_into_genes:

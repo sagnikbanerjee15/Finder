@@ -46,16 +46,20 @@ for chromosome in gene_info:
                     if ( end - transcript_start )/(end - start if (end-start)<(transcript_end-transcript_start) else (transcript_end-transcript_start) ) > 0.8:
                         transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                         transcript_incorporated = 1
+                        break
                 elif transcript_start <= start <= transcript_end <= end:
                     if ( transcript_end - start )/(end - start if (end-start)<(transcript_end-transcript_start) else (transcript_end-transcript_start) ) > 0.8:
                         transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                         transcript_incorporated = 1
+                        break
                 elif start <= transcript_start <= transcript_end <= end:
                     transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                     transcript_incorporated = 1
+                    break
                 elif transcript_start <= start <= end <= transcript_end:
                     transcripts_grouped_into_genes[chromosome][gene][previous_transcript_id] = [start, end, strand]
                     transcript_incorporated = 1
+                    break
         if transcript_incorporated == 0:
             transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"] = {}
             transcripts_grouped_into_genes[chromosome][f"gene_{gene_number}"][previous_transcript_id] = [start, end, strand]

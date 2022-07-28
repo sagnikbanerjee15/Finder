@@ -35,6 +35,8 @@ for chromosome in gene_info:
     for row in gene_info[chromosome]:
         previous_transcript_id, start, end, strand = row
         transcript_incorporated = 0
+        if chromosome not in transcripts_grouped_into_genes:
+            transcripts_grouped_into_genes[chromosome] = {}
         for gene in transcripts_grouped_into_genes[chromosome]:
             for transcript in transcripts_grouped_into_genes[chromosome][gene]:
                 transcript_start, transcript_end, transcript_strand = transcripts_grouped_into_genes[chromosome][gene][transcript]

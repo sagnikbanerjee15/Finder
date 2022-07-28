@@ -7,8 +7,6 @@ import math
 import os
 import sys
 
-import pandas as pd
-
 gene_annotation_gtf = sys.argv[1]
 
 # Read from gtf file

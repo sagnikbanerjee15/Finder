@@ -19,7 +19,7 @@ for line in fhr:
         chromosome = line[0]
         if chromosome not in gene_info:
             gene_info[chromosome] = []
-        previous_transcript_id = line[-1].split("transcript_id")[-1].strip().split()[0].strip("\"")
+        previous_transcript_id = line[-1].split("transcript_id")[-1].strip().split()[0].strip()[-1].strip("\"")
         start = int(line[3])
         end = int(line[4])
         strand = line[6]

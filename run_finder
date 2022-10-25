@@ -211,7 +211,6 @@ def main():
 
     elif framework_of_choice == "bare":
         runBareCommand(command=cmd)
-        
 
 
 if __name__ == "__main__":

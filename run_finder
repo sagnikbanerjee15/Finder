@@ -87,6 +87,27 @@ def runSingularityCommand( name, version, image_location, container_name, volume
     os.system( singularity_cmd )
 
 
+def runSingularityCommand( name, version, image_location, container_name, volumes, command , cpus = 1, memory = '1g' ):
+    """
+    Runs the command in a Singularity container
+    """
+
+    # Runs the main command
+    singularity_cmd = f" singularity exec --disable-cache  "
+    for mapping in volumes:
+        singularity_cmd += f" -B {mapping}"
+    singularity_cmd += f" docker://{image_location}:{version} "
+    singularity_cmd += f" bash -c {command}"
+    os.system( singularity_cmd )
+
+
+def runBareCommand( command ):
+    """
+    Runs the command directly on the system
+    """
+    # Runs the main command
+    os.system( command )
+
 def main():
     commandLineArg = sys.argv
     if len( commandLineArg ) == 1:
@@ -148,10 +169,6 @@ def main():
     docker_installed = 1 if "no docker in" not in open( f"{options.output_directory}/find_docker", "r" ).read() else 0
     singularity_installed = 1 if "no singularity in" not in open( f"{options.output_directory}/find_singularity", "r" ).read() else 0
 
-    if docker_installed == 0 and singularity_installed == 0:
-        print( "You need to have either docker or singularity installed" )
-        sys.exit()
-
     framework_of_choice = ""
     if options.framework == "docker":
         if docker_installed == 1:
@@ -164,6 +181,9 @@ def main():
             framework_of_choice = "singularity"
         else:
             framework_of_choice = "docker"
+            
+    elif options.framework == "bare":
+        framework_of_choice = "bare"
 
     if framework_of_choice == "docker":
         os.system( "docker pull sagnikbanerjee15/finder:1.1.0" )
@@ -188,6 +208,10 @@ def main():
                             cpus = options.cpu,
                             memory = '300g'
             )
+
+    elif framework_of_choice == "bare":
+        runBareCommand(command=cmd)
+        
 
 
 if __name__ == "__main__":

@@ -86,21 +86,6 @@ def runSingularityCommand( name, version, image_location, container_name, volume
     singularity_cmd += f" bash -c {command}"
     os.system( singularity_cmd )
 
-
-def runSingularityCommand( name, version, image_location, container_name, volumes, command , cpus = 1, memory = '1g' ):
-    """
-    Runs the command in a Singularity container
-    """
-
-    # Runs the main command
-    singularity_cmd = f" singularity exec --disable-cache  "
-    for mapping in volumes:
-        singularity_cmd += f" -B {mapping}"
-    singularity_cmd += f" docker://{image_location}:{version} "
-    singularity_cmd += f" bash -c {command}"
-    os.system( singularity_cmd )
-
-
 def runBareCommand( command ):
     """
     Runs the command directly on the system
@@ -119,7 +104,7 @@ def main():
                     f"{'/'.join(options.genome.split('/')[:-1])}:{'/'.join(options.genome.split('/')[:-1])}",
                     f"{options.output_directory}:{options.output_directory}"]
 
-    cmd = f" \" "
+    # cmd = f" \" "
     cmd += f" finder "
     cmd += f" --metadatafile {options.metadatafile} "
     cmd += f" --output_directory {options.output_directory} "
@@ -158,7 +143,7 @@ def main():
     cmd += f" --genemark_license {options.genemark_license}"
     volumes_list.append( f"{'/'.join(options.genemark_license.split('/')[:-1])}:{'/'.join(options.genemark_license.split('/')[:-1])}" )
 
-    cmd += f" \" "
+    # cmd += f" \" "
 
     volumes_list = list( set( volumes_list ) )
 

@@ -105,7 +105,7 @@ def main():
                     f"{options.output_directory}:{options.output_directory}"]
 
     # cmd = f" \" "
-    cmd += f" finder "
+    cmd = f" finder "
     cmd += f" --metadatafile {options.metadatafile} "
     cmd += f" --output_directory {options.output_directory} "
     cmd += f" --genome {options.genome} "

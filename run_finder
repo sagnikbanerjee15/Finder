@@ -45,7 +45,7 @@ def parseCommandLineArguments():
     optional_named.add_argument( "--skip_cpd", "--skip_cpd", help = "Turn on this option to skip changepoint detection. Could be effective for grasses", action = "store_true" )
     optional_named.add_argument( "--exonerate_gff3", "-egff3", help = "Enter the exonerate output in gff3 format" )
     optional_named.add_argument( "--star_shared_mem", "--star_shared_mem", help = "Turn on this option if you want STAR to load the genome index into shared memory. This saves memory if multiple finder runs are executing on the same host, but might not work in your cluster environment.", action = "store_true" )
-    optional_named.add_argument( "--framework", "-fm", help = "Enter your choice of framework", choices = ["docker", "singularity"], default = "docker" )
+    optional_named.add_argument( "--framework", "-fm", help = "Enter your choice of framework", choices = ["docker", "singularity", "bare"], default = "bare" )
 
     # optional_named.add_argument("--intron_gff3","-intron_gff3",help="Enter the name and location of the file containing introns in gff3 format")
     # optional_named.add_argument("--ground_truth_gtf","-gt_gtf",help="Enter the gtf filename of the actual annotation [for developmental purposes]")

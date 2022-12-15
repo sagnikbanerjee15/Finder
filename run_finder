@@ -148,8 +148,9 @@ def main():
     volumes_list = list( set( volumes_list ) )
 
     os.system( f"mkdir -p {options.output_directory}" )
-    os.system( f"which docker > {options.output_directory}/find_docker" )
-    os.system( f"which singularity > {options.output_directory}/find_singularity" )
+    os.system( f"which docker > {options.output_directory}/find_docker 2> {options.output_directory}/find_docker.err" )
+    os.system( f"which singularity > {options.output_directory}/find_singularity 2> {options.output_directory}/find_singularity.err" )
+
 
     docker_installed = 1 if "no docker in" not in open( f"{options.output_directory}/find_docker", "r" ).read() else 0
     singularity_installed = 1 if "no singularity in" not in open( f"{options.output_directory}/find_singularity", "r" ).read() else 0

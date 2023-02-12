@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+
+from argparse import RawTextHelpFormatter
+
+import os
+import glob
+import argparse
+import sys
+import math
+
+def parseCommandLineArguments():
+
+    parser = argparse.ArgumentParser( prog = "annotate_gtf_with_CDS", description = """Add CDS annotation to gtf file""", formatter_class = RawTextHelpFormatter )
+
+    parser.add_argument( "--gtf_file_without_cds", help = "Enter the gtf file without CDS", required = True )
+    parser.add_argument( "--gtf_file_with_cds", help = "Enter the outputfilename", required = True )
+    parser.add_argument( "--gtf_from_CDS_prediction", help = "Enter the gtf file generated from the CDS predictor", required = True )
+    return parser.parse_args()
+
+def main():
+    """
+    """
+    options = parseCommandLineArguments()
+    
+    
+if __name__ == "__main__":
+    main()

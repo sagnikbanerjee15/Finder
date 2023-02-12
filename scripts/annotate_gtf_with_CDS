@@ -232,7 +232,7 @@ def main():
                 start_writing = 0
                 for exon in transcript_info[transcript_id]["exons"]:
                     exon_start, exon_end = exon[0], exon[1]
-                    #print( transcript_id, exon_start, CDS_start_genome_reference, exon_end, CDS_end_genome_reference )
+                    print( transcript_id, exon_start, CDS_start_genome_reference, exon_end, CDS_end_genome_reference )
                     if start_writing == 0 and exon_start <= CDS_start_genome_reference <= exon_end and ( exon_start <= CDS_end_genome_reference <= exon_end ) == False:
                         start_writing = 1
                         row = [chromosome,

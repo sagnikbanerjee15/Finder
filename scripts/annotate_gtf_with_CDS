@@ -232,7 +232,7 @@ def main():
                 start_writing = 0
                 for exon in transcript_info[transcript_id]["exons"]:
                     exon_start, exon_end = exon[0], exon[1]
-                    print( transcript_id, exon_start, CDS_start_genome_reference, exon_end, CDS_end_genome_reference )
+                    #print( transcript_id, exon_start, CDS_start_genome_reference, exon_end, CDS_end_genome_reference )
                     if start_writing == 0 and exon_start <= CDS_start_genome_reference <= exon_end and ( exon_start <= CDS_end_genome_reference <= exon_end ) == False:
                         start_writing = 1
                         row = [chromosome,
@@ -290,64 +290,6 @@ def main():
 
     fhw.close()
 
-    # Adding CDS frame info by calling readAllTranscriptsFromGTFFile
-    all_info_with_CDS = readAllTranscriptsFromGTFFile( [options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf", "dummy", "dummy"] )[0]
-    fhw = open( options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_temp.gtf", "w" )
-
-    for transcript_id in all_info_with_CDS:
-        chromosome = all_info_with_CDS[transcript_id]["chromosome"]
-        this_transcript = all_info_with_CDS[transcript_id]
-        transcript_start = this_transcript["exons"][0][0]
-        transcript_end = this_transcript["exons"][-1][1]
-        gene_id = ".".join( transcript_id.split( "." )[:2] )
-        desc = "gene_id \"" + gene_id + "\"; transcript_id \"" + transcript_id + "\"; "
-        desc += "FPKM \"" + str( this_transcript["FPKM"] ) + "\"; "
-        desc += "TPM \"" + str( this_transcript["TPM"] ) + "\"; "
-        desc += "cov \"" + str( this_transcript["cov"] ) + "\"; "
-
-        row = [chromosome,
-             annotator,
-             "transcript",
-             str( transcript_start ),
-             str( transcript_end ),
-             "1000",
-             this_transcript["direction"],
-             ".",
-             desc
-             ]
-        fhw.write( "\t".join( row ) + "\n" )
-
-        for exon in this_transcript["exons"]:
-            exon_start, exon_end = exon[0], exon[1]
-            row = [chromosome,
-             annotator,
-             "exon",
-             str( exon_start ),
-             str( exon_end ),
-             "1000",
-             this_transcript["direction"],
-             ".",
-             desc
-             ]
-            fhw.write( "\t".join( row ) + "\n" )
-
-        for cds_num, cds in enumerate( this_transcript["cds"] ):
-            cds_start, cds_end = cds[0], cds[1]
-            row = [chromosome,
-             annotator,
-             "CDS",
-             str( cds_start ),
-             str( cds_end ),
-             "1000",
-             this_transcript["direction"],
-             str( this_transcript["cds_frame"][cds_num] ),
-             desc
-             ]
-            fhw.write( "\t".join( row ) + "\n" )
-    fhw.close()
-    cmd = "mv " + options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS_temp.gtf "
-    cmd += options.output_assemblies_psiclass_terminal_exon_length_modified + "/combined/combined_with_CDS.gtf"
-    os.system( cmd )
     
 if __name__ == "__main__":
     main()

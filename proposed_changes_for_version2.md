@@ -64,10 +64,11 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 - [ ] Encode information in the "code" field of the GTF file.
 	- Code repsents a decimal number with each bit representing a special feature as listed below:
 
-| Item         | Price | # In stock |
-|--------------|:-----:|-----------:|
-| Juicy Apples |  1.99 |        739 |
-| Bananas      |  1.89 |          6 |
+| Bit number   | Description |
+|--------------|:-----:|
+| 0 | Predicted by AUGUSTUS & perfect overlap |
+| 1 | Predicted by AUGUSTUS & partial overlap |
+| 2 | Predicted by AUGUSTUS & no overlap |
 
 - [ ] Output a single GTF file with more information about annotation source
 - [ ] Output a peptide file 

@@ -76,6 +76,14 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 | 7 | Has only 5' UTR |
 | 8 | Has only 3' UTR |
 | 9 | Found in RNA-Seq data|
+|10 | Has a single exon |
+|11 | Constructed after changepoint split|
+|12 | Represented in long reads|
+|13 | Constructed after merging very closely placed transcript|
+|14 | End exons adjusted after coverage|
+|15 | Contains micro exons |
+|16 | Is a small-RNA|
+
 
 
 - [ ] Output a single GTF file with more information about annotation source

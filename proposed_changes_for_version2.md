@@ -65,7 +65,7 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 	- Code repsents a decimal number with each bit representing a special feature as listed below:
 
 | Bit number   | Description |
-|--------------|:-----:|
+|--------------|:-----|
 | 0 | Predicted by AUGUSTUS & perfect overlap |
 | 1 | Predicted by AUGUSTUS & partial overlap |
 | 2 | Predicted by AUGUSTUS & no overlap |

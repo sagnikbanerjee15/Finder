@@ -69,6 +69,14 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 | 0 | Predicted by AUGUSTUS & perfect overlap |
 | 1 | Predicted by AUGUSTUS & partial overlap |
 | 2 | Predicted by AUGUSTUS & no overlap |
+| 3 | Peptide sequences provided |
+| 4 | Found in peptide sequences |
+| 5 | Has Coding sequence |
+| 6 | Has both UTRs|
+| 7 | Has only 5' UTR |
+| 8 | Has only 3' UTR |
+| 9 | Found in RNA-Seq data|
+
 
 - [ ] Output a single GTF file with more information about annotation source
 - [ ] Output a peptide file 

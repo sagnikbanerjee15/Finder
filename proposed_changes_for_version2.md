@@ -10,16 +10,19 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 	- [ ] dockerfiles [will contain dockerfiles for all the software involved. Each dockerfile needs to be in its own directory and within it will be a directory for the version. For example, tools/star/2.7.9a/Dockerfile]
 	- [ ] tools [will contain CWL scripts for the tools. Each tool will be in its own directory and within it will be a directory for the version. For example, tools/star/2.7.9a]
 	- [ ] workflows [will contain CWL scripts for workflows. All workflows must utilize tools and/or workflows from this repository alone.]
-- [ ] Implement the entire workflow as a CWL pipeline - very easy to maintain and update software. cwltool, python and docker/singularity are the only software that needs to be installed
+- [ ] Implement the entire workflow as a CWL pipeline - very easy to maintain and update software. cwltool, python and docker/singularity are the only software that needs to be installed on the parent system
 - [ ] Provide option for a pip install and a conda install (have been a lot of requests from several users)
 - [ ] BRAKER requires license files and makes it very difficult for installation. We will replace BRAKER with Augustus since our focus is more on RNA-Seq data rather than on predictions.
+- [ ] FINDER2 will have a main program that will be named `finder`. This program will be written in python and will execute the workflows for various activities. This approach is favoured since a major part of the pipeline needs to execute on multiple samples and then aggregate the results into one and execute the rest of the pipeline
+- [ ] Utmost care needs to be taken to ensure that there is minimal space consumption. For some datasets, especially those that have a very large number of samples, the space demand can skyrocket easily.
 
 ## The nitty gritties
 
 - [ ] Decide where to have an ECR. Options are docker, ghcr
 - [ ] Write up a program to enable users create docker/singularity images locally instead of pulling from any repo
 - [ ] Implement the following Dockerfiles and tools
-	- [ ] repeatmasker (to perform soft masking to enhance mapping quality) 
+	- [ ] multiqc
+	- [ ] repeatmasker (to perform soft masking to enhance mapping quality and detect genes that are present in low complexity regions) 
 	- [ ] sratoolkit (to download data directly from NCBI SRA)
 	- [ ] trimmomatic (for adapter trimming)
 	- [ ] star (to perform alignment of short reads)
@@ -47,6 +50,8 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 	- [ ] Changepoint detection
 	- [ ] Align peptide to reference genomes
 - [ ] Decide on a proper format for accepting input from user. For this version, FINDER will be able to accept long reads data as well. Long reads transcriptomic data must be provided in fasta format.
+- [ ] Collect data for a variety of species for testing FINDER2
+- [ ] Decide on different metrics to judge quality of annotation for non-model organisms
 - [ ] Decide on a proper method to accumulate outputs and errors from a run and send a summary to the developers. These could be the fields
 	- sra_accession (SRA Accession number to download data directly from NCBI-SRA)
 	- tissue_type (Type of tissue)
@@ -61,8 +66,8 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 	- Integrate IGV and/or genome browsers for enhanced look and feel
 	- Option to select RNA-Seq sample to view alignment
 	- Provide option to select specific genes depending on several factors
-- [ ] Encode information in the "code" field of the GTF file.
-	- Code repsents a decimal number with each bit representing a special feature as listed below:
+- [ ] Output a single GTF file with more information about annotation source. Encode information in the "score" field of the GTF file only for transcripts. This is the 6th column.
+	- Code represents a decimal number with each bit representing a special feature as listed below:
 
 | Bit number   | Description |
 |--------------|:-----|
@@ -83,13 +88,22 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 |14 | End exons adjusted after coverage|
 |15 | Contains micro exons |
 |16 | Is a small-RNA|
+|17 | within 50 nucleotides of another transcript from a different gene on same strand|
+|18 | within 50 nucleotides of another transcript from a different gene on opposite strand|
+|19 | Contains introns larger than 10K|
+|20 | Present in low complexity region|
+|21 | Has less than 5 transcripts|
+|22 | Has >5 but <=10 transcripts|
+|23 | Has >10 but <=20 transcripts|
+|24 | Has >20 transcripts|
+|25-| Is present in xyz tissue type where xyz is a tissue type
 
 
-
-- [ ] Output a single GTF file with more information about annotation source
 - [ ] Output a peptide file 
 - [ ] Short read alignment - perform 3 rounds
 - [ ] Configure sra-toolkit to download fasta files instead of fastq to save space
 - [ ] Allow processing of small RNA-Seq data to annotate a variety of non coding RNAs
 - [ ] Write a program to select different types of genes from the GTF file produced by FINDER
 - [ ] Option to recreate gene annotations over existing gene annotations using new data (either long or short)
+- [ ] Select the model and non-model organisms on which FINDER2 will be tested. Also select a wide range of RNA-Seq samples and tissue types. BRAKER3 is coming out so we can test with that as well. 
+

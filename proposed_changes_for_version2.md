@@ -100,6 +100,7 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 
 
 - [ ] Output a peptide file 
+- [ ] Deploy a mongodb database for storing genes generated at each phase
 - [ ] Short read alignment - perform 3 rounds
 - [ ] Configure sra-toolkit to download fasta files instead of fastq to save space
 - [ ] Allow processing of small RNA-Seq data to annotate a variety of non coding RNAs

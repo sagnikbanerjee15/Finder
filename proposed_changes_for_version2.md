@@ -42,6 +42,7 @@ Here we list all the proposed changes that we intend to make to FINDER. The orde
 	- [ ] FINDER
 	- [ ] Polyester (for simulating reads)
 	- [ ] Other non coding RNA prediction tools 
+	- [ ] DIAMOND
 - [ ] Implement the following workflows
 	- [ ] Short read alignment with star
 	- [ ] Long read alignment with minimap2

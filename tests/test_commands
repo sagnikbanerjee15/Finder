@@ -1,0 +1,31 @@
+=============================================================================================================================================================================================================================================================
+# Copy paste these file paths
+
+RAW_DATA_DIRECTORY="/project/maizegdb/sagnik/FINDER/testing/raw_data"
+TOOL_OUTPUT_DIRECTORTY_ROOT="/project/maizegdb/sagnik/FINDER/testing/tools"
+WORKFLOW_OUTPUT_DIRECTORTY_ROOT="/project/maizegdb/sagnik/FINDER/testing/workflows"
+REFERENCE_DIRECTORY="/project/maizegdb/sagnik/FINDER/testing/reference"
+CWL_TOOLS_DIRECTORY="/project/maizegdb/sagnik/FINDER/Finder/tools"
+CWL_WORKFLOWS_DIRECTORY="/project/maizegdb/sagnik/FINDER/Finder/workflows"
+CWL_INPUT_JSON_DIRECTORY="/project/maizegdb/sagnik/FINDER/Finder/tests"
+TESTING_DIRECTORY_ROOT="/project/maizegdb/sagnik/FINDER/testing"
+=============================================================================================================================================================================================================================================================
+
+
+# Workflow - align_with_star_multiple_rounds
+
+nohup cwltool \
+--singularity \
+--outdir ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_SE \
+${CWL_WORKFLOWS_DIRECTORY}/align_with_star_multiple_rounds.cwl \
+${CWL_INPUT_JSON_DIRECTORY}/align_with_star_multiple_rounds_SE.json \
+1> ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_SE.output \
+2> ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_SE.error &
+
+nohup cwltool \
+--singularity \
+--outdir ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_PE \
+${CWL_WORKFLOWS_DIRECTORY}/align_with_star_multiple_rounds.cwl \
+${CWL_INPUT_JSON_DIRECTORY}/align_with_star_multiple_rounds_PE.json \
+1> ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_PE.output \
+2> ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_PE.error &

@@ -1,0 +1,17 @@
+{
+    "max_multimaps_round_1": 100,
+    "max_multimaps_round_2": 500,
+    "max_multimaps_round_3": 1,
+    "min_overhang_length_for_SJ_in_DB_round_1": 10,
+    "min_overhang_length_for_SJ_in_DB_round_2": 4,
+    "min_overhang_length_for_SJ_in_DB_round_3": 10,
+    "min_overhang_length_for_SJ_not_in_DB_round_1": 10,
+    "min_overhang_length_for_SJ_not_in_DB_round_2": 6,
+    "min_overhang_length_for_SJ_not_in_DB_round_3": 6,
+    "outFilterMismatchNoverLmax_round1": 0.2,
+    "outFilterMismatchNoverLmax_round2": 0.35,
+    "outFilterMismatchNoverLmax_round3": 0.2,
+    "outFilterMatchNminOverLread_round1": 0.7,
+    "outFilterMatchNminOverLread_round2": 0.6,
+    "outFilterMatchNminOverLread_round3": 0.7,
+}

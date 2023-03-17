@@ -1,0 +1,26 @@
+{
+    "max_multimaps_round_1": 100,
+    "max_multimaps_round_2": 500,
+    "max_multimaps_round_3": 1,
+    "min_overhang_length_for_SJ_in_DB_round_1": 12,
+    "min_overhang_length_for_SJ_in_DB_round_2": 4,
+    "min_overhang_length_for_SJ_in_DB_round_3": 12,
+    "min_overhang_length_for_SJ_not_in_DB_round_1": 12,
+    "min_overhang_length_for_SJ_not_in_DB_round_2": 8,
+    "min_overhang_length_for_SJ_not_in_DB_round_3": 8,
+    "outFilterMismatchNoverLmax_round1": 0.1,
+    "outFilterMismatchNoverLmax_round2": 0.25,
+    "outFilterMismatchNoverLmax_round3": 0.1,
+    "outFilterMatchNminOverLread_round1": 0.8,
+    "outFilterMatchNminOverLread_round2": 0.7,
+    "outFilterMatchNminOverLread_round3": 0.8,
+    "raw_input_files_pair1": {
+        "class": "File",
+        "path": "/project/maizegdb/sagnik/FINDER/testing/raw_data/SRR23255807_1.fasta"
+    },
+    "star_index": {
+        "class": "Directory",
+        "path": "/project/maizegdb/sagnik/FINDER/testing/reference/star_index"
+    },
+    "threads": 36
+}

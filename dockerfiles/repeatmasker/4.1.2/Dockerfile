@@ -1,0 +1,1 @@
+FROM veupathdb/repeatmasker:latest

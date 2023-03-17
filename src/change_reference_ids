@@ -1,0 +1,102 @@
+#!/usr/bin/env python
+
+
+######################################################################################################################################################################################
+#  Version 2.0
+#  Developed by Sagnik Banerjee
+
+# Usage: change_reference_names --reference <filename(s)> --modified_reference <filename> --mapping_filename <filename> 
+######################################################################################################################################################################################
+
+
+from argparse import RawTextHelpFormatter
+from builtins import enumerate, list
+from collections import OrderedDict
+from copy import deepcopy
+from itertools import groupby
+from operator import itemgetter
+from pathlib import Path
+
+import argparse
+import collections
+import copy
+import glob
+import importlib
+import itertools
+import math
+import multiprocessing
+import os
+import pickle
+import pprint
+import random
+import re
+import statistics
+import subprocess
+import sys
+import time
+import numpy as np
+import pandas as pd
+import cwltool
+import logging
+
+def parseCommandLineArguments():
+    parser = argparse.ArgumentParser( prog = "change_reference_ids", description = "Merges multiple reference files in fasta format into one. Converts the reference names into non-ambiguous identifiers", formatter_class = RawTextHelpFormatter )
+    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v2.0.0' )
+    
+    parser.add_argument( "--reference", "-reference", help = "Enter the set of reference files. Multiple files are accepted", nargs = '+')
+    parser.add_argument( "--modified_reference", "-modified_reference", help = "Enter the name of the modified reference", required = True)
+    parser.add_argument( "--mapping", "-mapping", help = "Enter the name of the file where the mapping between the old reference name and the new reference name will be output", required = True)
+    
+    parser.add_argument( "--logfilename", "-logfilename", help = "Enter the name of the log file", default = "change_reference_ids.log")
+
+    return parser.parse_args()
+
+def configureLogger( options ):
+    arguments = {}
+    arguments["file_name"] = options.logfilename 
+    arguments["formatter"] = "%(asctime)s - %(name)s - %(levelname)6s - %(message)s"
+    arguments["level"] = logging.DEBUG
+    arguments["delay"] = False
+
+    ( logger_proxy, logging_mutex ) = make_shared_logger_and_proxy ( setup_std_shared_logger, "CHANGE REFERENCE ID", arguments )
+
+    return logger_proxy, logging_mutex
+
+def convertReferenceIds(options, logger_proxy, logging_mutex):
+    """
+    Maps reference IDs to a modified name for easier processing all downstream applications
+    """
+    reference_sequence_number = 1 
+    fhw_mapping = open(options.mapping, "w")
+    fhw = open(options.modified_reference, "w")
+    for reference_file_num, reference_file in enumerate(options.reference):
+        with logging_mutex:
+            logger_proxy.info(f"Reading reference file {reference_file}, file number {reference_file_num + 1}/{len(options.reference)}")
+            
+        fhr = open(reference_file, "r")
+        for line in fhr:
+            if line[0] == ">":
+                old_name_of_reference_sequence = line.strip()[1:]
+                new_name_of_reference_sequence = f"reference_{reference_sequence_number}"
+                reference_sequence_number += 1
+                fhw.write(f">{new_name_of_reference_sequence}\n")
+                fhw_mapping(f"{old_name_of_reference_sequence}\t{new_name_of_reference_sequence}\n")
+            else:
+                fhw.write(line)
+        fhr.close()
+    fhw.close()
+    fhw_mapping.close()
+
+def main():
+    commandLineArg = sys.argv
+    if len( commandLineArg ) == 1:
+        print( "Please use the --help option to get usage information" )
+    options = parseCommandLineArguments()
+    logger_proxy, logging_mutex = configureLogger( options )
+    
+    convertReferenceIds(options, logger_proxy, logging_mutex)
+    
+    
+
+if __name__ == "__main__":
+    main()

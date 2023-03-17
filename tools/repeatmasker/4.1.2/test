@@ -1,0 +1,9 @@
+cwltool \
+--singularity \
+--outdir /project/maizegdb/sagnik/FINDER/testing/tools/repeatmasker \
+/project/maizegdb/sagnik/FINDER/Finder/tools/repeatmasker/4.1.2/repeatmasker.cwl \
+--sequence_fasta_file /project/maizegdb/sagnik/FINDER/testing/reference/Arabidopsis_thaliana.TAIR10.dna.chromosome.1.fa \
+--threads 72 \
+--species arabidopsis \
+1> /project/maizegdb/sagnik/FINDER/testing/tools/repeatmasker.output \
+2> /project/maizegdb/sagnik/FINDER/testing/tools/repeatmasker.error

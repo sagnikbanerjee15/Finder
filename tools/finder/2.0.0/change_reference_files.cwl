@@ -8,10 +8,7 @@ baseCommand:
   - change_reference_ids
 inputs:
   - id: reference
-    type:
-      - File
-      - type: array
-        items: File
+    type: 'File[]'
     inputBinding:
       position: 0
       prefix: '--reference'
@@ -38,7 +35,7 @@ arguments:
           return "--modified_reference modified_reference.fasta"
       }
 requirements:
-  - class: InlineJavascriptRequirement
   - class: ShellCommandRequirement
   - class: DockerRequirement
-    dockerPull: 'ghcr.io/sagnikbanerjee15/tools_and_pipelines/finder:2.0.0'
+    dockerPull: 'ghcr.io/tools_and_pipelines/finder:2.0.0'
+  - class: InlineJavascriptRequirement

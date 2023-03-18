@@ -7,31 +7,43 @@ $namespaces:
 inputs:
   - id: threads
     type: int?
-    'sbg:x': -616
-    'sbg:y': -74
+    'sbg:x': 0
+    'sbg:y': 160.5
   - id: SRA_accession
     type: string
-    'sbg:x': -626
-    'sbg:y': 182
+    'sbg:x': 0
+    'sbg:y': 267.5
 outputs:
   - id: pair2_fasta
     outputSource:
       - sratools_fasterq_dump/pair2_fasta
     type: File?
-    'sbg:x': -218.109375
-    'sbg:y': -123.5
+    'sbg:x': 513.29345703125
+    'sbg:y': 0
   - id: pair1_fasta
     outputSource:
       - sratools_fasterq_dump/pair1_fasta
     type: File?
-    'sbg:x': -120.109375
-    'sbg:y': 107.5
+    'sbg:x': 513.29345703125
+    'sbg:y': 107
   - id: fastas
     outputSource:
       - sratools_fasterq_dump/fastas
     type: 'File[]'
-    'sbg:x': -238.109375
-    'sbg:y': 327.5
+    'sbg:x': 513.29345703125
+    'sbg:y': 428
+  - id: fasterq_dump_output
+    outputSource:
+      - sratools_fasterq_dump/fasterq_dump_output
+    type: File
+    'sbg:x': 513.29345703125
+    'sbg:y': 214
+  - id: fasterq_dump_error
+    outputSource:
+      - sratools_fasterq_dump/fasterq_dump_error
+    type: File
+    'sbg:x': 513.29345703125
+    'sbg:y': 321
 steps:
   - id: sratools_fasterq_dump
     in:
@@ -43,8 +55,10 @@ steps:
       - id: fastas
       - id: pair1_fasta
       - id: pair2_fasta
+      - id: fasterq_dump_output
+      - id: fasterq_dump_error
     run: ../tools/sratools/3.0.0/fasterq_dump.cwl
     label: sratools_fasterq_dump
-    'sbg:x': -350
-    'sbg:y': 46
+    'sbg:x': 175.453125
+    'sbg:y': 186
 requirements: []

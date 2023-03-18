@@ -86,6 +86,13 @@ inputs:
       position: 0
       prefix: '--outFilterMatchNminOverLread'
       shellQuote: false
+  - 'sbg:toolDefaultValue': '50'
+    id: seedPerWindowNmax
+    type: int?
+    inputBinding:
+      position: 0
+      prefix: '--seedPerWindowNmax'
+      shellQuote: false
 outputs:
   - id: alignment_file
     type: File
@@ -102,11 +109,19 @@ outputs:
   - id: unmapped_1
     type: File?
     outputBinding:
-      glob: '*unmapped*1*fastq'
+      glob: '*unmapped*1*fast*'
   - id: unmapped_2
     type: File?
     outputBinding:
-      glob: '*unmapped*2*fastq'
+      glob: '*unmapped*2*fast*'
+  - id: star_align_output
+    type: File
+    outputBinding:
+      glob: '*output'
+  - id: star_align_error
+    type: File
+    outputBinding:
+      glob: '*error'
 label: star_align
 arguments:
   - position: 1
@@ -208,10 +223,18 @@ arguments:
           if(inputs.splice_junction_db_file == undefined)
               return "STAR --genomeDir "+inputs.genome_directory.path
           else
-              return "mkdir star_index && cp -r "+inputs.genome_directory.path+"/* star_index/ && STAR --genomeDir star_index"
+              return "mkdir star_index && ln -s "+inputs.genome_directory.path+"  star_index && STAR --genomeDir star_index"
       }
 requirements:
   - class: ShellCommandRequirement
   - class: DockerRequirement
     dockerPull: 'sagnikbanerjee15/star:2.7.10a'
   - class: InlineJavascriptRequirement
+stdout: |-
+  ${
+      return inputs.raw_input_files_pair1.nameroot + "_star_align_"+inputs.RG_id+".output"
+  }
+stderr: |-
+  ${
+      return inputs.raw_input_files_pair1.nameroot + "_star_align_"+inputs.RG_id+".error"
+  }

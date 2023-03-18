@@ -31,6 +31,14 @@ outputs:
     type: File?
     outputBinding:
       glob: '*_2.fasta'
+  - id: fasterq_dump_output
+    type: File
+    outputBinding:
+      glob: '*output'
+  - id: fasterq_dump_error
+    type: File
+    outputBinding:
+      glob: '*error'
 label: sratools_fasterq_dump
 arguments:
   - position: 0
@@ -73,3 +81,5 @@ requirements:
   - class: DockerRequirement
     dockerPull: 'ncbi/sra-tools:3.0.1'
   - class: InlineJavascriptRequirement
+stdout: fasterq_dump.output
+stderr: fasterq_dump.error

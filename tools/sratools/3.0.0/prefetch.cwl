@@ -40,7 +40,9 @@ arguments:
           return "--quiet"
       }
 requirements:
-  - class: InlineJavascriptRequirement
   - class: ShellCommandRequirement
   - class: DockerRequirement
     dockerPull: 'ncbi/sra-tools:3.0.1'
+  - class: InlineJavascriptRequirement
+stdout: prefetch.output
+stderr: prefetch.error

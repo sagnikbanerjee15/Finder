@@ -111,10 +111,13 @@ def generateDockerImagesLocally(options):
 
     list_of_software = glob.glob(f"{options.output_directory}/for_docker_image_generation/dockerfiles/*")
     for each_software_directory in list_of_software:
-        print(each_software_directory)
         version = glob.glob(f"{each_software_directory}/*")[0].split("/")[-1]
-        os.chdir(each_software_directory)
-        print(each_software_directory, version)
+        os.chdir(f"{each_software_directory}/{version}")
+        software_name = each_software_directory.split("/")[-1]
+        cmd = f"docker build sagnikbanerjee15/{software_name}:{version} ."
+        os.system(cmd)
+        print(each_software_directory, software_name, version)
+        
 
 def main():
     commandLineArg = sys.argv

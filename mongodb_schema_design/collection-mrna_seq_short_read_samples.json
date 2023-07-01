@@ -1,0 +1,78 @@
+{
+	"finder_project_name": "",
+	"bio_project_id": "",
+	"sra_accession": "",
+	"description": "",
+	"tissue_type": "",
+	"ended": "",
+	"date": "",
+	"raw_data_files_full_path": [],
+	"skip": 0,
+	"star_alignment_summary": {
+		"round1": {
+			"total_number_of_reads": 0,
+			"percentage_of_uniquely_mapped_reads": 0,
+			"percentage_of_multi_mapped_reads": 0,
+			"percentage_of_unmapped_reads": 0,
+			"duration_in_sec": 0,
+			"number_of_cores": 0,
+			"number_of_splice_sites_detected": 0
+		},
+		"round2": {
+			"total_number_of_reads": 0,
+			"percentage_of_uniquely_mapped_reads": 0,
+			"percentage_of_multi_mapped_reads": 0,
+			"percentage_of_unmapped_reads": 0,
+			"duration_in_sec": 0,
+			"number_of_cores": 0,
+			"number_of_splice_sites_detected": 0
+		},
+		"round3": {
+			"total_number_of_reads": 0,
+			"percentage_of_uniquely_mapped_reads": 0,
+			"percentage_of_multi_mapped_reads": 0,
+			"percentage_of_unmapped_reads": 0,
+			"duration_in_sec": 0,
+			"number_of_cores": 0,
+			"number_of_splice_sites_detected": 0
+		},
+		"merged_after_3_rounds_of_STAR_alignment_samfile": {
+			"path": "",
+			"checksum": "",
+			"description": "Alignment file in SAM format merged from all three rounds of STAR"
+		},
+		"consolidated_summary_before_dense_ultra_long_intron_removal": {
+			"total_number_of_reads": 0,
+			"percentage_of_uniquely_mapped_reads": 0,
+			"percentage_of_multi_mapped_reads": 0,
+			"percentage_of_unmapped_reads": 0,
+			"duration_in_sec": 0,
+			"number_of_cores": 0,
+			"number_of_splice_sites_detected": 0
+		},
+		"ultra_long_introns_with_mappings_inside_them_removed_samfile": {
+			"path": "",
+			"checksum": "",
+			"description": "Alignment file in SAM format after removing mappings with ultra long introns that harbour a high density of other read mappings. Possibly spurious"
+		},
+		"consolidated_summary_after_dense_ultra_long_intron_removal": {
+			"total_number_of_reads": 0,
+			"percentage_of_uniquely_mapped_reads": 0,
+			"percentage_of_multi_mapped_reads": 0,
+			"percentage_of_unmapped_reads": 0,
+			"duration_in_sec": 0,
+			"number_of_cores": 0,
+			"number_of_splice_sites_detected": 0
+		},
+		"regions_of_low_short_read_coverage_file": {
+			"path": "",
+			"checksum": "",
+			"description": "File contains the loci where  short-read sample has insufficient read coverage. Tab delimited 3 columns -> chromosome, start, end"
+		},
+		"final_alignment_bamfile": {
+			"path": "",
+			"checksum": "",
+			"description": ""
+		}
+	}
+}

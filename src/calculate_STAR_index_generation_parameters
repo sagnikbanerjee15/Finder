@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+
+######################################################################################################################################################################################
+#  Version 2.0
+#  Developed by Sagnik Banerjee
+
+# Usage: calculate_STAR_index_generation_parameters --reference <filename(s)> --genomeSAindexNbases_filename <filename> --genomeChrBinNbits_filename <filename> 
+######################################################################################################################################################################################
+
+
+from argparse import RawTextHelpFormatter
+from builtins import enumerate, list
+from collections import OrderedDict
+from copy import deepcopy
+from itertools import groupby
+from operator import itemgetter
+from pathlib import Path
+
+import argparse
+import collections
+import copy
+import glob
+import importlib
+import itertools
+import math
+import multiprocessing
+import os
+import pickle
+import pprint
+import random
+import re
+import statistics
+import subprocess
+import sys
+import time
+import numpy as np
+import pandas as pd
+import cwltool
+import logging
+
+def parseCommandLineArguments():
+    parser = argparse.ArgumentParser( prog = "change_reference_ids", description = "Merges multiple reference files in fasta format into one. Converts the reference names into non-ambiguous identifiers", formatter_class = RawTextHelpFormatter )
+    parser.add_argument( '--version', action = 'version', version = '%(prog)s-v2.0.0' )
+    
+    parser.add_argument( "--reference", "-reference", help = "Enter the reference file", required = True)
+    parser.add_argument( "--genomeSAindexNbases_filename", "-genomeSAindexNbases_filename", help = "Enter the name of the modified file where SA index value will be stored", required = True)
+    parser.add_argument( "--genomeChrBinNbits_filename", "-genomeChrBinNbits_filename", help = "Enter the name of the file where the ChrBinNbits will be stored", required = True)
+
+    return parser.parse_args()
+
+def calculateSTARIndexGenerationParameters(options):
+    """
+    """
+    number_of_reference_sequences = 0
+    total_length_of_genome = 0
+
+    fhr = open(options.reference, "r")
+    for line in fhr:
+        if line[0] == ">":
+            number_of_reference_sequences += 1
+        else:
+            total_length_of_genome += len(line.strip())
+    fhr.close()
+
+    fhw = open(options.genomeSAindexNbases_filename, "w")
+    fhw.write(str(  min(14, math.log2(total_length_of_genome)/2 - 1) ))
+    fhw.close()
+
+    fhw = open(options.genomeChrBinNbits_filename, "w")
+    fhw.write(str( min(18, math.log2(total_length_of_genome/number_of_reference_sequences)   )))
+    fhw.close()
+
+def main():
+    commandLineArg = sys.argv
+    if len( commandLineArg ) == 1:
+        print( "Please use the --help option to get usage information" )
+    options = parseCommandLineArguments()
+    
+    calculateSTARIndexGenerationParameters(options)
+    
+if __name__ == "__main__":
+    main()

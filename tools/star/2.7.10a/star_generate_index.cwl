@@ -51,6 +51,7 @@ arguments:
       ${return "--genomeChrBinNbits `cat
       "+inputs.genome_chr_bin_n_bits.path+"`"}
 requirements:
+  - class: InlineJavascriptRequirement
   - class: ShellCommandRequirement
   - class: ResourceRequirement
     coresMin: 0

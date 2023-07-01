@@ -100,12 +100,6 @@ outputs:
     type: File
     'sbg:x': 2349.228759765625
     'sbg:y': 501.32647705078125
-  - id: merged_bam
-    outputSource:
-      - samtools_merge/output_bam
-    type: File?
-    'sbg:x': 2664.881591796875
-    'sbg:y': 1042.9794921875
   - id: star_align_round1_output
     outputSource:
       - star_align_round_1/star_align_output
@@ -142,6 +136,12 @@ outputs:
     type: File
     'sbg:x': 1703.41455078125
     'sbg:y': -154.26419067382812
+  - id: output_sam
+    outputSource:
+      - samtools_merge/output_sam
+    type: File?
+    'sbg:x': 2580.591552734375
+    'sbg:y': 925.5758666992188
 steps:
   - id: star_align_round_1
     in:
@@ -285,7 +285,7 @@ steps:
           - star_align_round_2/alignment_file
           - star_align_round_3/alignment_file
       - id: output_format
-        default: BAM
+        default: SAM
       - id: threads
         source: threads
     out:

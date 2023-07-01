@@ -74,6 +74,7 @@ def parseCommandLineArguments():
     required_named.add_argument( "--logfilename", "-logfilename", help = "Enter the name of the log file", default = "change_reference_ids.log")
 
     # Optional arguments
+    optional_named.add_argument( "--compose_docker_files", help = "Set this argument to enforce compilation of docker images locally", action = "store_true")
     optional_named.add_argument( "--cpu", "-n", help = "Enter the number of CPUs to be used.", default = 1 )
     optional_named.add_argument( "--verbose", "-verb", default = 1, help = "Enter a verbosity level" )
     optional_named.add_argument( "--protein", "-p", help = "Enter the protein fasta" )
@@ -116,9 +117,20 @@ def configureLogger( options ):
     arguments["level"] = logging.DEBUG
     arguments["delay"] = False
 
-    ( logger_proxy, logging_mutex ) = make_shared_logger_and_proxy ( setup_std_shared_logger, "CHANGE REFERENCE ID", arguments )
+    ( logger_proxy, logging_mutex ) = make_shared_logger_and_proxy ( setup_std_shared_logger, "FINDER", arguments )
 
     return logger_proxy, logging_mutex
+
+def generateDockerImagesLocally(options):
+    """
+    """
+    cmd = f"mkdir -p {options.output_directory}/for_docker_image_generation"
+    os.system(cmd)
+
+    cmd = f"git clone https://github.com/sagnikbanerjee15/Finder.git {options.output_directory}/for_docker_image_generation"
+    os.system(cmd)
+
+    list_of_software = glob.glob(f"{options.output_directory}/for_docker_image_generation/dockerfiles")
 
 def main():
     commandLineArg = sys.argv
@@ -126,6 +138,17 @@ def main():
         print( "Please use the --help option to get usage information" )
     options = parseCommandLineArguments()
     logger_proxy, logging_mutex = configureLogger( options )
+
+    
+    if options.compose_docker_files == True:
+        with logging_mutex:
+            logger_proxy.info("Starting the generation of docker images locally")
+        generateDockerImagesLocally(options)
+        with logging_mutex:
+            logger_proxy.info("Docker image creation is complete")
+    else:
+        with logging_mutex:
+            logger_proxy.info("Docker images will not be generated locally but will be pulled from ghcr")
 
 if __name__ == "__main__":
     main()

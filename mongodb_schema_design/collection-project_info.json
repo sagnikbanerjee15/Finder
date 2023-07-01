@@ -1,0 +1,31 @@
+{
+    "finder_project_name": "",
+    "mrna_seq_short_read_samples": {
+        "present": 0,
+        "total_number_of_rna_seq_samples": 0,
+        "total_number_of_tissue_types": 0
+    },
+    "genome_file": {
+        "path": "",
+        "checksum": "",
+        "description": "Raw genome file submitted by user for annotation"
+    },
+    "genome_file_reference_ids_altered": {
+        "path": "",
+        "checksum": "",
+        "description": "Altered genome file with substituted reference IDSs"
+    },
+    "original_reference_id_mapping_to_finder_reference_id_file": {
+        "path": "",
+        "checksum": "",
+        "description": "Tab delimited file containing the mapping between original reference IDs and finder introduced reference IDs."
+    },
+    "star_index_directory": {
+        "path": ""
+    },
+    "regions_of_low_short_read_coverage_consolidated_file": {
+        "path": "",
+        "checksum": "",
+        "description": "File contains the loci where no RNA-Seq short read sample has sufficient reads. Tab delimited 3 columns -> chromosome, start, end"
+    }
+}

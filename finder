@@ -33,30 +33,9 @@ import statistics
 import subprocess
 import sys
 import time
-import numpy as np
-import pandas as pd
-import cwltool
 import logging
 
 from ruffus.proxy_logger import *
-from scripts.alignReads import *
-from scripts.determineOptimalStartingPoint import *
-from scripts.fileReadWriteOperations import *
-from scripts.findGenesFromExpression import *
-from scripts.findTranscriptsInEachSampleNotReportedInCombinedAnnotations import *
-from scripts.fixOverlappingAndMergedTranscripts import *
-from scripts.fixTranscriptsConnectingTwoTranscripts import *
-from scripts.generateGenomicAndTranscriptomicCounts import *
-from scripts.mergeCloselySpacedTranscripts import *
-from scripts.performAssembly import *
-from scripts.predictCDS import *
-from scripts.predictGenesUsingBRAKER import *
-from scripts.removeRedundantTranscripts import *
-from scripts.removeSpuriousTranscriptsBasedOnCDS import *
-from scripts.runCommand import *
-from scripts.splitTranscriptsWithQuestionableSpliceJunctions import *
-from scripts.transcriptToConditions import *
-from scripts.verifyInstallations import *
 
 
 def parseCommandLineArguments():
@@ -130,7 +109,12 @@ def generateDockerImagesLocally(options):
     cmd = f"git clone https://github.com/sagnikbanerjee15/Finder.git {options.output_directory}/for_docker_image_generation"
     os.system(cmd)
 
-    list_of_software = glob.glob(f"{options.output_directory}/for_docker_image_generation/dockerfiles")
+    list_of_software = glob.glob(f"{options.output_directory}/for_docker_image_generation/dockerfiles/*")
+    for each_software_directory in list_of_software:
+        print(each_software_directory)
+        version = glob.glob(f"{each_software_directory}/*")[0].split("/")[-1]
+        os.chdir(each_software_directory)
+        print(each_software_directory, version)
 
 def main():
     commandLineArg = sys.argv
@@ -138,6 +122,8 @@ def main():
         print( "Please use the --help option to get usage information" )
     options = parseCommandLineArguments()
     logger_proxy, logging_mutex = configureLogger( options )
+
+    os.system(f"mkdir -p {options.output_directory}")
 
     
     if options.compose_docker_files == True:

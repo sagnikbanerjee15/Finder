@@ -31,12 +31,13 @@ ${CWL_INPUT_JSON_DIRECTORY}/align_with_star_multiple_rounds_PE.json \
 2> ${TESTING_DIRECTORY_ROOT}/workflows/align_with_star_multiple_rounds_PE.error &
 
 
-finder \
+nohup python3 /home/ubuntu/work/FINDER/Finder/finder \
 --metadatafile /home/ubuntu/work/FINDER/Finder/tests/finder/arath/metadata.csv \
---genome /home/ubuntu/work/FINDER/Finder/data/reference/arath/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa \
+--genome /home/ubuntu/work/FINDER/data/reference/arath/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa \
 --cpu 64 \
---output_directory /home/ubuntu/work/FINDER/Finder/data/finder_testing/arath \
+--compose_docker_files \
+--output_directory /home/ubuntu/work/FINDER/data/finder_testing/arath \
 --organism_model VERT \
---logfilename /home/ubuntu/work/FINDER/Finder/data/finder_testing/arath.log \
-1> /home/ubuntu/work/FINDER/Finder/data/finder_testing.output \
-2> /home/ubuntu/work/FINDER/Finder/data/finder_testing.error 
+--logfilename /home/ubuntu/work/FINDER/data/finder_testing/arath.log \
+1> /home/ubuntu/work/FINDER/data/finder_testing.output \
+2> /home/ubuntu/work/FINDER/data/finder_testing.error &
